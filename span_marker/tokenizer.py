@@ -88,7 +88,10 @@ class SpanMarkerTokenizer:
         for sample_idx, input_ids in enumerate(batch_encoding["input_ids"]):
             word_ids = itertools.takewhile(lambda word_id: word_id is not None, batch_encoding.word_ids(sample_idx)[1:])
             num_words = max(word_ids) + 1
-            num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
+            if self.tokenizer.pad_token_id in input_ids:
+                num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
+            else:
+                num_tokens = len(input_ids)
             if labels:
                 span_to_label = {(start_idx, end_idx): label for label, start_idx, end_idx in labels[sample_idx]}
                 spans, span_labels = zip(
