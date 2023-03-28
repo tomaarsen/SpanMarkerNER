@@ -28,14 +28,16 @@ class SpanMarkerDataCollator:
 
             # Prepare input_ids by padding and adding start and end markers
             if not isinstance(input_ids, torch.Tensor):
-                input_ids = torch.tensor(input_ids)
+                input_ids = torch.tensor(input_ids, dtype=torch.int)
+            else:
+                input_ids.to(torch.int)
             input_ids = F.pad(input_ids, (0, total_size - len(input_ids)), value=self.tokenizer.pad_token_id)
             input_ids[start_marker_idx : start_marker_idx + num_spans] = self.tokenizer.start_marker_id
             input_ids[end_marker_idx : end_marker_idx + num_spans] = self.tokenizer.end_marker_id
             batch["input_ids"].append(input_ids)
 
             # Prepare position IDs
-            position_ids = torch.arange(num_tokens) + 2
+            position_ids = torch.arange(num_tokens, dtype=torch.int) + 2
             position_ids = F.pad(position_ids, (0, total_size - len(position_ids)), value=0)
             position_ids[start_marker_idx : start_marker_idx + num_spans] = (
                 torch.tensor(sample["start_position_ids"]) + 2
