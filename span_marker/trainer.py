@@ -116,6 +116,10 @@ class Trainer(TransformersTrainer):
         optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
         preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
     ) -> None:
+        if model_init:
+            self.model_init = model_init
+            model = self.call_model_init()
+
         # TODO: Move this pre-processing into reusable methods?
         # Convert dataset labels to a common format (list of label-start-end tuples)
         label_normalizer = AutoLabelNormalizer.from_config(model.config)
@@ -147,9 +151,10 @@ class Trainer(TransformersTrainer):
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
             tokenizer=model.tokenizer,  # <- Might be needed for saving a model
-            model_init=model_init,
+            model_init=None,
             compute_metrics=lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction),
             callbacks=callbacks,
             optimizers=optimizers,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
         )
+        self.model_init = model_init
