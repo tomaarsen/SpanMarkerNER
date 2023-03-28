@@ -1,0 +1,23 @@
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+        exclude_types: [text, jupyter]
+      - id: trailing-whitespace
+
+  - repo: https://github.com/psf/black
+    rev: 23.1.0
+    hooks:
+      - id: black
+        additional_dependencies: ["click==8.0.4"]
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.0.254
+    hooks:
+      # Simulate isort via (the much faster) ruff
+      - id: ruff
+        args:
+          - --select=I
+          - --fix
