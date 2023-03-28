@@ -68,6 +68,7 @@ class SpanMarkerTokenizer:
             **kwargs,
             is_split_into_words=is_split_into_words,
             padding="max_length",
+            truncation=True,
             max_length=self.model_max_length,
             return_tensors="pt",
         )
