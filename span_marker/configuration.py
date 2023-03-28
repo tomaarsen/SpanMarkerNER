@@ -15,24 +15,37 @@ class SpanMarkerConfig(PretrainedConfig):
         entity_max_length: int = 16,
         **kwargs,
     ) -> None:
-        # if encoder_config is None:
-        #     raise Exception("`encoder_config` must be provided.")
         self.encoder = encoder_config
         self.model_max_length = model_max_length
         self.model_max_length_default = 512
         self.marker_max_length = marker_max_length
         self.entity_max_length = entity_max_length
         super().__init__(**kwargs)
-        if encoder_config is None:
-            return
-
-        # These are automatically set, but we want to rely on the encoder configs instead if we can,
-        # so we delete them.
+        # These are automatically set by super().__init__, but we want to rely on
+        # the encoder configs instead if we can, so we delete them.
         del self.id2label
         del self.label2id
 
+        if encoder_config is None:
+            return
+
+        # If the id2label of the encoder is not overridden
+        if self.id2label == {0: "LABEL_0", 1: "LABEL_1"}:
+            raise ValueError(
+                "Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.\n"
+                ">>> SpanMarkerModel.from_pretrained(\n"
+                '...     "roberta-large",\n'
+                '...     labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...]\n'
+                "... )\n"
+                "or\n"
+                ">>> SpanMarkerModel.from_pretrained(\n"
+                '...     "roberta-large",\n'
+                '...     labels=["O", "PER", "ORG", "LOC", "MISC"]\n'
+                "... )"
+            )
+
         if self.id2label and "O" not in self.label2id:
-            raise Exception("There must be an O label.")
+            raise Exception("There must be an 'O' label.")
 
         # TODO: Consider converting this into several properties
         if self.are_labels_schemed():
@@ -43,9 +56,8 @@ class SpanMarkerConfig(PretrainedConfig):
             }
             self.id2label = dict(enumerate(reduced_labels))
             self.label2id = {v: k for k, v in self.id2label.items()}
-            self.outside_id = self.id2reduced_id[self.label2id["O"]]  # <- always 0
+            self.outside_id = 0
         else:
-            self.id2reduced_id = None
             self.outside_id = self.label2id["O"]
 
     def __setattr__(self, name, value) -> None:

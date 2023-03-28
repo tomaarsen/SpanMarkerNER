@@ -136,9 +136,6 @@ class SpanMarkerModel(PreTrainedModel):
             config_kwargs["id2label"] = dict(enumerate(labels))
             # if "label2id" not in kwargs:
             config_kwargs["label2id"] = {v: k for k, v in config_kwargs["id2label"].items()}
-            config_kwargs["num_labels"] = len(labels)
-        else:
-            raise Exception("Must provide `labels` list to `SpanMarkerModel.from_pretrained`.")
 
         config = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs, **config_kwargs)
 
