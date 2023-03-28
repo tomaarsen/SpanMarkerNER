@@ -1,5 +1,6 @@
 import itertools
 import os
+import warnings
 from typing import Dict, Generator, Iterator, List, Tuple, Union
 
 import torch
@@ -12,7 +13,7 @@ from span_marker.configuration import SpanMarkerConfig
 
 class SpanMarkerTokenizer:
     # def __init__(self, model: SpanMarkerModel, tokenizer: PreTrainedTokenizer, **kwargs):
-    def __init__(self, tokenizer: PreTrainedTokenizer, config=None, **kwargs) -> None:
+    def __init__(self, tokenizer: PreTrainedTokenizer, config, **kwargs) -> None:
         # super().__init__(**kwargs)
         # self.model = model
         self.tokenizer = tokenizer
@@ -25,33 +26,39 @@ class SpanMarkerTokenizer:
 
         # TODO: This could be done more cleverly. Perhaps I can just subclass PreTrainedTokenizerFast?
         # I'm concerned about .from_pretrained not initializing a SpanMarkerTokenizer though.
+
+        if self.tokenizer.model_max_length > 1e29 and self.config.model_max_length is None:
+            warnings.warn(
+                f"Base {self.tokenizer.__class__.__name__} nor {self.config.__class__.__name__} specify"
+                f" `model_max_length`: defaulting to {self.model_max_length_default} tokens."
+            )
+        self.model_max_length = min(
+            self.tokenizer.model_max_length, self.config.model_max_length or self.config.model_max_length_default
+        )
         self.pad = tokenizer.pad
         self.save_pretrained = tokenizer.save_pretrained
         self.decode = tokenizer.decode
-        self.model_max_length = self.tokenizer.model_max_length
         self.pad_token_id = self.tokenizer.pad_token_id
         self.eos_token_id = self.tokenizer.eos_token_id
 
-    def get_all_valid_spans(self, num_words: int, max_entity_length: int) -> Iterator[Tuple[int, int]]:
+    def get_all_valid_spans(self, num_words: int, entity_max_length: int) -> Iterator[Tuple[int, int]]:
         for start_idx in range(num_words):
-            for end_idx in range(start_idx + 1, min(num_words + 1, start_idx + 1 + max_entity_length)):
+            for end_idx in range(start_idx + 1, min(num_words + 1, start_idx + 1 + entity_max_length)):
                 yield (start_idx, end_idx)
 
     def get_all_valid_spans_and_labels(
-        self, num_words: int, label_ids_dict: Dict[Tuple[int, int], int], max_entity_length: int, outside_id: int
+        self, num_words: int, span_to_label: Dict[Tuple[int, int], int], entity_max_length: int, outside_id: int
     ) -> Iterator[Tuple[Tuple[int, int], int]]:
-        for span in self.get_all_valid_spans(num_words, max_entity_length):
-            yield span, label_ids_dict.get(span, outside_id)
+        for span in self.get_all_valid_spans(num_words, entity_max_length):
+            yield span, span_to_label.get(span, outside_id)
 
-    def __call__(
-        self, inputs, config: SpanMarkerConfig = None, labels=None, return_num_words: bool = False, **kwargs
-    ) -> Dict[str, List]:
-        config = config or self.config
-        if config is None:
-            raise Exception(
-                "Please provide `SpanMarkerTokenizer` with a `SpanMarkerConfig` instance via the `config` keyword argument."
-            )
-        self.config = config
+    def __call__(self, inputs, labels=None, return_num_words: bool = False, **kwargs) -> Dict[str, List]:
+        # config = config or self.config
+        # if config is None:
+        #     raise Exception(
+        #         "Please provide `SpanMarkerTokenizer` with a `SpanMarkerConfig` instance via the `config` keyword argument."
+        #     )
+        # self.config = config
 
         # TODO: Increase robustness of this
         # TODO: Ensure that inputs is a list of pretokenized words
@@ -61,12 +68,15 @@ class SpanMarkerTokenizer:
 
         # TODO: one-by-one tokenization to create smaller input_ids?
         # input_ids are already shrunk later on
-        kwargs["padding"] = "max_length"
-        kwargs["return_tensors"] = "pt"
-        # TODO: Undo this
         batch_encoding = self.tokenizer(
-            inputs, **kwargs, is_split_into_words=is_split_into_words, max_length=256
-        )  # <- TODO: Remove the hardcoding!
+            inputs,
+            **kwargs,
+            is_split_into_words=is_split_into_words,
+            padding="max_length",
+            # truncation="max_length",
+            max_length=self.model_max_length,
+            return_tensors="pt",
+        )
 
         all_input_ids = []
         all_num_spans = []
@@ -80,19 +90,19 @@ class SpanMarkerTokenizer:
             num_words = max(word_ids) + 1
             num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
             if labels:
-                label_ids_dict = {(start_idx, end_idx): label for label, start_idx, end_idx in labels[sample_idx]}
+                span_to_label = {(start_idx, end_idx): label for label, start_idx, end_idx in labels[sample_idx]}
                 spans, span_labels = zip(
                     *list(
                         self.get_all_valid_spans_and_labels(
-                            num_words, label_ids_dict, config.max_entity_length, config.outside_id
+                            num_words, span_to_label, self.config.entity_max_length, self.config.outside_id
                         )
                     )
                 )
             else:
-                spans = list(self.get_all_valid_spans(num_words, config.max_entity_length))
+                spans = list(self.get_all_valid_spans(num_words, self.config.entity_max_length))
 
-            for group_start_idx in range(0, len(spans), config.max_marker_length):
-                group_spans = spans[group_start_idx : group_start_idx + config.max_marker_length]
+            for group_start_idx in range(0, len(spans), self.config.marker_max_length):
+                group_spans = spans[group_start_idx : group_start_idx + self.config.marker_max_length]
                 group_word_starts, group_word_ends = zip(*group_spans)
                 group_num_spans = len(group_spans)
 
@@ -110,7 +120,7 @@ class SpanMarkerTokenizer:
                 all_end_position_ids.append(end_position_ids)
 
                 if labels:
-                    group_labels = span_labels[group_start_idx : group_start_idx + config.max_marker_length]
+                    group_labels = span_labels[group_start_idx : group_start_idx + self.config.marker_max_length]
                     all_labels.append(group_labels)
 
                 if return_num_words:

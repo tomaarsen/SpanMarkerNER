@@ -8,13 +8,20 @@ class SpanMarkerConfig(PretrainedConfig):
     model_type: str = "span-marker"
 
     def __init__(
-        self, encoder_config: Optional[Dict[str, Any]] = None, max_marker_length=256, max_entity_length=16, **kwargs
+        self,
+        encoder_config: Optional[Dict[str, Any]] = None,
+        model_max_length: Optional[int] = None,
+        marker_max_length: int = 256,
+        entity_max_length: int = 16,
+        **kwargs,
     ) -> None:
         # if encoder_config is None:
         #     raise Exception("`encoder_config` must be provided.")
         self.encoder = encoder_config
-        self.max_marker_length = max_marker_length
-        self.max_entity_length = max_entity_length
+        self.model_max_length = model_max_length
+        self.model_max_length_default = 512
+        self.marker_max_length = marker_max_length
+        self.entity_max_length = entity_max_length
         super().__init__(**kwargs)
         if encoder_config is None:
             return

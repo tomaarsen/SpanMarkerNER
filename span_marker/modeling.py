@@ -30,7 +30,7 @@ class SpanMarkerModel(PreTrainedModel):
     config_class = SpanMarkerConfig
     base_model_prefix = "encoder"
 
-    def __init__(self, config: SpanMarkerConfig, encoder=None):
+    def __init__(self, config: SpanMarkerConfig, encoder=None, **kwargs):
         super().__init__(config)
         self.config = config
         # `encoder` will be specified if this Model is initializer via .from_pretrained with an encoder
@@ -42,10 +42,7 @@ class SpanMarkerModel(PreTrainedModel):
             # Load the encoder via the Config to prevent having to use AutoModel.from_pretrained, which
             # could load e.g. all of `roberta-large` from the Hub unnecessarily.
             # However, use the SpanMarkerModel updated vocab_size
-            encoder_config = AutoConfig.from_pretrained(
-                self.config.encoder["_name_or_path"],
-                **self.config.encoder,
-            )
+            encoder_config = AutoConfig.from_pretrained(self.config.encoder["_name_or_path"], **self.config.encoder)
             encoder = AutoModel.from_config(encoder_config)
         self.encoder = encoder
 
@@ -55,11 +52,20 @@ class SpanMarkerModel(PreTrainedModel):
             self.dropout = nn.Identity()
         # TODO: hidden_size is not always defined
         self.classifier = nn.Linear((self.config.hidden_size or 768) * 2, self.config.num_labels)
-
         self.loss_func = nn.CrossEntropyLoss()
+
+        # tokenizer and data collator are filled using set_tokenizer
+        self.tokenizer = None
+        self.data_collator = None
 
         # Initialize weights and apply final processing
         self.post_init()
+
+    def set_tokenizer(self, tokenizer: SpanMarkerTokenizer) -> None:
+        self.tokenizer = tokenizer
+        self.data_collator = SpanMarkerDataCollator(
+            tokenizer=tokenizer, marker_max_length=self.config.marker_max_length
+        )
 
     def _init_weights(self, module):
         """Initialize the weights"""
@@ -93,13 +99,13 @@ class SpanMarkerModel(PreTrainedModel):
         last_hidden_state = self.dropout(last_hidden_state)
 
         sequence_length = last_hidden_state.size(1)
-        start_marker_idx = sequence_length - 2 * self.config.max_marker_length
-        end_marker_idx = start_marker_idx + self.config.max_marker_length
-        # The start marker embeddings concatenated with the end marker embeddings
+        start_marker_idx = sequence_length - 2 * self.config.marker_max_length
+        end_marker_idx = start_marker_idx + self.config.marker_max_length
         # TODO: Can we use view, which may be more efficient?
         # Answer: Yes, but only if we move to using start-end-...-start-end instead
         # of start-start-...-end-end.
 
+        # The start marker embeddings concatenated with the end marker embeddings
         feature_vector = torch.cat(
             (
                 last_hidden_state[:, start_marker_idx:end_marker_idx],
@@ -138,19 +144,26 @@ class SpanMarkerModel(PreTrainedModel):
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance
         if isinstance(config, cls.config_class):
-            return super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
+            model = super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
 
         # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.)
-        encoder = AutoModel.from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
-        span_marker_config = cls.config_class(encoder_config=config.to_dict())
-        model = cls(span_marker_config, encoder, *model_args, **kwargs)
+        else:
+            encoder = AutoModel.from_pretrained(pretrained_model_name_or_path, *model_args, config=config)
+            config = cls.config_class(encoder_config=config.to_dict())
+            model = cls(config, encoder, *model_args, **kwargs)
+
+        # Pass the tokenizer directly to the model for convenience
+        tokenizer = SpanMarkerTokenizer.from_pretrained(pretrained_model_name_or_path, config=config, **kwargs)
+        model.set_tokenizer(tokenizer)
+        model.resize_token_embeddings(len(tokenizer))
+
         return model
 
-    def predict(self, inputs: Union[str, List[str], List[List[str]]], tokenizer: SpanMarkerTokenizer):
+    def predict(self, inputs: Union[str, List[str], List[List[str]]]):
         # breakpoint()
-        inputs = tokenizer(inputs, config=self.config)
+        inputs = self.tokenizer(inputs, config=self.config)
         inputs = [{key: value[idx] for key, value in inputs.items()} for idx in range(len(inputs["input_ids"]))]
-        inputs = SpanMarkerDataCollator(tokenizer, self.config.max_marker_length)(inputs)
+        inputs = self.data_collator(inputs)
         inputs = {key: value.to(self.device) for key, value in inputs.items()}
         logits = self(**inputs)[0]
         labels = logits.argmax(-1)

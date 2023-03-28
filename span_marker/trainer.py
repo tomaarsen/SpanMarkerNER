@@ -39,13 +39,11 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     sample_dict = {}
     for sample_idx in range(inputs.shape[0]):
         tokens = inputs[sample_idx]
-        eos_idx = tokens.tolist().index(tokenizer.tokenizer.eos_token_id)
-        text = tokenizer.decode(tokens[: eos_idx + 1], skip_special_tokens=True)
-        # token_hash = hash(tokens.data.tobytes())
+        text = tokenizer.decode(tokens, skip_special_tokens=True)
         token_hash = hash(text)
         if token_hash not in sample_dict:
             # TODO: Avoid having to have a config on the tokenizer
-            spans = list(tokenizer.get_all_valid_spans(num_words[sample_idx], tokenizer.config.max_entity_length))
+            spans = list(tokenizer.get_all_valid_spans(num_words[sample_idx], tokenizer.config.entity_max_length))
             sample_dict[token_hash] = {
                 "text": text,
                 "spans": spans,
@@ -121,12 +119,12 @@ class Trainer(TransformersTrainer):
         self,
         model: SpanMarkerModel = None,
         args: TrainingArguments = None,
-        data_collator: Optional[DataCollator] = None,
+        # data_collator: Optional[DataCollator] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
-        tokenizer: SpanMarkerTokenizer = None,
+        # tokenizer: SpanMarkerTokenizer = None,
         model_init: Callable[[], PreTrainedModel] = None,
-        compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
+        # compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
         callbacks: Optional[List[TrainerCallback]] = None,
         optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
         preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
@@ -134,15 +132,16 @@ class Trainer(TransformersTrainer):
         # TODO: Disallow custom compute_metrics and data_collator?
 
         # Ensure that the model is resized to accompany the updated tokenizer (i.e. the added "<start>" and "<end>")
-        model.resize_token_embeddings(len(tokenizer))
+        # model.resize_token_embeddings(len(tokenizer))
 
+        # TODO: Move this pre-processing into reusable methods?
         # Convert dataset labels to a common format (list of label-start-end tuples)
         label_normalizer = AutoLabelNormalizer.from_config(model.config)
         if train_dataset:
             train_dataset = train_dataset.map(label_normalizer, input_columns="ner_tags", batched=True)
             # Tokenize and add start/end markers
             train_dataset = train_dataset.map(
-                lambda batch: tokenizer(batch["tokens"], config=model.config, labels=batch["ner_tags"]),
+                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"]),
                 batched=True,
                 remove_columns=train_dataset.column_names,
             )
@@ -150,17 +149,11 @@ class Trainer(TransformersTrainer):
             eval_dataset = eval_dataset.map(label_normalizer, input_columns="ner_tags", batched=True)
             # Tokenize and add start/end markers, return tokens for use in the metrics computations
             eval_dataset = eval_dataset.map(
-                lambda batch: tokenizer(
-                    batch["tokens"], config=model.config, labels=batch["ner_tags"], return_num_words=True
-                ),
+                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"], return_num_words=True),
                 batched=True,
                 remove_columns=eval_dataset.column_names,
             )
 
-        if data_collator is None:
-            data_collator = SpanMarkerDataCollator(
-                tokenizer=tokenizer, max_marker_length=model.config.max_marker_length
-            )
         if args is None:
             args = TrainingArguments()
         args.include_inputs_for_metrics = True
@@ -168,12 +161,12 @@ class Trainer(TransformersTrainer):
         super().__init__(
             model=model,
             args=args,
-            data_collator=data_collator,
+            data_collator=model.data_collator,
             train_dataset=train_dataset,
             eval_dataset=eval_dataset,
-            tokenizer=tokenizer,
+            tokenizer=model.tokenizer,  # <- Might be needed for saving a model
             model_init=model_init,
-            compute_metrics=lambda eval_prediction: compute_f1_via_seqeval(tokenizer, eval_prediction),
+            compute_metrics=lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction),
             callbacks=callbacks,
             optimizers=optimizers,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,

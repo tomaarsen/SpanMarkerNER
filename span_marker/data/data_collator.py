@@ -12,13 +12,13 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 @dataclass
 class SpanMarkerDataCollator:
     tokenizer: SpanMarkerTokenizer
-    max_marker_length: int
+    marker_max_length: int
     return_tensors: str = "pt"
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, Any]:
-        total_size = self.tokenizer.model_max_length + 2 * self.max_marker_length
+        total_size = self.tokenizer.model_max_length + 2 * self.marker_max_length
         start_marker_idx = self.tokenizer.model_max_length
-        end_marker_idx = self.tokenizer.model_max_length + self.max_marker_length
+        end_marker_idx = self.tokenizer.model_max_length + self.marker_max_length
         batch = defaultdict(list)
         num_words = []
         for sample in features:
@@ -61,7 +61,7 @@ class SpanMarkerDataCollator:
 
             if "labels" in sample:
                 labels = torch.tensor(sample["labels"])
-                labels = F.pad(labels, (0, self.max_marker_length - len(labels)), value=-100)
+                labels = F.pad(labels, (0, self.marker_max_length - len(labels)), value=-100)
                 batch["labels"].append(labels)
 
             if "num_words" in sample:
