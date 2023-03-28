@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import List, Optional, TypeVar, Union
+from typing import Dict, List, Optional, TypeVar, Union
 
 import torch
 from torch import nn
@@ -156,16 +156,79 @@ class SpanMarkerModel(PreTrainedModel):
 
         return model
 
-    def predict(self, inputs: Union[str, List[str], List[List[str]]]):
-        # breakpoint()
-        inputs = self.tokenizer(inputs, config=self.config)
-        inputs = [{key: value[idx] for key, value in inputs.items()} for idx in range(len(inputs["input_ids"]))]
-        inputs = self.data_collator(inputs)
-        inputs = {key: value.to(self.device) for key, value in inputs.items()}
+    def predict_one(
+        self, sentence: Union[str, List[str]], allow_overlapping: bool = False
+    ) -> List[Dict[str, Union[str, int, float]]]:
+        # Tokenization, i.e. computing spans, adding span markers to position_ids
+        tokenized = self.tokenizer(sentence, is_evaluate=True)
+        num_words = tokenized["num_words"][0]
+        # Converting into a common batch format like the data collator wants
+        tokenized = [
+            {key: value[idx] for key, value in tokenized.items()} for idx in range(len(tokenized["input_ids"]))
+        ]
+        # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
+        collated = self.data_collator(tokenized)
+        # Moving the inputs to the right device
+        inputs = {key: value.to(self.device) for key, value in collated.items()}
+
         logits = self(**inputs)[0]
-        labels = logits.argmax(-1)
-        print(labels.argmax(-1))
-        breakpoint()
-        # if isinstance(inputs, str):
-        #     return self._predict_one(inputs)
-        # return [self._predict_one(string) for string in inputs]
+        # Computing probabilities based on the logits
+        probs = logits.softmax(-1)
+        # Get the labels and the correponding probability scores
+        scores, labels = probs.max(-1)
+        # Reduce the dimensionality and convert to normal Python lists
+        scores = scores.view(-1).tolist()
+        labels = labels.view(-1).tolist()
+        # Get all of the valid spans to match with the score and labels
+        spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
+
+        output = []
+        id2label = self.config.id2label
+        if self.config.are_labels_schemed():
+            id2label = {label_id: id2label[self.config.id2reduced_id[label_id]] for label_id in self.config.id2label}
+        # If we don't allow overlapping, then we keep track of a boolean for each word, indicating if it has been
+        # selected already by a previous, higher score entity span
+        if not allow_overlapping:
+            word_selected = [False] * num_words
+        for (word_start_index, word_end_index), score, label_id in sorted(
+            zip(spans, scores, labels), key=lambda tup: tup[1], reverse=True
+        ):
+            if label_id != self.config.outside_id and (
+                allow_overlapping or not any(word_selected[word_start_index:word_end_index])
+            ):
+                char_start_index = self.tokenizer.batch_encoding.word_to_chars(0, word_start_index).start
+                char_end_index = self.tokenizer.batch_encoding.word_to_chars(0, word_end_index - 1).end
+                output.append(
+                    {
+                        "word_start_index": word_start_index,
+                        "word_end_index": word_end_index,
+                        "char_start_index": char_start_index,
+                        "char_end_index": char_end_index,
+                        "label": id2label[str(label_id)],
+                        "score": score,
+                        "span": sentence[char_start_index:char_end_index]
+                        if isinstance(sentence, str)
+                        else sentence[word_start_index:word_end_index],
+                    }
+                )
+                if not allow_overlapping:
+                    word_selected[word_start_index:word_end_index] = [True] * (word_end_index - word_start_index)
+        return sorted(output, key=lambda entity: entity["word_start_index"])
+
+    def predict(
+        self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False
+    ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
+        if not inputs:
+            return []
+
+        # Check if inputs is a string, i.e. a string sentence, or
+        # if it is a list of strings without spaces, i.e. if it's 1 tokenized sentence
+        if isinstance(inputs, str) or (
+            isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs)
+        ):
+            return self.predict_one(inputs, allow_overlapping=allow_overlapping)
+
+        # Otherwise, we likely have a list of strings, i.e. a list of string sentences,
+        # or a list of lists of strings, i.e. a list of tokenized sentences
+        # if isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs):
+        return [self.predict_one(sentence) for sentence in inputs]

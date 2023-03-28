@@ -61,6 +61,10 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
 
     outside_id = tokenizer.config.outside_id
     id2label = tokenizer.config.id2label
+    if tokenizer.config.are_labels_schemed():
+        id2label = {
+            label_id: id2label[tokenizer.config.id2reduced_id[label_id]] for label_id in tokenizer.config.id2label
+        }
     # all_gold_labels = []
     # all_pred_labels = []
     seqeval = evaluate.load("seqeval")
@@ -96,22 +100,8 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
         # breakpoint()
 
     result = seqeval.compute()
-    # breakpoint()
 
     return {key: value for key, value in result.items() if isinstance(value, float)}
-
-    """
-    breakpoint()
-
-    label_mask = (gold_labels != -100)# & (gold_labels != 0)
-    total_labels = label_mask.sum()
-    correct_labels = ((gold_labels == pred_labels) & label_mask).sum()
-    baseline = ((gold_labels == 0) & label_mask).sum()
-    print(f"A total of {correct_labels / total_labels:.2%} of all spans in the evaluation dataset are classified correctly.")
-    print(f"Compared to {baseline / total_labels:.2%} if we classified everything as 'Outside'.")
-    breakpoint()
-    return {"accuracy": correct_labels / total_labels}
-    """
 
 
 class Trainer(TransformersTrainer):
@@ -119,21 +109,13 @@ class Trainer(TransformersTrainer):
         self,
         model: SpanMarkerModel = None,
         args: TrainingArguments = None,
-        # data_collator: Optional[DataCollator] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
-        # tokenizer: SpanMarkerTokenizer = None,
         model_init: Callable[[], PreTrainedModel] = None,
-        # compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
         callbacks: Optional[List[TrainerCallback]] = None,
         optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
         preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
     ) -> None:
-        # TODO: Disallow custom compute_metrics and data_collator?
-
-        # Ensure that the model is resized to accompany the updated tokenizer (i.e. the added "<start>" and "<end>")
-        # model.resize_token_embeddings(len(tokenizer))
-
         # TODO: Move this pre-processing into reusable methods?
         # Convert dataset labels to a common format (list of label-start-end tuples)
         label_normalizer = AutoLabelNormalizer.from_config(model.config)
@@ -149,7 +131,7 @@ class Trainer(TransformersTrainer):
             eval_dataset = eval_dataset.map(label_normalizer, input_columns="ner_tags", batched=True)
             # Tokenize and add start/end markers, return tokens for use in the metrics computations
             eval_dataset = eval_dataset.map(
-                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"], return_num_words=True),
+                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"], is_evaluate=True),
                 batched=True,
                 remove_columns=eval_dataset.column_names,
             )

@@ -13,7 +13,7 @@ from span_marker.configuration import SpanMarkerConfig
 
 class SpanMarkerTokenizer:
     # def __init__(self, model: SpanMarkerModel, tokenizer: PreTrainedTokenizer, **kwargs):
-    def __init__(self, tokenizer: PreTrainedTokenizer, config, **kwargs) -> None:
+    def __init__(self, tokenizer: PreTrainedTokenizer, config: SpanMarkerConfig, **kwargs) -> None:
         # super().__init__(**kwargs)
         # self.model = model
         self.tokenizer = tokenizer
@@ -23,6 +23,9 @@ class SpanMarkerTokenizer:
         # tokenizer.add_special_tokens({"additional_special_tokens": ["<start>", "<end>"]})
         self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(["<start>", "<end>"])
         # self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(['madeupword0000', 'madeupword0001'])
+
+        # Sometimes we want to store the batch encodings for word to character index transformations
+        self.batch_encoding = None
 
         # TODO: This could be done more cleverly. Perhaps I can just subclass PreTrainedTokenizerFast?
         # I'm concerned about .from_pretrained not initializing a SpanMarkerTokenizer though.
@@ -52,16 +55,8 @@ class SpanMarkerTokenizer:
         for span in self.get_all_valid_spans(num_words, entity_max_length):
             yield span, span_to_label.get(span, outside_id)
 
-    def __call__(self, inputs, labels=None, return_num_words: bool = False, **kwargs) -> Dict[str, List]:
-        # config = config or self.config
-        # if config is None:
-        #     raise Exception(
-        #         "Please provide `SpanMarkerTokenizer` with a `SpanMarkerConfig` instance via the `config` keyword argument."
-        #     )
-        # self.config = config
-
+    def __call__(self, inputs, labels=None, is_evaluate: bool = False, **kwargs) -> Dict[str, List]:
         # TODO: Increase robustness of this
-        # TODO: Ensure that inputs is a list of pretokenized words
         is_split_into_words = True
         if isinstance(inputs, str) or (inputs and " " in inputs[0]):
             is_split_into_words = False
@@ -73,7 +68,6 @@ class SpanMarkerTokenizer:
             **kwargs,
             is_split_into_words=is_split_into_words,
             padding="max_length",
-            # truncation="max_length",
             max_length=self.model_max_length,
             return_tensors="pt",
         )
@@ -126,7 +120,7 @@ class SpanMarkerTokenizer:
                     group_labels = span_labels[group_start_idx : group_start_idx + self.config.marker_max_length]
                     all_labels.append(group_labels)
 
-                if return_num_words:
+                if is_evaluate:
                     all_num_words.append(num_words)
 
         output = {
@@ -137,8 +131,10 @@ class SpanMarkerTokenizer:
         }
         if labels:
             output["labels"] = all_labels
-        if return_num_words:
+        if is_evaluate:
             output["num_words"] = all_num_words
+            # Store the batch encoding, useful for converting word IDs to characters in the model.predict() method
+            self.batch_encoding = batch_encoding
         return output
 
     def __len__(self) -> int:
