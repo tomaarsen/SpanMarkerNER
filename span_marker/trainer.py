@@ -60,11 +60,9 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     # With other words, don't use this on the train dataset!
 
     outside_id = tokenizer.config.outside_id
-    id2label = tokenizer.config.id2label
+    id2label = {int(label_id): label for label_id, label in tokenizer.config.id2label.items()}
     if tokenizer.config.are_labels_schemed():
-        id2label = {
-            label_id: id2label[tokenizer.config.id2reduced_id[label_id]] for label_id in tokenizer.config.id2label
-        }
+        id2label = {label_id: id2label[tokenizer.config.id2reduced_id[label_id]] for label_id in id2label}
     # all_gold_labels = []
     # all_pred_labels = []
     seqeval = evaluate.load("seqeval")
