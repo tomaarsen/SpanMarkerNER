@@ -1,20 +1,9 @@
 from abc import ABC, abstractmethod
-from dataclasses import dataclass
-from typing import Any, Dict, Iterator, List, Set, Tuple, Union
-
-from datasets import Dataset
+from typing import Any, Dict, Iterator, List, Tuple
 
 from span_marker.configuration import SpanMarkerConfig
 
-# @dataclass
-# class Entity:
-#     label: int # <- refers to "reduced label", i.e. "B-LOC" and "I-LOC" have the same reduced label
-#     start_idx: int
-#     end_idx: int
-
-# label, start_idx, end_idx
 Entity = Tuple[int, int, int]
-# Entity = Dict[Tuple[int, int], int]
 
 
 class LabelNormalizer(ABC):
@@ -41,14 +30,12 @@ class LabelNormalizerScheme(LabelNormalizer):
 
     def ner_tags_to_entities(self, ner_tags: List[int]) -> Iterator[Entity]:
         """Assumes a correct IOB or IOB2 annotation scheme"""
-        # entities = {}
         start_idx = None
         reduced_label_id = None
         for idx, label_id in enumerate(ner_tags):
             # End of an entity
             if start_idx is not None and label_id in self.end_ids:
                 yield (reduced_label_id, start_idx, idx)
-                # entities[(start_idx, idx)] = reduced_label_id
                 start_idx = None
 
             # Start of an entity
@@ -59,14 +46,11 @@ class LabelNormalizerScheme(LabelNormalizer):
 
         if start_idx is not None:
             yield (reduced_label_id, start_idx, idx)
-            # entities[(start_idx, idx)] = reduced_label_id
-        # return entities
 
     def __call__(self, ner_tags: List[int]) -> Dict[str, List[Any]]:
         batch_entities = []
         for tags in ner_tags:
             entities = list(self.ner_tags_to_entities(tags))
-            # entities = self.ner_tags_to_entities(ner_tags)
             batch_entities.append(entities)
         return {"ner_tags": batch_entities}
 
@@ -82,7 +66,6 @@ class LabelNormalizerIOB(LabelNormalizerScheme):
 class LabelNormalizerBIOES(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
-        # Support for IOB2 and IOB, respectively:
         self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["S"]
         self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["S"]
 
@@ -90,7 +73,6 @@ class LabelNormalizerBIOES(LabelNormalizerScheme):
 class LabelNormalizerBILOU(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
-        # Support for IOB2 and IOB, respectively:
         self.start_ids = self.label_ids_by_tag["B"] & self.label_ids_by_tag["U"]
         self.end_ids = self.label_ids_by_tag["B"] & self.label_ids_by_tag["O"] & self.label_ids_by_tag["U"]
 
@@ -136,4 +118,7 @@ class AutoLabelNormalizer:
             return LabelNormalizerBIOES(config)
         if tags == set("BILOU"):
             return LabelNormalizerBILOU(config)
-        raise Exception("Data labeling scheme not recognized.")
+        raise ValueError(
+            "Data labeling scheme not recognized. Expected either IOB, IOB2, BIOES, BILOU "
+            "or no scheme (i.e. one label per class, no B-, I- scheme prefixes, etc.)"
+        )

@@ -1,24 +1,19 @@
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional, TypeVar, Union
+from typing import Dict, List, Optional, Union
 
 import torch
 from torch import nn
 from transformers import (
     AutoConfig,
     AutoModel,
-    AutoTokenizer,
-    BertPreTrainedModel,
     PreTrainedModel,
-    RobertaModel,
 )
 from transformers.modeling_outputs import TokenClassifierOutput
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
-
-T = TypeVar("T")
 
 
 @dataclass
@@ -126,8 +121,8 @@ class SpanMarkerModel(PreTrainedModel):
 
     @classmethod
     def from_pretrained(
-        cls: T, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, labels=None, **kwargs
-    ) -> T:
+        cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, labels=None, **kwargs
+    ) -> "SpanMarkerModel":
         config_kwargs = {}
         # TODO: Consider moving where labels must be defined to elsewhere
         # TODO: Ensure that the provided labels match the labels in the config

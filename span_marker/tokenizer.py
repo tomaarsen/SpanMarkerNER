@@ -1,11 +1,8 @@
 import itertools
 import os
 import warnings
-from typing import Dict, Generator, Iterator, List, Tuple, Union
+from typing import Dict, Iterator, List, Tuple, Union
 
-import torch
-from torch import nn
-from torch.nn import functional as F
 from transformers import AutoTokenizer, PreTrainedTokenizer
 
 from span_marker.configuration import SpanMarkerConfig

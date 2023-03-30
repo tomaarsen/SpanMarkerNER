@@ -1,17 +1,11 @@
-from typing import Callable, Dict, List, Optional, Tuple, Union
+from typing import Callable, Dict, List, Optional, Tuple
 
 import evaluate
-import numpy as np
 import torch
 from datasets import Dataset
-from torch import nn
-from torch.nn import functional as F
 from transformers import (
-    DataCollator,
-    DataCollatorForTokenClassification,
     EvalPrediction,
     PreTrainedModel,
-    PreTrainedTokenizerBase,
     TrainerCallback,
     TrainingArguments,
 )
@@ -19,8 +13,6 @@ from transformers import (
     Trainer as TransformersTrainer,
 )
 
-from span_marker.configuration import SpanMarkerConfig
-from span_marker.data.data_collator import SpanMarkerDataCollator
 from span_marker.data.label_normalizer import AutoLabelNormalizer
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
