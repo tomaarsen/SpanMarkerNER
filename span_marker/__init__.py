@@ -1,6 +1,6 @@
 __version__ = "0.1.0"
 
-from transformers import AutoConfig, AutoModel
+from transformers import AutoConfig, AutoModel, TrainingArguments
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
