@@ -1,4 +1,19 @@
-# SpanMarkerNER
+# SpanMarker for Named Entity Recognition
+
+SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
+Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.
+<!-- like performance dashboard integration, automatic mixed precision, 8-bit inference-->
+
+Based on the [`PL-Marker`](https://arxiv.org/pdf/2109.06067.pdf) paper, SpanMarker breaks the mold through its accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU` or no label annotation scheme.
+
+## Installation
+You may install the `span_marker` Python module via `pip` like so:
+```
+pip install span_marker
+```
+
+## Quick Start
+Please have a look at our [Getting Started](examples/getting_started.ipynb) jupyter notebook for details on how SpanMarker is commonly used. That notebook explains the following snippet in more detail.
 
 ```python
 from datasets import load_dataset
@@ -9,7 +24,7 @@ dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
 labels = dataset["train"].features["ner_tags"].feature.names
 
 model_name = "bert-base-cased"
-model = SpanMarkerModel.from_pretrained(model_name, labels=labels, model_max_length=256)
+model = SpanMarkerModel.from_pretrained(model_name, labels=labels)
 
 args = TrainingArguments(
     output_dir="my_span_marker_model",
@@ -18,10 +33,8 @@ args = TrainingArguments(
     per_device_train_batch_size=4,
     per_device_eval_batch_size=4,
     num_train_epochs=1,
-    evaluation_strategy="steps",
     save_strategy="steps",
     eval_steps=200,
-    push_to_hub=False,
     logging_steps=50,
     bf16=True,
     warmup_ratio=0.1,
@@ -40,3 +53,5 @@ trainer.save_model("my_span_marker_model/checkpoint-final")
 metrics = trainer.evaluate()
 print(metrics)
 ```
+
+For this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction). Tests, documentation and further information on expected performance will come soon.
