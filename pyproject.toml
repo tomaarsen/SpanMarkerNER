@@ -35,6 +35,10 @@ wandb = [
     "wandb"
 ]
 
+[project.urls]
+homepage = "https://github.com/tomaarsen/SpanMarkerNER"
+repository = "https://github.com/tomaarsen/SpanMarkerNER"
+
 [tool.setuptools.packages.find]
 include = ["span_marker"]
 
