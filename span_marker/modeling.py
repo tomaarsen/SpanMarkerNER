@@ -181,9 +181,9 @@ class SpanMarkerModel(PreTrainedModel):
         spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
 
         output = []
-        id2label = self.config.id2label
+        id2label = {int(label_id): label for label_id, label in self.config.id2label.items()}
         if self.config.are_labels_schemed():
-            id2label = {label_id: id2label[self.config.id2reduced_id[label_id]] for label_id in self.config.id2label}
+            id2label = {label_id: id2label[self.config.id2reduced_id[label_id]] for label_id in id2label}
         # If we don't allow overlapping, then we keep track of a boolean for each word, indicating if it has been
         # selected already by a previous, higher score entity span
         if not allow_overlapping:
@@ -202,7 +202,7 @@ class SpanMarkerModel(PreTrainedModel):
                         "word_end_index": word_end_index,
                         "char_start_index": char_start_index,
                         "char_end_index": char_end_index,
-                        "label": id2label[str(label_id)],
+                        "label": id2label[label_id],
                         "score": score,
                         "span": sentence[char_start_index:char_end_index]
                         if isinstance(sentence, str)
