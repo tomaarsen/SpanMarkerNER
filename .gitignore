@@ -181,6 +181,7 @@ logs
 
 # Common output folder
 models
+my_span_marker_model
 
 # Misc
 archived
