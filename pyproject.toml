@@ -31,6 +31,9 @@ dev = [
     "ruff",
     "black"
 ]
+wandb = [
+    "wandb"
+]
 
 [tool.setuptools.packages.find]
 include = ["span_marker"]
