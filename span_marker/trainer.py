@@ -13,7 +13,7 @@ from transformers import (
     Trainer as TransformersTrainer,
 )
 
-from span_marker.data.label_normalizer import AutoLabelNormalizer
+from span_marker.data.label_normalizer import AutoLabelNormalizer, LabelNormalizer
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -92,7 +92,11 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
 
         seqeval.add(prediction=pred_labels_per_tokens, reference=gold_labels_per_tokens)
 
-    return seqeval.compute()
+    results = seqeval.compute()
+    # `results` also contains e.g. "person-athlete": {'precision': 0.5982658959537572, 'recall': 0.9, 'f1': 0.71875, 'number': 230}
+    # logging this all is overkill. Tensorboard doesn't even support it, WandB does, but it's not very useful generally.
+    # I'd like to revisit this to expose this information somehow still
+    return {key: value for key, value in results.items() if isinstance(value, float)}
 
 
 class Trainer(TransformersTrainer):
@@ -113,24 +117,14 @@ class Trainer(TransformersTrainer):
             self.model_init = model_init
             model = self.call_model_init()
 
-        # Convert dataset labels to a common format (list of label-start-end tuples)
+        # To convert dataset labels to a common format (list of label-start-end tuples)
         label_normalizer = AutoLabelNormalizer.from_config(model.config)
-
+        # Normalize labels & tokenize the provided datasets
         if train_dataset:
-            train_dataset = train_dataset.map(label_normalizer, input_columns="ner_tags", batched=True)
-            # Tokenize and add start/end markers
-            train_dataset = train_dataset.map(
-                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"]),
-                batched=True,
-                remove_columns=train_dataset.column_names,
-            )
+            train_dataset = self.preprocess_dataset(train_dataset, label_normalizer, model.tokenizer)
         if eval_dataset:
-            eval_dataset = eval_dataset.map(label_normalizer, input_columns="ner_tags", batched=True)
-            # Tokenize and add start/end markers, return tokens for use in the metrics computations
-            eval_dataset = eval_dataset.map(
-                lambda batch: model.tokenizer(batch["tokens"], labels=batch["ner_tags"], is_evaluate=True),
-                batched=True,
-                remove_columns=eval_dataset.column_names,
+            eval_dataset = self.preprocess_dataset(
+                eval_dataset, label_normalizer, model.tokenizer, dataset_name="eval", is_evaluate=True
             )
 
         # Set some Training arguments that must be set for SpanMarker
@@ -166,3 +160,31 @@ class Trainer(TransformersTrainer):
         # and the Transformers Trainer would complain if we provide both a model and a model_init
         # in its __init__.
         self.model_init = model_init
+
+    def preprocess_dataset(
+        self,
+        dataset: Dataset,
+        label_normalizer: LabelNormalizer,
+        tokenizer: SpanMarkerTokenizer,
+        dataset_name: str = "train",
+        is_evaluate: bool = False,
+    ) -> Dataset:
+        for column in ("tokens", "ner_tags"):
+            if column not in dataset.column_names:
+                raise ValueError(f"The {dataset_name} dataset must contain a {column!r} column.")
+
+        # Normalize the labels to a common format (list of label-start-end tuples)
+        dataset = dataset.map(
+            label_normalizer,
+            input_columns="ner_tags",
+            batched=True,
+            desc=f"Label normalizing the {dataset_name} dataset",
+        )
+        # Tokenize and add start/end markers
+        dataset = dataset.map(
+            lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"], is_evaluate=is_evaluate),
+            batched=True,
+            remove_columns=dataset.column_names,
+            desc=f"Tokenizing the {dataset_name} dataset",
+        )
+        return dataset
