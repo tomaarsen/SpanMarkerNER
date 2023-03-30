@@ -30,8 +30,8 @@ args = TrainingArguments(
 trainer = Trainer(
     model=model,
     args=args,
-    train_dataset=dataset["train"].select(range(9797)),
-    eval_dataset=dataset["validation"].select(range(3107)),
+    train_dataset=dataset["train"].select(range(8000)),
+    eval_dataset=dataset["validation"].select(range(2000)),
 )
 
 trainer.train()
