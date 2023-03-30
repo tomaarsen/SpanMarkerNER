@@ -41,12 +41,14 @@ class SpanMarkerModel(PreTrainedModel):
             encoder = AutoModel.from_config(encoder_config)
         self.encoder = encoder
 
-        if self.config.hidden_dropout_prob:
-            self.dropout = nn.Dropout(self.config.hidden_dropout_prob)
+        dropout_rate = self.config.get(["hidden_dropout_prob", "dropout_rate"], default=0.1)
+        if dropout_rate:
+            self.dropout = nn.Dropout(dropout_rate)
         else:
             self.dropout = nn.Identity()
-        # TODO: hidden_size is not always defined
-        self.classifier = nn.Linear((self.config.hidden_size or 768) * 2, self.config.num_labels)
+        # TODO: Get a less arbitrary default
+        hidden_size = self.config.get("hidden_size", default=768)
+        self.classifier = nn.Linear(hidden_size * 2, self.config.num_labels)
         self.loss_func = nn.CrossEntropyLoss()
 
         # tokenizer and data collator are filled using set_tokenizer
@@ -67,7 +69,8 @@ class SpanMarkerModel(PreTrainedModel):
         if isinstance(module, (nn.Linear, nn.Embedding)):
             # Slightly different from the TF version which uses truncated_normal for initialization
             # cf https://github.com/pytorch/pytorch/pull/5617
-            module.weight.data.normal_(mean=0.0, std=self.config.initializer_range)
+            initializer_range = self.config.get("initializer_range", default=0.02)
+            module.weight.data.normal_(mean=0.0, std=initializer_range)
         elif isinstance(module, torch.nn.LayerNorm):
             module.bias.data.zero_()
             module.weight.data.fill_(1.0)
@@ -83,7 +86,6 @@ class SpanMarkerModel(PreTrainedModel):
         num_words: Optional[torch.Tensor] = None,
     ) -> SpanMarkerOutput:
         token_type_ids = torch.zeros_like(input_ids)
-        # TODO: Change position_ids from int64 to int8?
         outputs = self.encoder(
             input_ids,
             attention_mask=attention_mask,

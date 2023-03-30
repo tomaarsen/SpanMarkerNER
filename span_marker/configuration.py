@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, Optional, Set
+from typing import Any, Dict, Iterable, Optional, Set, Union
 
 from transformers import PretrainedConfig
 
@@ -110,3 +110,13 @@ class SpanMarkerConfig(PretrainedConfig):
         for label_id, label in self.encoder["id2label"].items():
             grouped[label[0]].add(label_id)
         return dict(grouped)
+
+    def get(self, options: Union[str, Iterable[str]], default: Any = None) -> Any:
+        if isinstance(options, str):
+            options = [options]
+        for option in options:
+            try:
+                return self.__getattribute__(option)
+            except AttributeError:
+                pass
+        return default
