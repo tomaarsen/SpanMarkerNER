@@ -1,10 +1,9 @@
-from typing import Callable, Dict, List, Optional, Tuple
+from typing import Callable, Dict, List, Optional, Self, Tuple
 
 import torch
 from datasets import Dataset
 from transformers import (
     EvalPrediction,
-    PreTrainedModel,
     TrainerCallback,
     TrainingArguments,
 )
@@ -19,18 +18,73 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 
 
 class Trainer(TransformersTrainer):
+    """
+    Trainer is a simple but feature-complete training and eval loop for SpanMarker,
+    built tightly on top of the 🤗 Transformers Trainer.
+
+    Args:
+        model (`SpanMarkerModel`, *optional*):
+            The model to train, evaluate or use for predictions. If not provided, a `model_init` must be passed.
+        args (`TrainingArguments`, *optional*):
+            The arguments to tweak for training. Will default to a basic instance of [`TrainingArguments`] with the
+            `output_dir` set to a directory named *tmp_trainer* in the current directory if not provided.
+        train_dataset (`datasets.Dataset`, *optional*):
+            The dataset to use for training.
+        eval_dataset (`datasets.Dataset`, *optional*):
+             The dataset to use for evaluation.
+        model_init (`Callable[[], SpanMarkerModel]`, *optional*):
+            A function that instantiates the model to be used. If provided, each call to `Trainer.train` will start
+            from a new instance of the model as given by this function.
+
+            The function may have zero argument, or a single one containing the optuna/Ray Tune/SigOpt trial object, to
+            be able to choose different architectures according to hyper parameters (such as layer count, sizes of
+            inner layers, dropout probabilities etc).
+        compute_metrics (`Callable[[EvalPrediction], Dict]`, *optional*):
+            The function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return
+            a dictionary string to metric values.
+        callbacks (List of [`TrainerCallback`], *optional*):
+            A list of callbacks to customize the training loop. Will add those to the list of default callbacks
+            detailed in [here](https://huggingface.co/docs/transformers/main/en/main_classes/callback).
+
+            If you want to remove one of the default callbacks used, use the [`Trainer.remove_callback`] method.
+        optimizers (`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple
+            containing the optimizer and the scheduler to use. Will default to an instance of `AdamW` on your model
+            and a scheduler given by `get_linear_schedule_with_warmup` controlled by `args`.
+        preprocess_logits_for_metrics (`Callable[[torch.Tensor, torch.Tensor], torch.Tensor]`, *optional*):
+            A function that preprocess the logits right before caching them at each evaluation step. Must take two
+            tensors, the logits and the labels, and return the logits once processed as desired. The modifications made
+            by this function will be reflected in the predictions received by `compute_metrics`.
+
+            Note that the labels (second parameter) will be `None` if the dataset does not have them.
+
+    Important attributes:
+
+        - **model** -- Always points to the core model.
+        - **model_wrapped** -- Always points to the most external model in case one or more other modules wrap the
+          original model. This is the model that should be used for the forward pass. For example, under `DeepSpeed`,
+          the inner model is wrapped in `DeepSpeed` and then again in `torch.nn.DistributedDataParallel`. If the inner
+          model hasn't been wrapped, then `self.model_wrapped` is the same as `self.model`.
+        - **is_model_parallel** -- Whether or not a model has been switched to a model parallel mode (different from
+          data parallelism, this means some of the model layers are split on different GPUs).
+        - **place_model_on_device** -- Whether or not to automatically place the model on the device - it will be set
+          to `False` if model parallel or deepspeed is used, or if the default
+          `TrainingArguments.place_model_on_device` is overridden to return `False` .
+        - **is_in_train** -- Whether or not a model is currently running `train` (e.g. when `evaluate` is called while
+          in `train`)
+    """
+
     def __init__(
         self,
         model: SpanMarkerModel = None,
         args: TrainingArguments = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
-        model_init: Callable[[], PreTrainedModel] = None,
+        model_init: Callable[[], SpanMarkerModel] = None,
         compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
         callbacks: Optional[List[TrainerCallback]] = None,
         optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
         preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
-    ) -> None:
+    ) -> Self:
         # Extract the model from an initializer function
         if model_init:
             self.model_init = model_init
@@ -88,6 +142,23 @@ class Trainer(TransformersTrainer):
         dataset_name: str = "train",
         is_evaluate: bool = False,
     ) -> Dataset:
+        """Normalize the `ner_tags` labels and call tokenizer on `tokens`.
+
+        Args:
+            dataset (Dataset): A Hugging Face dataset with `tokens` and `ner_tags` columns.
+            label_normalizer (LabelNormalizer): A callable that normalizes `ner_tags` into start-end-label tuples.
+            tokenizer (SpanMarkerTokenizer): The tokenizer responsible for tokenizing `tokens` into input IDs,
+                and adding start and end markers.
+            dataset_name (str, optional): The name of the dataset. Defaults to "train".
+            is_evaluate (bool, optional): Whether to return the number of words for each sample.
+                Required for evaluation. Defaults to False.
+
+        Raises:
+            ValueError: If the `dataset` does not contain `tokens` and `ner_tags` columns.
+
+        Returns:
+            Dataset: The normalized and tokenized version of the input dataset.
+        """
         for column in ("tokens", "ner_tags"):
             if column not in dataset.column_names:
                 raise ValueError(f"The {dataset_name} dataset must contain a {column!r} column.")
