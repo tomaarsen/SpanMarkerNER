@@ -101,16 +101,15 @@ class SpanMarkerTokenizer:
 
             for group_start_idx in range(0, len(spans), self.config.marker_max_length):
                 group_spans = spans[group_start_idx : group_start_idx + self.config.marker_max_length]
-                group_word_starts, group_word_ends = zip(*group_spans)
                 group_num_spans = len(group_spans)
 
-                start_position_ids = [
-                    batch_encoding.word_to_tokens(sample_idx, word_index=word_i).start for word_i in group_word_starts
-                ]
-                end_position_ids = [
-                    batch_encoding.word_to_tokens(sample_idx, word_index=word_i - 1).end - 1
-                    for word_i in group_word_ends
-                ]
+                start_position_ids, end_position_ids = [], []
+                for start_word_i, end_word_i in group_spans:
+                    start_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=start_word_i)
+                    start_position_ids.append(start_token_span.start if start_token_span else 0)
+
+                    end_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=end_word_i - 1)
+                    end_position_ids.append(end_token_span.end - 1 if end_token_span else 0)
 
                 all_input_ids.append(input_ids[:num_tokens])
                 all_num_spans.append(group_num_spans)
