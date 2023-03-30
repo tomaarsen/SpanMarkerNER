@@ -1,4 +1,4 @@
-from typing import Callable, Dict, List, Optional, Self, Tuple
+from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
 from datasets import Dataset
@@ -84,7 +84,7 @@ class Trainer(TransformersTrainer):
         callbacks: Optional[List[TrainerCallback]] = None,
         optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
         preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
-    ) -> Self:
+    ) -> None:
         # Extract the model from an initializer function
         if model_init:
             self.model_init = model_init
