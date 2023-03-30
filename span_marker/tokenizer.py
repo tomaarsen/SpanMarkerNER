@@ -34,6 +34,7 @@ class SpanMarkerTokenizer:
         )
         self.pad = tokenizer.pad
         self.save_pretrained = tokenizer.save_pretrained
+        self.push_to_hub = tokenizer.push_to_hub
         self.decode = tokenizer.decode
         self.pad_token_id = self.tokenizer.pad_token_id
         self.eos_token_id = self.tokenizer.eos_token_id
