@@ -13,7 +13,7 @@ from transformers import (
     Trainer as TransformersTrainer,
 )
 
-from span_marker.data.label_normalizer import AutoLabelNormalizer, LabelNormalizer
+from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
 

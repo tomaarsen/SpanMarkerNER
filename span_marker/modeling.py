@@ -12,7 +12,7 @@ from transformers import (
 from transformers.modeling_outputs import TokenClassifierOutput
 
 from span_marker.configuration import SpanMarkerConfig
-from span_marker.data.data_collator import SpanMarkerDataCollator
+from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
 
 
