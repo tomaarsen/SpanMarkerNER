@@ -155,8 +155,9 @@ class SpanMarkerModel(PreTrainedModel):
         self, sentence: Union[str, List[str]], allow_overlapping: bool = False
     ) -> List[Dict[str, Union[str, int, float]]]:
         # Tokenization, i.e. computing spans, adding span markers to position_ids
-        tokenized = self.tokenizer(sentence, is_evaluate=True)
-        num_words = tokenized["num_words"][0]
+        tokenized = self.tokenizer(sentence, return_num_words=True, return_batch_encoding=True)
+        num_words = tokenized.pop("num_words")[0]
+        batch_encoding = tokenized.pop("batch_encoding")
         # Converting into a common batch format like the data collator wants
         tokenized = [
             {key: value[idx] for key, value in tokenized.items()} for idx in range(len(tokenized["input_ids"]))
@@ -191,8 +192,8 @@ class SpanMarkerModel(PreTrainedModel):
             if label_id != self.config.outside_id and (
                 allow_overlapping or not any(word_selected[word_start_index:word_end_index])
             ):
-                char_start_index = self.tokenizer.batch_encoding.word_to_chars(0, word_start_index).start
-                char_end_index = self.tokenizer.batch_encoding.word_to_chars(0, word_end_index - 1).end
+                char_start_index = batch_encoding.word_to_chars(0, word_start_index).start
+                char_end_index = batch_encoding.word_to_chars(0, word_end_index - 1).end
                 output.append(
                     {
                         "word_start_index": word_start_index,

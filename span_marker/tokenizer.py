@@ -21,9 +21,6 @@ class SpanMarkerTokenizer:
         self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(["<start>", "<end>"])
         # self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(['madeupword0000', 'madeupword0001'])
 
-        # Sometimes we want to store the batch encodings for word to character index transformations
-        self.batch_encoding = None
-
         # TODO: This could be done more cleverly. Perhaps I can just subclass PreTrainedTokenizerFast?
         # I'm concerned about .from_pretrained not initializing a SpanMarkerTokenizer though.
 
@@ -52,14 +49,14 @@ class SpanMarkerTokenizer:
         for span in self.get_all_valid_spans(num_words, entity_max_length):
             yield span, span_to_label.get(span, outside_id)
 
-    def __call__(self, inputs, labels=None, is_evaluate: bool = False, **kwargs) -> Dict[str, List]:
+    def __call__(
+        self, inputs, labels=None, return_num_words: bool = False, return_batch_encoding=False, **kwargs
+    ) -> Dict[str, List]:
         # TODO: Increase robustness of this
         is_split_into_words = True
         if isinstance(inputs, str) or (inputs and " " in inputs[0]):
             is_split_into_words = False
 
-        # TODO: one-by-one tokenization to create smaller input_ids?
-        # input_ids are already shrunk later on
         batch_encoding = self.tokenizer(
             inputs,
             **kwargs,
@@ -117,7 +114,7 @@ class SpanMarkerTokenizer:
                     group_labels = span_labels[group_start_idx : group_start_idx + self.config.marker_max_length]
                     all_labels.append(group_labels)
 
-                if is_evaluate:
+                if return_num_words:
                     all_num_words.append(num_words)
 
         output = {
@@ -128,10 +125,12 @@ class SpanMarkerTokenizer:
         }
         if labels:
             output["labels"] = all_labels
-        if is_evaluate:
+        if return_num_words:
+            # Store the number of words, useful for computing the spans in the evaluation and model.predict() method
             output["num_words"] = all_num_words
+        if return_batch_encoding:
             # Store the batch encoding, useful for converting word IDs to characters in the model.predict() method
-            self.batch_encoding = batch_encoding
+            output["batch_encoding"] = batch_encoding
         return output
 
     def __len__(self) -> int:

@@ -12,6 +12,7 @@ from transformers import (
     Trainer as TransformersTrainer,
 )
 
+from span_marker.evaluation import compute_f1_via_seqeval
 from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
@@ -100,7 +101,7 @@ class Trainer(TransformersTrainer):
         )
         # Tokenize and add start/end markers
         dataset = dataset.map(
-            lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"], is_evaluate=is_evaluate),
+            lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"], return_num_words=is_evaluate),
             batched=True,
             remove_columns=dataset.column_names,
             desc=f"Tokenizing the {dataset_name} dataset",
