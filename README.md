@@ -1,4 +1,8 @@
-# SpanMarker for Named Entity Recognition
+<h1 align="center">
+SpanMarker for Named Entity Recognition
+
+[![Getting Started In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)
+</h1>
 
 SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
 Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.
