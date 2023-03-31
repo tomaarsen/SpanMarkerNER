@@ -102,7 +102,7 @@ class Trainer(TransformersTrainer):
 
         # Set some Training arguments that must be set for SpanMarker
         if args is None:
-            args = TrainingArguments()
+            args = TrainingArguments(output_dir="models/my_span_marker_model")
         args.include_inputs_for_metrics = True
         args.remove_unused_columns = False
 
