@@ -55,3 +55,9 @@ print(metrics)
 ```
 
 For this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction). Tests, documentation and further information on expected performance will come soon.
+
+## Pretrained Models
+
+* [`tomaarsen/span-marker-bert-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super) is a model that I have trained in just 4 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.7020 Test F1, competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup).
+See this [Weights and Biases report](https://api.wandb.ai/links/tomaarsen/dm21vbbm) for details. You can observe the model inferences in this [Argilla dataset](https://argilla-span-marker.hf.space/datasets/team/span-marker-bert-base-fewnerd-fine-super) (username: `argilla`, password: `1234`).
+
