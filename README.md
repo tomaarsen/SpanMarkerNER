@@ -36,7 +36,7 @@ args = TrainingArguments(
     save_strategy="steps",
     eval_steps=200,
     logging_steps=50,
-    bf16=True,
+    fp16=True,
     warmup_ratio=0.1,
 )
 
