@@ -34,12 +34,12 @@ class SpanMarkerConfig(PretrainedConfig):
             raise ValueError(
                 "Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.\n"
                 ">>> SpanMarkerModel.from_pretrained(\n"
-                '...     "roberta-large",\n'
+                '...     "bert-base-cased",\n'
                 '...     labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...]\n'
                 "... )\n"
                 "or\n"
                 ">>> SpanMarkerModel.from_pretrained(\n"
-                '...     "roberta-large",\n'
+                '...     "bert-base-cased",\n'
                 '...     labels=["O", "PER", "ORG", "LOC", "MISC"]\n'
                 "... )"
             )
