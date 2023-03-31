@@ -11,7 +11,7 @@ Tightly implemented on top of the [🤗 Transformers](https://github.com/hugging
 Based on the [PL-Marker](https://arxiv.org/pdf/2109.06067.pdf) paper, SpanMarker breaks the mold through its accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU` or no label annotation scheme.
 
 ## Installation
-You may install the `span_marker` Python module via `pip` like so:
+You may install the [`span_marker`](https://pypi.org/project/span-marker) Python module via `pip` like so:
 ```
 pip install span_marker
 ```
