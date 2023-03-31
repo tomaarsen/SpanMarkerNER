@@ -58,7 +58,7 @@ metrics = trainer.evaluate()
 print(metrics)
 ```
 
-For this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction). Tests, documentation and further information on expected performance will come soon.
+Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction) results. Tests, documentation and further information on expected performance will come soon.
 
 ## Pretrained Models
 
