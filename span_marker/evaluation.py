@@ -28,7 +28,7 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     num_words = eval_prediction.predictions[-1]
 
     # Compute probabilities via softmax and extract 'winning' scores/labels
-    probs = torch.tensor(logits).softmax(dim=-1)
+    probs = torch.tensor(logits, dtype=torch.float32).softmax(dim=-1)
     scores, pred_labels = probs.max(-1)
 
     # Collect all samples in one dict. We do this because some samples are spread between multiple inputs
