@@ -1,7 +1,7 @@
 import itertools
 import os
 import warnings
-from typing import Dict, Iterator, List, Tuple, Union
+from typing import Any, Dict, Iterator, List, Tuple, Union
 
 from transformers import AutoTokenizer, PreTrainedTokenizer
 
@@ -9,20 +9,12 @@ from span_marker.configuration import SpanMarkerConfig
 
 
 class SpanMarkerTokenizer:
-    # def __init__(self, model: SpanMarkerModel, tokenizer: PreTrainedTokenizer, **kwargs):
     def __init__(self, tokenizer: PreTrainedTokenizer, config: SpanMarkerConfig, **kwargs) -> None:
-        # super().__init__(**kwargs)
-        # self.model = model
         self.tokenizer = tokenizer
         self.config = config
 
         tokenizer.add_tokens(["<start>", "<end>"], special_tokens=True)
-        # tokenizer.add_special_tokens({"additional_special_tokens": ["<start>", "<end>"]})
         self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(["<start>", "<end>"])
-        # self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(['madeupword0000', 'madeupword0001'])
-
-        # TODO: This could be done more cleverly. Perhaps I can just subclass PreTrainedTokenizerFast?
-        # I'm concerned about .from_pretrained not initializing a SpanMarkerTokenizer though.
 
         if self.tokenizer.model_max_length > 1e29 and self.config.model_max_length is None:
             warnings.warn(
@@ -32,12 +24,6 @@ class SpanMarkerTokenizer:
         self.model_max_length = min(
             self.tokenizer.model_max_length, self.config.model_max_length or self.config.model_max_length_default
         )
-        self.pad = tokenizer.pad
-        self.save_pretrained = tokenizer.save_pretrained
-        self.push_to_hub = tokenizer.push_to_hub
-        self.decode = tokenizer.decode
-        self.pad_token_id = self.tokenizer.pad_token_id
-        self.eos_token_id = self.tokenizer.eos_token_id
 
     def get_all_valid_spans(self, num_words: int, entity_max_length: int) -> Iterator[Tuple[int, int]]:
         for start_idx in range(num_words):
@@ -49,6 +35,12 @@ class SpanMarkerTokenizer:
     ) -> Iterator[Tuple[Tuple[int, int], int]]:
         for span in self.get_all_valid_spans(num_words, entity_max_length):
             yield span, span_to_label.get(span, outside_id)
+
+    def __getattribute__(self, key: str) -> Any:
+        try:
+            return super().__getattribute__(key)
+        except AttributeError:
+            return super().__getattribute__("tokenizer").__getattribute__(key)
 
     def __call__(
         self, inputs, labels=None, return_num_words: bool = False, return_batch_encoding=False, **kwargs
@@ -139,7 +131,6 @@ class SpanMarkerTokenizer:
 
     @classmethod
     def from_pretrained(cls, pretrained_model_name_or_path: Union[str, os.PathLike], *inputs, config=None, **kwargs):
-        # TODO: Consider subclassing an AutoTokenizer directly instead of loading one like this:
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path, *inputs, **kwargs, add_prefix_space=True
         )
