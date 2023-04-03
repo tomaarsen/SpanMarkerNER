@@ -68,7 +68,7 @@ class SpanMarkerConfig(PretrainedConfig):
             self.encoder[name] = value
         return super().__setattr__(name, value)
 
-    def __getattribute__(self, key: str):
+    def __getattribute__(self, key: str) -> Any:
         try:
             return super().__getattribute__(key)
         except AttributeError as e:

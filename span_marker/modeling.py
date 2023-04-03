@@ -27,7 +27,7 @@ class SpanMarkerModel(PreTrainedModel):
     config_class = SpanMarkerConfig
     base_model_prefix = "encoder"
 
-    def __init__(self, config: SpanMarkerConfig, encoder=None, **kwargs):
+    def __init__(self, config: SpanMarkerConfig, encoder=None, **kwargs) -> None:
         super().__init__(config)
         self.config = config
         # `encoder` will be specified if this Model is initializer via .from_pretrained with an encoder
@@ -66,7 +66,7 @@ class SpanMarkerModel(PreTrainedModel):
             tokenizer=tokenizer, marker_max_length=self.config.marker_max_length
         )
 
-    def _init_weights(self, module):
+    def _init_weights(self, module) -> None:
         """Initialize the weights"""
         if isinstance(module, (nn.Linear, nn.Embedding)):
             # Slightly different from the TF version which uses truncated_normal for initialization
