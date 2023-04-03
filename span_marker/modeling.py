@@ -1,6 +1,6 @@
 import os
 from dataclasses import dataclass
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 from torch import nn
@@ -14,6 +14,8 @@ from transformers.modeling_outputs import TokenClassifierOutput
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
+
+T = TypeVar("T", bound="SpanMarkerModel")
 
 
 @dataclass
@@ -123,37 +125,124 @@ class SpanMarkerModel(PreTrainedModel):
 
     @classmethod
     def from_pretrained(
-        cls, pretrained_model_name_or_path: Optional[Union[str, os.PathLike]], *model_args, labels=None, **kwargs
-    ) -> "SpanMarkerModel":
+        cls: Type[T],
+        pretrained_model_name_or_path: Union[str, os.PathLike],
+        *model_args,
+        labels: Optional[List[str]] = None,
+        **kwargs,
+    ) -> T:
+        """Instantiate a pretrained pytorch model from a pre-trained model configuration.
+
+        Example:
+
+            >>> # Initialize a SpanMarkerModel using a pretrained encoder
+            >>> model = SpanMarkerModel.from_pretrained("bert-base-cased", labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...])
+            >>> # Load a pretrained SpanMarker model
+            >>> model = SpanMarkerModel.from_pretrained("tomaarsen/span-marker-bert-base-fewnerd-fine-super")
+
+        Args:
+            pretrained_model_name_or_path (Union[str, os.PathLike]):
+                Either a pretrained encoder (e.g. `bert-base-cased`, `roberta-large`, etc.), or a pretrained SpanMarkerModel.
+                Can be either:
+
+                    - A string, the *model id* of a pretrained model hosted inside a model repo on huggingface.co.
+                      Valid model ids can be located at the root-level, like `bert-base-uncased`, or namespaced under a
+                      user or organization name, like `dbmdz/bert-base-german-cased`.
+                    - A path to a *directory* containing model weights saved using
+                      `.save_pretrained`, e.g., `./my_model_directory/`.
+                    - A path or url to a *tensorflow index checkpoint file* (e.g, `./tf_model/model.ckpt.index`). In
+                      this case, `from_tf` should be set to `True` and a configuration object should be provided as
+                      `config` argument. This loading path is slower than converting the TensorFlow checkpoint in a
+                      PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.
+                    - A path or url to a model folder containing a *flax checkpoint file* in *.msgpack* format (e.g,
+                      `./flax_model/` containing `flax_model.msgpack`). In this case, `from_flax` should be set to
+                      `True`.
+
+            labels (List[str], optional): A list of string labels corresponding to the `ner_tags` in your datasets.
+                Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.
+
+        Additional arguments are passed to the `from_pretrained` methods of `AutoConfig`, `AutoModel` and
+        `SpanMarkerTokenizer`.
+
+        Returns:
+            SpanMarkerModel: A SpanMarkerModel instance, either ready for training using the `Trainer` or for
+                inference via `model.predict()`.
+        """
         config_kwargs = {}
-        # TODO: Consider moving where labels must be defined to elsewhere
         # TODO: Ensure that the provided labels match the labels in the config
         if labels is not None:
-            # if "id2label" not in kwargs:
             config_kwargs["id2label"] = dict(enumerate(labels))
-            # if "label2id" not in kwargs:
             config_kwargs["label2id"] = {v: k for k, v in config_kwargs["id2label"].items()}
 
+        # Create an encoder or SpanMarker config
         config = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs, **config_kwargs)
 
-        # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance
+        # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         if isinstance(config, cls.config_class):
             model = super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
 
-        # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.)
+        # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.),
+        # then initialize it and create the SpanMarker config and model using the encoder and its config.
         else:
             encoder = AutoModel.from_pretrained(pretrained_model_name_or_path, *model_args, config=config)
             config = cls.config_class(encoder_config=config.to_dict())
             model = cls(config, encoder, *model_args, **kwargs)
 
-        # Pass the tokenizer directly to the model for convenience
+        # Pass the tokenizer directly to the model for convenience, this way the user doesn't have to
+        # make it themselves.
         tokenizer = SpanMarkerTokenizer.from_pretrained(pretrained_model_name_or_path, config=config, **kwargs)
         model.set_tokenizer(tokenizer)
         model.resize_token_embeddings(len(tokenizer))
 
         return model
 
-    def predict_one(
+    def predict(
+        self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False
+    ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
+        """Predict named entities from input texts.
+
+        Args:
+            inputs (Union[str, List[str], List[List[str]]]): Input sentences from which to extract entities.
+                Valid datastructures are:
+
+                * str: a string sentence.
+                * List[str]: a pre-tokenized string sentence, i.e. a list of words.
+                * List[str]: a list of multiple string sentences.
+                * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.
+            allow_overlapping (bool, optional): Whether to allow entity spans to overlap. The model does not
+                have good support for this, so False is recommended. Defaults to False.
+
+        Returns:
+            Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]: If
+                the input is a single sentence, then we output a list of dictionaries. Each dictionary
+                represents one predicted entity, and contains the following keys:
+
+                * `label`: The predicted entity label.
+                * `span`: The text that the model deems an entity.
+                * `score`: The model its confidence.
+                * `word_start_index` & `word_end_index`: The word indices for the start/end of the entity,
+                    if the input is pre-tokenized.
+                * `char_start_index` & `char_end_index`: The character indices for the start/end of the entity,
+                    if the input is a string.
+
+                If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.
+        """
+        if not inputs:
+            return []
+
+        # Check if inputs is a string, i.e. a string sentence, or
+        # if it is a list of strings without spaces, i.e. if it's 1 tokenized sentence
+        if isinstance(inputs, str) or (
+            isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs)
+        ):
+            return self._predict_one(inputs, allow_overlapping=allow_overlapping)
+
+        # Otherwise, we likely have a list of strings, i.e. a list of string sentences,
+        # or a list of lists of strings, i.e. a list of tokenized sentences
+        # if isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs):
+        return [self._predict_one(sentence) for sentence in inputs]
+
+    def _predict_one(
         self, sentence: Union[str, List[str]], allow_overlapping: bool = False
     ) -> List[Dict[str, Union[str, int, float]]]:
         # Tokenization, i.e. computing spans, adding span markers to position_ids
@@ -212,21 +301,3 @@ class SpanMarkerModel(PreTrainedModel):
                 if not allow_overlapping:
                     word_selected[word_start_index:word_end_index] = [True] * (word_end_index - word_start_index)
         return sorted(output, key=lambda entity: entity["word_start_index"])
-
-    def predict(
-        self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False
-    ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
-        if not inputs:
-            return []
-
-        # Check if inputs is a string, i.e. a string sentence, or
-        # if it is a list of strings without spaces, i.e. if it's 1 tokenized sentence
-        if isinstance(inputs, str) or (
-            isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs)
-        ):
-            return self.predict_one(inputs, allow_overlapping=allow_overlapping)
-
-        # Otherwise, we likely have a list of strings, i.e. a list of string sentences,
-        # or a list of lists of strings, i.e. a list of tokenized sentences
-        # if isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs):
-        return [self.predict_one(sentence) for sentence in inputs]
