@@ -2,6 +2,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
 from datasets import Dataset
+from torch.utils.data import DataLoader
 from transformers import (
     EvalPrediction,
     TrainerCallback,
@@ -91,14 +92,7 @@ class Trainer(TransformersTrainer):
             model = self.call_model_init()
 
         # To convert dataset labels to a common format (list of label-start-end tuples)
-        label_normalizer = AutoLabelNormalizer.from_config(model.config)
-        # Normalize labels & tokenize the provided datasets
-        if train_dataset:
-            train_dataset = self.preprocess_dataset(train_dataset, label_normalizer, model.tokenizer)
-        if eval_dataset:
-            eval_dataset = self.preprocess_dataset(
-                eval_dataset, label_normalizer, model.tokenizer, dataset_name="eval", is_evaluate=True
-            )
+        self.label_normalizer = AutoLabelNormalizer.from_config(model.config)
 
         # Set some Training arguments that must be set for SpanMarker
         if args is None:
@@ -178,3 +172,17 @@ class Trainer(TransformersTrainer):
             desc=f"Tokenizing the {dataset_name} dataset",
         )
         return dataset
+
+    def get_train_dataloader(self) -> DataLoader:
+        """Return the preprocessed training DataLoader."""
+        self.train_dataset = self.preprocess_dataset(self.train_dataset, self.label_normalizer, self.tokenizer)
+        return super().get_train_dataloader()
+
+    def get_eval_dataloader(self, eval_dataset: Optional[Dataset] = None) -> DataLoader:
+        """Return the preprocessed evaluation DataLoader."""
+        eval_dataset = eval_dataset or self.eval_dataset
+        if eval_dataset is not None:
+            eval_dataset = self.preprocess_dataset(
+                eval_dataset, self.label_normalizer, self.tokenizer, dataset_name="evaluation", is_evaluate=True
+            )
+        return super().get_eval_dataloader(eval_dataset)
