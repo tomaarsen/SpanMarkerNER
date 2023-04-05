@@ -1,8 +1,7 @@
 import pytest
 
 from span_marker.modeling import SpanMarkerModel
-
-CONLL_LABELS = ["O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "B-MISC", "I-MISC"]
+from tests.constants import CONLL_LABELS
 
 
 @pytest.fixture
