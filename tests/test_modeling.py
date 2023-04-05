@@ -6,15 +6,15 @@ import pytest
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
-from tests.constants import CONLL_LABELS, FEWNERD_COARSE_LABELS
+from tests.constants import CONLL_LABELS, FEWNERD_COARSE_LABELS, TINY_BERT
 
 
 @pytest.mark.parametrize(
     ("model_name", "labels"),
     [
-        ("prajjwal1/bert-tiny", CONLL_LABELS),
-        ("prajjwal1/bert-tiny", FEWNERD_COARSE_LABELS),
-        ("prajjwal1/bert-tiny", None),
+        (TINY_BERT, CONLL_LABELS),
+        (TINY_BERT, FEWNERD_COARSE_LABELS),
+        (TINY_BERT, None),
         ("tomaarsen/span-marker-bert-tiny-conll03", CONLL_LABELS),
         ("tomaarsen/span-marker-bert-tiny-conll03", None),
         ("tomaarsen/span-marker-bert-tiny-fewnerd-coarse-super", FEWNERD_COARSE_LABELS),
@@ -26,7 +26,7 @@ def test_from_pretrained(model_name: str, labels: Optional[List[str]]) -> None:
         return SpanMarkerModel.from_pretrained(model_name, labels=labels)
 
     # If labels have to be provided
-    if model_name == "prajjwal1/bert-tiny" and labels is None:
+    if model_name == TINY_BERT and labels is None:
         with pytest.raises(
             ValueError, match=re.escape("Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`")
         ):

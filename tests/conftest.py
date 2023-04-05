@@ -2,12 +2,12 @@ import pytest
 from datasets import DatasetDict, load_dataset
 
 from span_marker.modeling import SpanMarkerModel
-from tests.constants import CONLL_LABELS, FEWNERD_COARSE_LABELS
+from tests.constants import CONLL_LABELS, FEWNERD_COARSE_LABELS, TINY_BERT
 
 
 @pytest.fixture()
 def fresh_conll_span_marker_model() -> SpanMarkerModel:
-    return SpanMarkerModel.from_pretrained("prajjwal1/bert-tiny", labels=CONLL_LABELS)
+    return SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)
 
 
 @pytest.fixture()
@@ -17,7 +17,7 @@ def finetuned_conll_span_marker_model() -> SpanMarkerModel:
 
 @pytest.fixture()
 def fresh_fewnerd_span_marker_model() -> SpanMarkerModel:
-    return SpanMarkerModel.from_pretrained("prajjwal1/bert-tiny", labels=FEWNERD_COARSE_LABELS)
+    return SpanMarkerModel.from_pretrained(TINY_BERT, labels=FEWNERD_COARSE_LABELS)
 
 
 @pytest.fixture()
