@@ -37,7 +37,8 @@ dev = [
     "pre-commit",
     "ruff",
     "black",
-    "pytest"
+    "pytest",
+    "pytest-cov"
 ]
 wandb = [
     "wandb"
@@ -54,15 +55,13 @@ include = ["span_marker"]
 version = {attr = "span_marker.__version__"}
 
 [tool.pytest.ini_options]
-log_format = "%(asctime)s %(name)s %(levelname)s %(message)s"
-log_date_format = "%Y-%m-%d %H:%M:%S"
-log_cli = "True"
 testpaths = [
     "tests"
 ]
 filterwarnings = [
     "ignore::DeprecationWarning:tensorboard.*:"
 ]
+addopts = "--cov=span_marker --durations=10"
 
 [tool.coverage.report]
 exclude_lines = [

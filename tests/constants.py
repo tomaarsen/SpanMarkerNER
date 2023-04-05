@@ -1,3 +1,5 @@
+from transformers import TrainingArguments
+
 CONLL_LABELS = ["O", "B-PER", "I-PER", "B-ORG", "I-ORG", "B-LOC", "I-LOC", "B-MISC", "I-MISC"]
 FEWNERD_COARSE_LABELS = ["O", "art", "building", "event", "location", "organization", "other", "person", "product"]
 FEWNERD_FINE_LABELS = [
@@ -69,3 +71,5 @@ FEWNERD_FINE_LABELS = [
     "product-train",
     "product-weapon",
 ]
+
+DEFAULT_ARGS = TrainingArguments(output_dir="models/my_span_marker_model", report_to="none")
