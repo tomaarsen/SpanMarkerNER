@@ -1,5 +1,5 @@
 import pytest
-from datasets import DatasetDict, load_dataset
+from datasets import DatasetDict
 
 from span_marker.modeling import SpanMarkerModel
 from tests.constants import (
