@@ -34,7 +34,7 @@ class SpanMarkerConfig(PretrainedConfig):
 
         # We need the "O" label for label normalization, etc.
         if self.label2id and "O" not in self.label2id:
-            raise Exception("There must be an 'O' label.")
+            raise ValueError("There must be an 'O' label in the list of `labels`.")
 
         # Keys are always strings in JSON so convert ids to int here.
         self.encoder["id2label"] = {int(label_id): label for label_id, label in self.encoder["id2label"].items()}
