@@ -1,0 +1,148 @@
+{
+  "builder_name": "few-nerd",
+  "citation": "\n@inproceedings{ding2021few,\ntitle={Few-NERD: A Few-Shot Named Entity Recognition Dataset},\nauthor={Ding, Ning and Xu, Guangwei and Chen, Yulin, and Wang, Xiaobin and Han, Xu and Xie, \nPengjun and Zheng, Hai-Tao and Liu, Zhiyuan},\nbooktitle={ACL-IJCNLP},\nyear={2021}\n}\n",
+  "config_name": "supervised",
+  "dataset_size": 116925069,
+  "description": "\nFew-NERD is a large-scale, fine-grained manually annotated named entity recognition dataset, \nwhich contains 8 coarse-grained types, 66 fine-grained types, 188,200 sentences, 491,711 entities \nand 4,601,223 tokens. Three benchmark tasks are built, one is supervised: Few-NERD (SUP) and the \nother two are few-shot: Few-NERD (INTRA) and Few-NERD (INTER).\n",
+  "download_checksums": {
+    "https://cloud.tsinghua.edu.cn/f/09265750ae6340429827/?dl=1": {
+      "num_bytes": 14577157,
+      "checksum": null
+    }
+  },
+  "download_size": 14577157,
+  "features": {
+    "id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "tokens": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "ner_tags": {
+      "feature": {
+        "names": [
+          "O",
+          "art",
+          "building",
+          "event",
+          "location",
+          "organization",
+          "other",
+          "person",
+          "product"
+        ],
+        "_type": "ClassLabel"
+      },
+      "_type": "Sequence"
+    },
+    "fine_ner_tags": {
+      "feature": {
+        "names": [
+          "O",
+          "art-broadcastprogram",
+          "art-film",
+          "art-music",
+          "art-other",
+          "art-painting",
+          "art-writtenart",
+          "building-airport",
+          "building-hospital",
+          "building-hotel",
+          "building-library",
+          "building-other",
+          "building-restaurant",
+          "building-sportsfacility",
+          "building-theater",
+          "event-attack/battle/war/militaryconflict",
+          "event-disaster",
+          "event-election",
+          "event-other",
+          "event-protest",
+          "event-sportsevent",
+          "location-GPE",
+          "location-bodiesofwater",
+          "location-island",
+          "location-mountain",
+          "location-other",
+          "location-park",
+          "location-road/railway/highway/transit",
+          "organization-company",
+          "organization-education",
+          "organization-government/governmentagency",
+          "organization-media/newspaper",
+          "organization-other",
+          "organization-politicalparty",
+          "organization-religion",
+          "organization-showorganization",
+          "organization-sportsleague",
+          "organization-sportsteam",
+          "other-astronomything",
+          "other-award",
+          "other-biologything",
+          "other-chemicalthing",
+          "other-currency",
+          "other-disease",
+          "other-educationaldegree",
+          "other-god",
+          "other-language",
+          "other-law",
+          "other-livingthing",
+          "other-medical",
+          "person-actor",
+          "person-artist/author",
+          "person-athlete",
+          "person-director",
+          "person-other",
+          "person-politician",
+          "person-scholar",
+          "person-soldier",
+          "product-airplane",
+          "product-car",
+          "product-food",
+          "product-game",
+          "product-other",
+          "product-ship",
+          "product-software",
+          "product-train",
+          "product-weapon"
+        ],
+        "_type": "ClassLabel"
+      },
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "https://ningding97.github.io/fewnerd/",
+  "license": "",
+  "size_in_bytes": 131502226,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 81848645,
+      "num_examples": 131767,
+      "dataset_name": "few-nerd"
+    },
+    "validation": {
+      "name": "validation",
+      "num_bytes": 11731110,
+      "num_examples": 18824,
+      "dataset_name": "few-nerd"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 23345314,
+      "num_examples": 37648,
+      "dataset_name": "few-nerd"
+    }
+  },
+  "version": {
+    "version_str": "0.0.0",
+    "major": 0,
+    "minor": 0,
+    "patch": 0
+  }
+}

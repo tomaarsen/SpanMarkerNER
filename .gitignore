@@ -188,3 +188,6 @@ hf_models
 archived
 notes.txt
 demo.py
+
+# Ignore arrow cahce files
+cache-*.arrow
