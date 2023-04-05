@@ -60,6 +60,9 @@ log_cli = "True"
 testpaths = [
     "tests"
 ]
+filterwarnings = [
+    "ignore::DeprecationWarning:tensorboard.*:"
+]
 
 [tool.coverage.report]
 exclude_lines = [
