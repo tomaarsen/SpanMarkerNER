@@ -304,4 +304,7 @@ class SpanMarkerModel(PreTrainedModel):
                 )
                 if not allow_overlapping:
                     word_selected[word_start_index:word_end_index] = [True] * (word_end_index - word_start_index)
-        return sorted(output, key=lambda entity: entity["word_start_index"])
+        return sorted(
+            output,
+            key=lambda entity: entity["char_start_index"] if isinstance(sentence, str) else entity["word_start_index"],
+        )
