@@ -57,9 +57,9 @@ jobs:
       - name: Run unit tests
         shell: bash
         run: |
-          echo "OLD_HF_CACHE_HASH=$(find ~/.cache/huggingface/hub ~/.cache/torch -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d ' ' -f 1)" >> $GITHUB_ENV
+          echo "OLD_HF_CACHE_HASH=$(find ~/.cache/huggingface/hub -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d ' ' -f 1)" >> $GITHUB_ENV
           pytest -sv
-          echo "NEW_HF_CACHE_HASH=$(find ~/.cache/huggingface/hub ~/.cache/torch -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d ' ' -f 1)" >> $GITHUB_ENV
+          echo "NEW_HF_CACHE_HASH=$(find ~/.cache/huggingface/hub -type f -exec sha256sum {} + | LC_ALL=C sort | sha256sum | cut -d ' ' -f 1)" >> $GITHUB_ENV
 
       - name: Save new HF models to cache
         uses: actions/cache/save@v3
