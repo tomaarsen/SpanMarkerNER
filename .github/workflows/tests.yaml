@@ -33,7 +33,7 @@ jobs:
         id: restore-cache
         with:
           path: ${{ env.pythonLocation }}
-          key: python-dependencies-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('setup.py') }}-${{ env.pythonLocation }}
+          key: python-dependencies-${{ matrix.os }}-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml') }}-${{ env.pythonLocation }}
 
       - name: Install external dependencies on cache miss
         run: |
