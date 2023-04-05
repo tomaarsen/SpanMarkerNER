@@ -53,9 +53,7 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
             sample_dict[token_hash]["scores"] += scores[sample_idx].tolist()
 
     outside_id = tokenizer.config.outside_id
-    id2label = {int(label_id): label for label_id, label in tokenizer.config.id2label.items()}
-    if tokenizer.config.are_labels_schemed():
-        id2label = {label_id: id2label[tokenizer.config.id2reduced_id[label_id]] for label_id in id2label}
+    id2label = tokenizer.config.id2label
     # seqeval works wonders for NER evaluation
     seqeval = evaluate.load("seqeval")
     for sample in sample_dict.values():

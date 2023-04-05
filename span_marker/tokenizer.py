@@ -19,7 +19,7 @@ class SpanMarkerTokenizer:
         if self.tokenizer.model_max_length > 1e29 and self.config.model_max_length is None:
             warnings.warn(
                 f"Base {self.tokenizer.__class__.__name__} nor {self.config.__class__.__name__} specify"
-                f" `model_max_length`: defaulting to {self.model_max_length_default} tokens."
+                f" `model_max_length`: defaulting to {self.config.model_max_length_default} tokens."
             )
         self.model_max_length = min(
             self.tokenizer.model_max_length, self.config.model_max_length or self.config.model_max_length_default

@@ -36,7 +36,8 @@ dynamic = ["version"]
 dev = [
     "pre-commit",
     "ruff",
-    "black"
+    "black",
+    "pytest"
 ]
 wandb = [
     "wandb"

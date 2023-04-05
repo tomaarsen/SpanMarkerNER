@@ -4,11 +4,7 @@ from typing import Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 from torch import nn
-from transformers import (
-    AutoConfig,
-    AutoModel,
-    PreTrainedModel,
-)
+from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 from transformers.modeling_outputs import TokenClassifierOutput
 
 from span_marker.configuration import SpanMarkerConfig
@@ -168,14 +164,9 @@ class SpanMarkerModel(PreTrainedModel):
             SpanMarkerModel: A SpanMarkerModel instance, either ready for training using the `Trainer` or for
                 inference via `model.predict()`.
         """
-        config_kwargs = {}
-        # TODO: Ensure that the provided labels match the labels in the config
-        if labels is not None:
-            config_kwargs["id2label"] = dict(enumerate(labels))
-            config_kwargs["label2id"] = {v: k for k, v in config_kwargs["id2label"].items()}
-
+        # If loading a SpanMarkerConfig, then we don't want to override id2label and label2id
         # Create an encoder or SpanMarker config
-        config = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs, **config_kwargs)
+        config: PretrainedConfig = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         if isinstance(config, cls.config_class):
@@ -185,6 +176,21 @@ class SpanMarkerModel(PreTrainedModel):
         # then initialize it and create the SpanMarker config and model using the encoder and its config.
         else:
             encoder = AutoModel.from_pretrained(pretrained_model_name_or_path, *model_args, config=config)
+            if labels is None:
+                raise ValueError(
+                    "Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.\n"
+                    ">>> SpanMarkerModel.from_pretrained(\n"
+                    '...     "bert-base-cased",\n'
+                    '...     labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...]\n'
+                    "... )\n"
+                    "or\n"
+                    ">>> SpanMarkerModel.from_pretrained(\n"
+                    '...     "bert-base-cased",\n'
+                    '...     labels=["O", "PER", "ORG", "LOC", "MISC"]\n'
+                    "... )"
+                )
+            config.id2label = dict(enumerate(labels))
+            config.label2id = {v: k for k, v in config.id2label.items()}
             config = cls.config_class(encoder_config=config.to_dict())
             model = cls(config, encoder, *model_args, **kwargs)
 
@@ -270,9 +276,7 @@ class SpanMarkerModel(PreTrainedModel):
         spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
 
         output = []
-        id2label = {int(label_id): label for label_id, label in self.config.id2label.items()}
-        if self.config.are_labels_schemed():
-            id2label = {label_id: id2label[self.config.id2reduced_id[label_id]] for label_id in id2label}
+        id2label = self.config.id2label
         # If we don't allow overlapping, then we keep track of a boolean for each word, indicating if it has been
         # selected already by a previous, higher score entity span
         if not allow_overlapping:

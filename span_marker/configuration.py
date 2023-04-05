@@ -6,6 +6,7 @@ from transformers import PretrainedConfig
 
 class SpanMarkerConfig(PretrainedConfig):
     model_type: str = "span-marker"
+    is_composition = True
 
     def __init__(
         self,
@@ -21,34 +22,25 @@ class SpanMarkerConfig(PretrainedConfig):
         self.marker_max_length = marker_max_length
         self.entity_max_length = entity_max_length
         super().__init__(**kwargs)
-        # These are automatically set by super().__init__, but we want to rely on
-        # the encoder configs instead if we can, so we delete them.
-        del self.id2label
-        del self.label2id
 
-        if encoder_config is None:
-            return
+        # label2id and id2label are automatically set by super().__init__, but we want to rely on
+        # the encoder configs instead if we can, so we delete them under two conditions
+        # 1. if they're the default ({0: "LABEL_0", 1: "LABEL_1"})
+        # 2. if they're identical to the encoder label2id
+        span_marker_label2id = super().__getattribute__("label2id")
+        if span_marker_label2id == {"LABEL_0": 0, "LABEL_1": 1} or span_marker_label2id == self.encoder.get("label2id"):
+            del self.id2label
+            del self.label2id
 
-        # If the id2label of the encoder is not overridden
-        if self.id2label == {0: "LABEL_0", 1: "LABEL_1"}:
-            raise ValueError(
-                "Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.\n"
-                ">>> SpanMarkerModel.from_pretrained(\n"
-                '...     "bert-base-cased",\n'
-                '...     labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...]\n'
-                "... )\n"
-                "or\n"
-                ">>> SpanMarkerModel.from_pretrained(\n"
-                '...     "bert-base-cased",\n'
-                '...     labels=["O", "PER", "ORG", "LOC", "MISC"]\n'
-                "... )"
-            )
-
-        if self.id2label and "O" not in self.label2id:
+        # We need the "O" label for label normalization, etc.
+        if self.label2id and "O" not in self.label2id:
             raise Exception("There must be an 'O' label.")
 
-        # TODO: Consider converting this into several properties
-        if self.are_labels_schemed():
+        # Keys are always strings in JSON so convert ids to int here.
+        if hasattr(self, "id2reduced_id"):
+            self.id2reduced_id = {int(label_id): reduced_id for label_id, reduced_id in self.id2reduced_id.items()}
+            self.encoder["id2label"] = {int(label_id): label for label_id, label in self.encoder["id2label"].items()}
+        elif self.are_labels_schemed():
             reduced_labels = {label[2:] for label in self.label2id.keys() if label != "O"}
             reduced_labels = ["O"] + sorted(reduced_labels)
             self.id2reduced_id = {
@@ -56,9 +48,10 @@ class SpanMarkerConfig(PretrainedConfig):
             }
             self.id2label = dict(enumerate(reduced_labels))
             self.label2id = {v: k for k, v in self.id2label.items()}
-            self.outside_id = 0
-        else:
-            self.outside_id = self.label2id["O"]
+
+    @property
+    def outside_id(self) -> None:
+        return self.label2id["O"]
 
     def __setattr__(self, name, value) -> None:
         """Whenever the vocab_size is updated, update it for both the SpanMarkerConfig and the
@@ -66,6 +59,9 @@ class SpanMarkerConfig(PretrainedConfig):
         """
         if name == "vocab_size":
             self.encoder[name] = value
+        # `outside_id` is now a property instead.
+        if name == "outside_id":
+            return
         return super().__setattr__(name, value)
 
     def __getattribute__(self, key: str) -> Any:
