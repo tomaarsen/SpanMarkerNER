@@ -102,12 +102,12 @@ class Trainer(TransformersTrainer):
 
         # Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics
         if compute_metrics is not None:
-            compute_metrics = lambda eval_prediction: {
+            compute_metrics_func = lambda eval_prediction: {
                 **compute_f1_via_seqeval(model.tokenizer, eval_prediction),
                 **compute_metrics(eval_prediction),
             }
         else:
-            compute_metrics = lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction)
+            compute_metrics_func = lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction)
 
         super().__init__(
             model=model,
@@ -117,7 +117,7 @@ class Trainer(TransformersTrainer):
             eval_dataset=eval_dataset,
             tokenizer=model.tokenizer,
             model_init=None,
-            compute_metrics=compute_metrics,
+            compute_metrics=compute_metrics_func,
             callbacks=callbacks,
             optimizers=optimizers,
             preprocess_logits_for_metrics=preprocess_logits_for_metrics,
