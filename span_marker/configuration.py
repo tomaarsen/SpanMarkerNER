@@ -37,9 +37,9 @@ class SpanMarkerConfig(PretrainedConfig):
             raise Exception("There must be an 'O' label.")
 
         # Keys are always strings in JSON so convert ids to int here.
+        self.encoder["id2label"] = {int(label_id): label for label_id, label in self.encoder["id2label"].items()}
         if hasattr(self, "id2reduced_id"):
             self.id2reduced_id = {int(label_id): reduced_id for label_id, reduced_id in self.id2reduced_id.items()}
-            self.encoder["id2label"] = {int(label_id): label for label_id, label in self.encoder["id2label"].items()}
         elif self.are_labels_schemed():
             reduced_labels = {label[2:] for label in self.label2id.keys() if label != "O"}
             reduced_labels = ["O"] + sorted(reduced_labels)
