@@ -12,10 +12,11 @@ from tests.constants import DEFAULT_ARGS
 @pytest.mark.parametrize(
     ("model_fixture", "dataset_fixture"),
     [
-        ("fresh_conll_span_marker_model", "conll_dataset_dict"),
-        ("finetuned_conll_span_marker_model", "conll_dataset_dict"),
-        ("fresh_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),
-        ("finetuned_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),
+        ("fresh_conll_span_marker_model", "conll_dataset_dict"),  # IOB2
+        ("finetuned_conll_span_marker_model", "conll_dataset_dict"),  # IOB2
+        ("fresh_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),  # no scheme
+        ("finetuned_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),  # no scheme
+        ("fresh_fabner_span_marker_model", "fabner_dataset_dict"),  # BIOES
     ],
 )
 def test_trainer_standard(model_fixture: str, dataset_fixture: str, request: pytest.FixtureRequest) -> None:

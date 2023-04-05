@@ -1,0 +1,133 @@
+{
+  "builder_name": "fabner",
+  "citation": "@article{DBLP:journals/jim/KumarS22,\n  author    = {Aman Kumar and\n               Binil Starly},\n  title     = {\"FabNER\": information extraction from manufacturing process science\n               domain literature using named entity recognition},\n  journal   = {J. Intell. Manuf.},\n  volume    = {33},\n  number    = {8},\n  pages     = {2393--2407},\n  year      = {2022},\n  url       = {https://doi.org/10.1007/s10845-021-01807-x},\n  doi       = {10.1007/s10845-021-01807-x},\n  timestamp = {Sun, 13 Nov 2022 17:52:57 +0100},\n  biburl    = {https://dblp.org/rec/journals/jim/KumarS22.bib},\n  bibsource = {dblp computer science bibliography, https://dblp.org}\n}\n",
+  "config_name": "fabner",
+  "dataset_size": 6268493,
+  "description": "FabNER is a manufacturing text corpus of 350,000+ words for Named Entity Recognition.\nIt is a collection of abstracts obtained from Web of Science through known journals available in manufacturing process \nscience research.\nFor every word, there were categories/entity labels defined namely Material (MATE), Manufacturing Process (MANP), \nMachine/Equipment (MACEQ), Application (APPL), Features (FEAT), Mechanical Properties (PRO), Characterization (CHAR), \nParameters (PARA), Enabling Technology (ENAT), Concept/Principles (CONPRI), Manufacturing Standards (MANS) and \nBioMedical (BIOP). Annotation was performed in all categories along with the output tag in 'BIOES' format: \nB=Beginning, I-Intermediate, O=Outside, E=End, S=Single.\n",
+  "download_checksums": {
+    "https://figshare.com/ndownloader/files/28405854/S2-train.txt": {
+      "num_bytes": 2659848,
+      "checksum": null
+    },
+    "https://figshare.com/ndownloader/files/28405857/S3-val.txt": {
+      "num_bytes": 564168,
+      "checksum": null
+    },
+    "https://figshare.com/ndownloader/files/28405851/S1-test.txt": {
+      "num_bytes": 569597,
+      "checksum": null
+    }
+  },
+  "download_size": 3793613,
+  "features": {
+    "id": {
+      "dtype": "string",
+      "_type": "Value"
+    },
+    "tokens": {
+      "feature": {
+        "dtype": "string",
+        "_type": "Value"
+      },
+      "_type": "Sequence"
+    },
+    "ner_tags": {
+      "feature": {
+        "names": [
+          "O",
+          "B-MATE",
+          "I-MATE",
+          "O-MATE",
+          "E-MATE",
+          "S-MATE",
+          "B-MANP",
+          "I-MANP",
+          "O-MANP",
+          "E-MANP",
+          "S-MANP",
+          "B-MACEQ",
+          "I-MACEQ",
+          "O-MACEQ",
+          "E-MACEQ",
+          "S-MACEQ",
+          "B-APPL",
+          "I-APPL",
+          "O-APPL",
+          "E-APPL",
+          "S-APPL",
+          "B-FEAT",
+          "I-FEAT",
+          "O-FEAT",
+          "E-FEAT",
+          "S-FEAT",
+          "B-PRO",
+          "I-PRO",
+          "O-PRO",
+          "E-PRO",
+          "S-PRO",
+          "B-CHAR",
+          "I-CHAR",
+          "O-CHAR",
+          "E-CHAR",
+          "S-CHAR",
+          "B-PARA",
+          "I-PARA",
+          "O-PARA",
+          "E-PARA",
+          "S-PARA",
+          "B-ENAT",
+          "I-ENAT",
+          "O-ENAT",
+          "E-ENAT",
+          "S-ENAT",
+          "B-CONPRI",
+          "I-CONPRI",
+          "O-CONPRI",
+          "E-CONPRI",
+          "S-CONPRI",
+          "B-MANS",
+          "I-MANS",
+          "O-MANS",
+          "E-MANS",
+          "S-MANS",
+          "B-BIOP",
+          "I-BIOP",
+          "O-BIOP",
+          "E-BIOP",
+          "S-BIOP"
+        ],
+        "_type": "ClassLabel"
+      },
+      "_type": "Sequence"
+    }
+  },
+  "homepage": "https://figshare.com/articles/dataset/Dataset_NER_Manufacturing_-_FabNER_Information_Extraction_from_Manufacturing_Process_Science_Domain_Literature_Using_Named_Entity_Recognition/14782407",
+  "license": "",
+  "size_in_bytes": 10062106,
+  "splits": {
+    "train": {
+      "name": "train",
+      "num_bytes": 4394010,
+      "num_examples": 9435,
+      "dataset_name": "fabner"
+    },
+    "validation": {
+      "name": "validation",
+      "num_bytes": 934347,
+      "num_examples": 2183,
+      "dataset_name": "fabner"
+    },
+    "test": {
+      "name": "test",
+      "num_bytes": 940136,
+      "num_examples": 2064,
+      "dataset_name": "fabner"
+    }
+  },
+  "version": {
+    "version_str": "1.1.0",
+    "major": 1,
+    "minor": 1,
+    "patch": 0
+  }
+}

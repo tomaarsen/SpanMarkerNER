@@ -18,7 +18,7 @@ class LabelNormalizer(ABC):
 
     @abstractmethod
     def __call__(self, ner_tags: List[int]) -> Dict[str, List[Any]]:
-        return
+        raise NotImplementedError
 
 
 class LabelNormalizerScheme(LabelNormalizer):
