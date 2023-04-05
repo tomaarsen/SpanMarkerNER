@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Dict
 
 import pytest
@@ -19,10 +20,13 @@ from tests.constants import DEFAULT_ARGS
         ("fresh_fabner_span_marker_model", "fabner_dataset_dict"),  # BIOES
     ],
 )
-def test_trainer_standard(model_fixture: str, dataset_fixture: str, request: pytest.FixtureRequest) -> None:
+def test_trainer_standard(
+    model_fixture: str, dataset_fixture: str, request: pytest.FixtureRequest, tmp_path: Path
+) -> None:
     model: SpanMarkerModel = request.getfixturevalue(model_fixture)
     dataset: DatasetDict = request.getfixturevalue(dataset_fixture)
 
+    # Perform training and evaluation
     trainer = Trainer(model, args=DEFAULT_ARGS, train_dataset=dataset["train"], eval_dataset=dataset["test"])
     trainer.train()
     metrics = trainer.evaluate()
@@ -38,6 +42,15 @@ def test_trainer_standard(model_fixture: str, dataset_fixture: str, request: pyt
         "eval_steps_per_second",
         "epoch",
     }
+
+    # Try saving and loading the model
+    model_path = tmp_path / model_fixture / dataset_fixture
+    model.save_pretrained(model_path)
+    loaded_model = model.from_pretrained(model_path)
+    output = loaded_model.predict(
+        "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."
+    )
+    assert isinstance(output, list)
 
 
 def test_trainer_compute_metrics(

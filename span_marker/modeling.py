@@ -196,7 +196,9 @@ class SpanMarkerModel(PreTrainedModel):
 
         # Pass the tokenizer directly to the model for convenience, this way the user doesn't have to
         # make it themselves.
-        tokenizer = SpanMarkerTokenizer.from_pretrained(pretrained_model_name_or_path, config=config, **kwargs)
+        tokenizer = SpanMarkerTokenizer.from_pretrained(
+            config.encoder.get("_name_or_path", pretrained_model_name_or_path), config=config, **kwargs
+        )
         model.set_tokenizer(tokenizer)
         model.resize_token_embeddings(len(tokenizer))
 
