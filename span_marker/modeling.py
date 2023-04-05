@@ -291,15 +291,15 @@ class SpanMarkerModel(PreTrainedModel):
                 char_end_index = batch_encoding.word_to_chars(0, word_end_index - 1).end
                 output.append(
                     {
-                        "word_start_index": word_start_index,
-                        "word_end_index": word_end_index,
-                        "char_start_index": char_start_index,
-                        "char_end_index": char_end_index,
-                        "label": id2label[label_id],
-                        "score": score,
                         "span": sentence[char_start_index:char_end_index]
                         if isinstance(sentence, str)
                         else sentence[word_start_index:word_end_index],
+                        "label": id2label[label_id],
+                        "score": score,
+                        "word_start_index": word_start_index if not isinstance(sentence, str) else None,
+                        "word_end_index": word_end_index if not isinstance(sentence, str) else None,
+                        "char_start_index": char_start_index if isinstance(sentence, str) else None,
+                        "char_end_index": char_end_index if isinstance(sentence, str) else None,
                     }
                 )
                 if not allow_overlapping:
