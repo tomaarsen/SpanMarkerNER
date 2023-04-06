@@ -17,6 +17,8 @@ Types of changes
 
 ## [Unreleased]
 
+## [0.2.0] - 2023-04-06
+
 ### Added
 
 - Added missing docstrings.
@@ -32,14 +34,14 @@ Types of changes
 - Add missing methods to `SpanMarkerTokenizer`.
 - Fix endless recursion bug when providing a `compute_metrics` to the Trainer.
 
-## [0.1.1] - 2019-03-31
+## [0.1.1] - 2023-03-31
 
 ### Fixed
 
 - Prevent crash when `args` not supplied to Trainer.
 - Prevent crash on evaluation when using `fp16=True` as a Training Argument.
 
-## [0.1.0] - 2019-03-30
+## [0.1.0] - 2023-03-30
 
 ### Added
 
