@@ -1,0 +1,43 @@
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Python environment
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.9
+
+      - name: Try to load cached dependencies
+        uses: actions/cache@v3
+        id: restore-cache
+        with:
+          path: ${{ env.pythonLocation }}
+          key: python-docs-dependencies-${{ hashFiles('pyproject.toml') }}-${{ env.pythonLocation }}
+
+      - name: Install dependencies on cache miss
+        run: |
+          pip install --no-cache-dir --upgrade pip
+          pip install --no-cache-dir ".[docs]"
+        if: steps.restore-cache.outputs.cache-hit != 'true'
+
+      - name: Build Sphinx
+        run: make html
+
+      - name: Deploy Sphinx
+        uses: peaceiris/actions-gh-pages@v3
+        if: ${{ github.ref == 'refs/heads/main' }}
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./build
