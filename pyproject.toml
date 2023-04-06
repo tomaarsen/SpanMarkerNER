@@ -41,6 +41,7 @@ dev = [
     "pytest-cov"
 ]
 docs = [
+    "nltk_theme",
     "sphinx",
     "m2r2",
     "better-apidoc",
