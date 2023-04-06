@@ -39,7 +39,15 @@ def test_from_pretrained(model_name: str, labels: Optional[List[str]]) -> None:
     assert isinstance(model.config, SpanMarkerConfig)
     assert isinstance(model.tokenizer, SpanMarkerTokenizer)
 
-    output = model.predict(
-        "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."
-    )
-    assert isinstance(output, list)
+    for sentence in [
+        "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany.",
+        ["This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."],
+        "This might just output confusing things like M.C. Escher , but it should at least not crash in Germany .".split(),
+        [
+            "This might just output confusing things like M.C. Escher , but it should at least not crash in Germany .".split()
+        ],
+    ]:
+        output = model.predict(sentence)
+        assert isinstance(output, list)
+    output = model.predict([])
+    assert output == []
