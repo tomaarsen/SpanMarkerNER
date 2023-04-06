@@ -1,14 +1,22 @@
 <h1 align="center">
 SpanMarker for Named Entity Recognition
-
-[![Getting Started In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)
 </h1>
+<div align="center">
+
+[🤗 Models](https://huggingface.co/models?other=span-marker) |
+<img src="https://ssl.gstatic.com/colaboratory-static/common/d42b9041c87c7f85d49a93be9c3c668a/img/favicon.ico" width=20 style="margin-bottom:-5px; margin-left:2px;">
+[Getting Started In Google Colab](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb) |
+[📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER)
+</div>
 
 SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
 Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.
 <!-- like performance dashboard integration, automatic mixed precision, 8-bit inference-->
 
 Based on the [PL-Marker](https://arxiv.org/pdf/2109.06067.pdf) paper, SpanMarker breaks the mold through its accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU` or no label annotation scheme.
+
+## Documentation
+Feel free to have a look at the [documentation](https://tomaarsen.github.io/SpanMarkerNER).
 
 ## Installation
 You may install the [`span_marker`](https://pypi.org/project/span-marker) Python module via `pip` like so:
@@ -17,7 +25,7 @@ pip install span_marker
 ```
 
 ## Quick Start
-Please have a look at our [Getting Started](examples/getting_started.ipynb) jupyter notebook for details on how SpanMarker is commonly used. That notebook explains the following snippet in more detail.
+Please have a look at our [Getting Started](notebooks/getting_started.ipynb) notebook for details on how SpanMarker is commonly used. It explains the following snippet in more detail.
 
 ```python
 from datasets import load_dataset
@@ -62,6 +70,8 @@ Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf
 
 ## Pretrained Models
 
-* [`tomaarsen/span-marker-bert-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super) is a model that I have trained in just 4 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.7020 Test F1, competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup).
+* [`tomaarsen/span-marker-bert-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super) is a model that I have trained in just 4 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.7020 Test F1, competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup). My training script resembles the one that you can see above.
   * See this [Weights and Biases report](https://api.wandb.ai/links/tomaarsen/dm21vbbm) for training details.
 
+## Changelog
+See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
