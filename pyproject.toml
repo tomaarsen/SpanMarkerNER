@@ -54,7 +54,7 @@ wandb = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/tomaarsen/SpanMarkerNER"
+Documentation = "https://tomaarsen.github.io/SpanMarkerNER"
 Repository = "https://github.com/tomaarsen/SpanMarkerNER"
 
 [tool.setuptools.packages.find]
