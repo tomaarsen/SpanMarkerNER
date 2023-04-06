@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: SpanMarker for Named Entity Recognition</title>
+  
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="#">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="spanmarker-for-named-entity-recognition">
+<h1>SpanMarker for Named Entity Recognition<a class="headerlink" href="#spanmarker-for-named-entity-recognition" title="Permalink to this heading">¶</a></h1>
+<p>SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT,
+RoBERTa and DeBERTa. Tightly implemented on top of the <a class="reference external" href="https://github.com/huggingface/transformers">🤗 Transformers</a>
+library, SpanMarker can take advantage of its valuable functionality.</p>
+<p>Based on the <a class="reference external" href="https://arxiv.org/pdf/2109.06067.pdf">PL-Marker</a> paper, SpanMarker breaks the mold through its
+accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as
+<cite>bert-base-cased</cite> and <cite>roberta-large</cite>, and automatically works with datasets using the <cite>IOB</cite>, <cite>IOB2</cite>, <cite>BIOES</cite>, <cite>BILOU</cite>
+or no label annotation scheme.</p>
+<section id="quick-reference">
+<h2>Quick Reference<a class="headerlink" href="#quick-reference" title="Permalink to this heading">¶</a></h2>
+<section id="how-to-train">
+<h3>How to Train<a class="headerlink" href="#how-to-train" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
+
+<span class="c1"># The dataset labels can have a tagging schemed (IOB, IOB2, BIOES),</span>
+<span class="c1"># but that is not necessary. This dataset has no tagging scheme:</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;DFKI-SLT/few-nerd&quot;</span><span class="p">,</span> <span class="s2">&quot;supervised&quot;</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;art&quot;</span><span class="p">,</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;organization&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="s2">&quot;product&quot;</span><span class="p">]</span>
+
+<span class="c1"># Initialize a SpanMarkerModel using an encoder, e.g. BERT:</span>
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+
+<span class="c1"># See the 🤗 TrainingArguments documentation for details here</span>
+<span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;my_span_marker_model&quot;</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-5</span><span class="p">,</span>
+    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">save_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Our Trainer subclasses the 🤗 Trainer, and the usage is very similar</span>
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8000</span><span class="p">)),</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="c1"># Training is really simple using our Trainer!</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;my_span_marker_model/checkpoint-final&quot;</span><span class="p">)</span>
+
+<span class="c1"># ... and so is evaluating!</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="how-to-predict">
+<h3>How to predict<a class="headerlink" href="#how-to-predict" title="Permalink to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+<span class="c1"># Load a finetuned SpanMarkerModel from the 🤗 Hub</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span><span class="p">)</span>
+
+<span class="c1"># It is recommended to explicitly move the model to CUDA for faster inference</span>
+<span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
+
+<span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;A prototype was fitted in the mid-&#39;60s in a one-off DB5 extended 4&#39;&#39; after the doors and driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.&quot;</span><span class="p">)</span>
+<span class="p">[{</span><span class="s1">&#39;span&#39;</span><span class="p">:</span> <span class="s1">&#39;DB5&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;product-car&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="mf">0.8675689101219177</span><span class="p">,</span> <span class="s1">&#39;char_start_index&#39;</span><span class="p">:</span> <span class="mi">52</span><span class="p">,</span> <span class="s1">&#39;char_end_index&#39;</span><span class="p">:</span> <span class="mi">55</span><span class="p">},</span>
+ <span class="p">{</span><span class="s1">&#39;span&#39;</span><span class="p">:</span> <span class="s1">&#39;Marek&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;person-other&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="mf">0.9100819230079651</span><span class="p">,</span> <span class="s1">&#39;char_start_index&#39;</span><span class="p">:</span> <span class="mi">99</span><span class="p">,</span> <span class="s1">&#39;char_end_index&#39;</span><span class="p">:</span> <span class="mi">104</span><span class="p">},</span>
+ <span class="p">{</span><span class="s1">&#39;span&#39;</span><span class="p">:</span> <span class="s1">&#39;Aston Martin DB7&#39;</span><span class="p">,</span> <span class="s1">&#39;label&#39;</span><span class="p">:</span> <span class="s1">&#39;product-car&#39;</span><span class="p">,</span> <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="mf">0.9931442737579346</span><span class="p">,</span> <span class="s1">&#39;char_start_index&#39;</span><span class="p">:</span> <span class="mi">143</span><span class="p">,</span> <span class="s1">&#39;char_end_index&#39;</span><span class="p">:</span> <span class="mi">159</span><span class="p">}]</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can also load a locally saved model through <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained(&quot;path/to/model&quot;)</span></code>,
+much like in 🤗 Transformers.</p>
+</div>
+</section>
+<section id="how-to-save-a-model">
+<h3>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Permalink to this heading">¶</a></h3>
+<section id="locally">
+<h4>Locally<a class="headerlink" href="#locally" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="s2">&quot;my_model_dir&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="to-the-hub">
+<h4>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Permalink to this heading">¶</a></h4>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
+<span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Be sure to also push the <code class="docutils literal notranslate"><span class="pre">model.tokenizer</span></code>!
+Otherwise, the model can’t be easily loaded with <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code> again.</p>
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+<div class="toctree-wrapper compound">
+</div>
+</section>
+</section>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/index.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

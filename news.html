@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: Changelog</title>
+  
+  <link rel="index" title="Index" href="genindex.html"/>
+
+  <link rel="stylesheet" href="_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/documentation_options.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="changelog">
+<h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this heading">¶</a></h1>
+<p>All notable changes to this project will be documented in this file.</p>
+<p>The format is based on <a class="reference external" href="https://keepachangelog.com/en/1.0.0/">Keep a Changelog</a>,
+and this project adheres to <a class="reference external" href="https://semver.org/spec/v2.0.0.html">Semantic Versioning</a>.</p>
+<!--
+Types of changes
+* "Added" for new features.
+* "Changed" for changes in existing functionality.
+* "Deprecated" for soon-to-be removed features.
+* "Removed" for now removed features.
+* "Fixed" for any bug fixes.
+* "Security" in case of vulnerabilities.
+--><section id="unreleased">
+<h2>[Unreleased]<a class="headerlink" href="#unreleased" title="Permalink to this heading">¶</a></h2>
+<section id="added">
+<h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Added missing docstrings.</p></li>
+</ul>
+</section>
+<section id="changed">
+<h3>Changed<a class="headerlink" href="#changed" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Updated how entity span indices are returned for <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.predict</span></code>.</p></li>
+</ul>
+</section>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Prevent incorrect labels when loading a model trained with a schemed (e.g. IOB, BIOES) dataset.</p></li>
+<li><p>Fix several bugs with loading finetuned SpanMarker models.</p></li>
+<li><p>Add missing methods to <code class="docutils literal notranslate"><span class="pre">SpanMarkerTokenizer</span></code>.</p></li>
+<li><p>Fix endless recursion bug when providing a <code class="docutils literal notranslate"><span class="pre">compute_metrics</span></code> to the Trainer.</p></li>
+</ul>
+</section>
+</section>
+<section id="id1">
+<h2>[0.1.1] - 2019-03-31<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<section id="id2">
+<h3>Fixed<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Prevent crash when <code class="docutils literal notranslate"><span class="pre">args</span></code> not supplied to Trainer.</p></li>
+<li><p>Prevent crash on evaluation when using <code class="docutils literal notranslate"><span class="pre">fp16=True</span></code> as a Training Argument.</p></li>
+</ul>
+</section>
+</section>
+<section id="id3">
+<h2>[0.1.0] - 2019-03-30<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<section id="id4">
+<h3>Added<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Implement initial working version.</p></li>
+</ul>
+</section>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="_sources/news.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

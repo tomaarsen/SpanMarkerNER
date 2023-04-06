@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker package</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="module-span_marker">
+<span id="span-marker-package"></span><h1>span_marker package<a class="headerlink" href="#module-span_marker" title="Permalink to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.modeling.html">span_marker.modeling module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.forward()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.predict()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.device"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.device</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.cuda"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.cuda()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.cpu"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.cpu()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.train"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.train()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.eval"><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.eval()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.trainer.html">span_marker.trainer module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer"><code class="docutils literal notranslate"><span class="pre">Trainer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset"><code class="docutils literal notranslate"><span class="pre">Trainer.preprocess_dataset()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer.train"><code class="docutils literal notranslate"><span class="pre">Trainer.train()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer.evaluate"><code class="docutils literal notranslate"><span class="pre">Trainer.evaluate()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer.push_to_hub"><code class="docutils literal notranslate"><span class="pre">Trainer.push_to_hub()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.trainer.html#span_marker.trainer.Trainer.hyperparameter_search"><code class="docutils literal notranslate"><span class="pre">Trainer.hyperparameter_search()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.configuration.html">span_marker.configuration module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.model_type"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.model_type</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.is_composition"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.is_composition</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.outside_id"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.outside_id</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.are_labels_schemed"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.are_labels_schemed()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.get_scheme_tags"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.get_scheme_tags()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.group_label_ids_by_tag"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.group_label_ids_by_tag()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.get"><code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig.get()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.data_collator.html">span_marker.data_collator module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator"><code class="docutils literal notranslate"><span class="pre">SpanMarkerDataCollator</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.tokenizer"><code class="docutils literal notranslate"><span class="pre">SpanMarkerDataCollator.tokenizer</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length"><code class="docutils literal notranslate"><span class="pre">SpanMarkerDataCollator.marker_max_length</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.__call__"><code class="docutils literal notranslate"><span class="pre">SpanMarkerDataCollator.__call__()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.tokenizer.html">span_marker.tokenizer module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer"><code class="docutils literal notranslate"><span class="pre">SpanMarkerTokenizer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans"><code class="docutils literal notranslate"><span class="pre">SpanMarkerTokenizer.get_all_valid_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans_and_labels"><code class="docutils literal notranslate"><span class="pre">SpanMarkerTokenizer.get_all_valid_spans_and_labels()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained"><code class="docutils literal notranslate"><span class="pre">SpanMarkerTokenizer.from_pretrained()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.evaluation.html">span_marker.evaluation module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.evaluation.html#span_marker.evaluation.compute_f1_via_seqeval"><code class="docutils literal notranslate"><span class="pre">compute_f1_via_seqeval()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.label_normalizer.html">span_marker.label_normalizer module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer"><code class="docutils literal notranslate"><span class="pre">LabelNormalizer</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerScheme</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme.ner_tags_to_entities"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerScheme.ner_tags_to_entities()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerIOB"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerIOB</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBIOES"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerBIOES</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBILOU"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerBILOU</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerNoScheme</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme.ner_tags_to_entities"><code class="docutils literal notranslate"><span class="pre">LabelNormalizerNoScheme.ner_tags_to_entities()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer"><code class="docutils literal notranslate"><span class="pre">AutoLabelNormalizer</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer.from_config"><code class="docutils literal notranslate"><span class="pre">AutoLabelNormalizer.from_config()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="span_marker.output.html">span_marker.output module</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.output.html#span_marker.output.SpanMarkerOutput"><code class="docutils literal notranslate"><span class="pre">SpanMarkerOutput</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="span_marker.output.html#span_marker.output.SpanMarkerOutput.num_words"><code class="docutils literal notranslate"><span class="pre">SpanMarkerOutput.num_words</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/api/span_marker.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

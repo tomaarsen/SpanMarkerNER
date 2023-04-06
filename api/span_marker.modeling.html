@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.modeling module</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="span_marker.html">API Reference</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="module-span_marker.modeling">
+<span id="span-marker-modeling-module"></span><h1>span_marker.modeling module<a class="headerlink" href="#module-span_marker.modeling" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.modeling.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code></p>
+<p>This SpanMarker model allows for Named Entity Recognition (NER) using a variety of underlying encoders,
+such as BERT and RoBERTa. The model should be initialized using <a class="reference internal" href="#span_marker.modeling.SpanMarkerModel.from_pretrained" title="span_marker.modeling.SpanMarkerModel.from_pretrained"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_pretrained()</span></code></a>,
+e.g. like so:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize a SpanMarkerModel using a pretrained encoder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;bert-base-cased&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;B-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;B-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;I-ORG&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load a pretrained SpanMarker model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>After the model is loaded (and finetuned if it wasn’t already), it can be used to predict entities:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;A prototype was fitted in the mid-&#39;60s in a one-off DB5 extended 4&#39;&#39; after the doors and &quot;</span>
+<span class="gp">... </span><span class="s2">&quot;driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.&quot;</span><span class="p">)</span>
+<span class="go">[{&#39;span&#39;: &#39;DB5&#39;, &#39;label&#39;: &#39;product-car&#39;, &#39;score&#39;: 0.8675689101219177, &#39;char_start_index&#39;: 52, &#39;char_end_index&#39;: 55},</span>
+<span class="go"> {&#39;span&#39;: &#39;Marek&#39;, &#39;label&#39;: &#39;person-other&#39;, &#39;score&#39;: 0.9100819230079651, &#39;char_start_index&#39;: 99, &#39;char_end_index&#39;: 104},</span>
+<span class="go"> {&#39;span&#39;: &#39;Aston Martin DB7&#39;, &#39;label&#39;: &#39;product-car&#39;, &#39;score&#39;: 0.9931442737579346, &#39;char_start_index&#39;: 143, &#39;char_end_index&#39;: 159}]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a>) – </p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.forward">
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_words</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Forward call of the SpanMarkerModel.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>input_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a>) – Input IDs including start/end markers.</p></li>
+<li><p><strong>attention_mask</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a>) – Attention mask matrix including one-directional attention for markers.</p></li>
+<li><p><strong>position_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a>) – Position IDs including start/end markers.</p></li>
+<li><p><strong>labels</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a><em>]</em><em>, </em><em>optional</em>) – The labels for each span candidate. Defaults to None.</p></li>
+<li><p><strong>num_words</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a><em>]</em><em>, </em><em>optional</em>) – The number of words for each batch sample. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The output dataclass.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="span_marker.output.html#span_marker.output.SpanMarkerOutput" title="span_marker.output.SpanMarkerOutput">SpanMarkerOutput</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.from_pretrained">
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pretrained</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">model_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.from_pretrained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.from_pretrained" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate a pretrained pytorch model from a pre-trained model configuration.</p>
+<p class="rubric">Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize a SpanMarkerModel using a pretrained encoder</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;bert-base-cased&quot;</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;B-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;B-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;I-ORG&quot;</span><span class="p">,</span> <span class="o">...</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Load a pretrained SpanMarker model</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>os.PathLike</em></a><em>]</em>) – <p>Either a pretrained encoder (e.g. <cite>bert-base-cased</cite>, <cite>roberta-large</cite>, etc.), or a pretrained SpanMarkerModel.
+Can be either:</p>
+<blockquote>
+<div><ul>
+<li><p>A string, the <em>model id</em> of a pretrained model hosted inside a model repo on huggingface.co.
+Valid model ids can be located at the root-level, like <cite>bert-base-uncased</cite>, or namespaced under a
+user or organization name, like <cite>dbmdz/bert-base-german-cased</cite>.</p></li>
+<li><p>A path to a <em>directory</em> containing model weights saved using
+<cite>.save_pretrained</cite>, e.g., <cite>./my_model_directory/</cite>.</p></li>
+<li><p>A path or url to a <em>tensorflow index checkpoint file</em> (e.g, <cite>./tf_model/model.ckpt.index</cite>). In
+this case, <cite>from_tf</cite> should be set to <cite>True</cite> and a configuration object should be provided as
+<cite>config</cite> argument. This loading path is slower than converting the TensorFlow checkpoint in a
+PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.</p></li>
+<li><p>A path or url to a model folder containing a <em>flax checkpoint file</em> in <em>.msgpack</em> format (e.g,
+<cite>./flax_model/</cite> containing <cite>flax_model.msgpack</cite>). In this case, <cite>from_flax</cite> should be set to
+<cite>True</cite>.</p></li>
+</ul>
+</div></blockquote>
+</p></li>
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <cite>ner_tags</cite> in your datasets.
+Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><em>T</em></p>
+</dd>
+</dl>
+<p>Additional arguments are passed to the <cite>from_pretrained</cite> methods of <cite>AutoConfig</cite>, <cite>AutoModel</cite> and
+<cite>SpanMarkerTokenizer</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>A SpanMarkerModel instance, either ready for training using the <cite>Trainer</cite> or for</dt><dd><p>inference via <cite>model.predict()</cite>.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel">SpanMarkerModel</a></p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>PathLike</em></a>) – </p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overlapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.predict" title="Permalink to this definition">¶</a></dt>
+<dd><p>Predict named entities from input texts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>]</em><em>]</em>) – <p>Input sentences from which to extract entities.
+Valid datastructures are:</p>
+<ul>
+<li><p>str: a string sentence.</p></li>
+<li><p>List[str]: a pre-tokenized string sentence, i.e. a list of words.</p></li>
+<li><p>List[str]: a list of multiple string sentences.</p></li>
+<li><p>List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.</p></li>
+</ul>
+</p></li>
+<li><p><strong>allow_overlapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to allow entity spans to overlap. The model does not
+have good support for this, so False is recommended. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>If the input is a single sentence, then we output a list of dictionaries. Each dictionary
+represents one predicted entity, and contains the following keys:</p>
+<ul class="simple">
+<li><p><cite>label</cite>: The predicted entity label.</p></li>
+<li><p><cite>span</cite>: The text that the model deems an entity.</p></li>
+<li><p><cite>score</cite>: The model its confidence.</p></li>
+<li><p><cite>word_start_index</cite> &amp; <cite>word_end_index</cite>: The word indices for the start/end of the entity,
+if the input is pre-tokenized.</p></li>
+<li><p><cite>char_start_index</cite> &amp; <cite>char_end_index</cite>: The character indices for the start/end of the entity,
+if the input is a string.</p></li>
+</ul>
+<p>If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Union[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>]]], List[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>]]]]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.device">
+<em class="property"><span class="pre">property</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">device</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://pytorch.org/docs/master/tensor_attributes.html#torch.device" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><span class="pre">device</span></a></em><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.device" title="Permalink to this definition">¶</a></dt>
+<dd><p>The device on which the module is (assuming that all the module parameters are on the same
+device).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><cite>torch.device</cite></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.cuda">
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">cuda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.cuda" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves all model parameters and buffers to the GPU.</p>
+<p>This also makes associated parameters and buffers different objects. So
+it should be called before constructing optimizer if the module will
+live on GPU while being optimized.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method modifies the module in-place.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><em>optional</em>) – if specified, all parameters will be
+copied to that device</p></li>
+<li><p><strong>self</strong> (<em>T</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.cpu">
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">cpu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.cpu" title="Permalink to this definition">¶</a></dt>
+<dd><p>Moves all model parameters and buffers to the CPU.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>This method modifies the module in-place.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Module</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> (<em>T</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.train">
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the module in training mode.</p>
+<p>This has any effect only on certain modules. See documentations of
+particular modules for details of their behaviors in training/evaluation
+mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
+etc.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – whether to set training mode (<code class="docutils literal notranslate"><span class="pre">True</span></code>) or evaluation
+mode (<code class="docutils literal notranslate"><span class="pre">False</span></code>). Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>self</strong> (<em>T</em>) – </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>self</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Module</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.eval">
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.eval" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets the module in evaluation mode.</p>
+<p>This has any effect only on certain modules. See documentations of
+particular modules for details of their behaviors in training/evaluation
+mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
+etc.</p>
+<p>This is equivalent with <a class="reference external" href="https://pytorch.org/docs/master/generated/torch.nn.Module.html#torch.nn.Module.train" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><code class="xref py py-meth docutils literal notranslate"><span class="pre">self.train(False)</span></code></a>.</p>
+<p>See <a class="reference external" href="https://pytorch.org/docs/master/notes/autograd.html#locally-disable-grad-doc" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><span>Locally disabling gradient computation</span></a> for a comparison between
+<cite>.eval()</cite> and several similar mechanisms that may be confused with it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>self</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Module</p>
+</dd>
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>self</strong> (<em>T</em>) – </p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/api/span_marker.modeling.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

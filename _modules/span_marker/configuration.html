@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.configuration</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.configuration</h1><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">PretrainedConfig</span>
+
+
+<div class="viewcode-block" id="SpanMarkerConfig"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerConfig</span><span class="p">(</span><span class="n">PretrainedConfig</span><span class="p">):</span>
+    <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;span-marker&quot;</span>
+    <span class="n">is_composition</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">encoder_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">256</span><span class="p">,</span>
+        <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder_config</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">=</span> <span class="n">model_max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length_default</span> <span class="o">=</span> <span class="mi">512</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span> <span class="o">=</span> <span class="n">marker_max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span> <span class="o">=</span> <span class="n">entity_max_length</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># label2id and id2label are automatically set by super().__init__, but we want to rely on</span>
+        <span class="c1"># the encoder configs instead if we can, so we delete them under two conditions</span>
+        <span class="c1"># 1. if they&#39;re the default ({0: &quot;LABEL_0&quot;, 1: &quot;LABEL_1&quot;})</span>
+        <span class="c1"># 2. if they&#39;re identical to the encoder label2id</span>
+        <span class="n">span_marker_label2id</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;label2id&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">span_marker_label2id</span> <span class="o">==</span> <span class="p">{</span><span class="s2">&quot;LABEL_0&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;LABEL_1&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span> <span class="ow">or</span> <span class="n">span_marker_label2id</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;label2id&quot;</span><span class="p">):</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">id2label</span>
+            <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span>
+
+        <span class="c1"># We need the &quot;O&quot; label for label normalization, etc.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span> <span class="ow">and</span> <span class="s2">&quot;O&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;There must be an &#39;O&#39; label in the list of `labels`.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Keys are always strings in JSON so convert ids to int here.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">label_id</span><span class="p">):</span> <span class="n">label</span> <span class="k">for</span> <span class="n">label_id</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;id2reduced_id&quot;</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id2reduced_id</span> <span class="o">=</span> <span class="p">{</span><span class="nb">int</span><span class="p">(</span><span class="n">label_id</span><span class="p">):</span> <span class="n">reduced_id</span> <span class="k">for</span> <span class="n">label_id</span><span class="p">,</span> <span class="n">reduced_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id2reduced_id</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">are_labels_schemed</span><span class="p">():</span>
+            <span class="n">reduced_labels</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;O&quot;</span><span class="p">}</span>
+            <span class="n">reduced_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">reduced_labels</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id2reduced_id</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="n">_id</span><span class="p">:</span> <span class="n">reduced_labels</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">label</span><span class="p">[</span><span class="mi">2</span><span class="p">:]</span> <span class="k">if</span> <span class="n">label</span> <span class="o">!=</span> <span class="s2">&quot;O&quot;</span> <span class="k">else</span> <span class="n">label</span><span class="p">)</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+            <span class="p">}</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">id2label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">reduced_labels</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">id2label</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">outside_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">label2id</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__setattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Whenever the vocab_size is updated, update it for both the SpanMarkerConfig and the</span>
+<span class="sd">        underlying encoder config.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;vocab_size&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c1"># `outside_id` is now a property instead.</span>
+        <span class="k">if</span> <span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;outside_id&quot;</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__setattr__</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;encoder&quot;</span><span class="p">)[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">e</span>
+
+<div class="viewcode-block" id="SpanMarkerConfig.are_labels_schemed"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.are_labels_schemed">[docs]</a>    <span class="k">def</span> <span class="nf">are_labels_schemed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;True if all labels are strings matching one of the two following rules:</span>
+
+<span class="sd">        * `label == &quot;O&quot;`</span>
+<span class="sd">        * `label[0] in &quot;BIESLU&quot;` and `label[1] == &quot;-&quot;`, e.g. in `&quot;I-LOC&quot;`</span>
+
+<span class="sd">        We ensure that the first index is in `&quot;BIELSU&quot;` because of these definitions:</span>
+<span class="sd">        * `&quot;B&quot;` for `&quot;begin&quot;`</span>
+<span class="sd">        * `&quot;I&quot;` for `&quot;in&quot;`</span>
+<span class="sd">        * `&quot;E&quot;` for `&quot;end&quot;`</span>
+<span class="sd">        * `&quot;L&quot;` for `&quot;last&quot;`</span>
+<span class="sd">        * `&quot;S&quot;` for `&quot;singular&quot;`</span>
+<span class="sd">        * `&quot;U&quot;` for `&quot;unit&quot;`</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            id2label (Dict[int, str]): Dictionary of label ids to label strings.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if it seems like a labeling scheme is used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span>
+            <span class="n">label</span> <span class="o">==</span> <span class="s2">&quot;O&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">in</span> <span class="s2">&quot;BIELSU&quot;</span> <span class="ow">and</span> <span class="n">label</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpanMarkerConfig.get_scheme_tags"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.get_scheme_tags">[docs]</a>    <span class="k">def</span> <span class="nf">get_scheme_tags</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Set</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="nb">set</span><span class="p">(</span><span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="SpanMarkerConfig.group_label_ids_by_tag"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.group_label_ids_by_tag">[docs]</a>    <span class="k">def</span> <span class="nf">group_label_ids_by_tag</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Set</span><span class="p">]:</span>
+        <span class="n">grouped</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">set</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">label_id</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;id2label&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">grouped</span><span class="p">[</span><span class="n">label</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">label_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">grouped</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpanMarkerConfig.get"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.get">[docs]</a>    <span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">options</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">default</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">options</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">options</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="n">options</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">option</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="k">return</span> <span class="n">default</span></div></div>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

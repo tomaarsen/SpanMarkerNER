@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.modeling</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.modeling</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoModel</span><span class="p">,</span> <span class="n">PretrainedConfig</span><span class="p">,</span> <span class="n">PreTrainedModel</span>
+
+<span class="kn">from</span> <span class="nn">span_marker.configuration</span> <span class="kn">import</span> <span class="n">SpanMarkerConfig</span>
+<span class="kn">from</span> <span class="nn">span_marker.data_collator</span> <span class="kn">import</span> <span class="n">SpanMarkerDataCollator</span>
+<span class="kn">from</span> <span class="nn">span_marker.output</span> <span class="kn">import</span> <span class="n">SpanMarkerOutput</span>
+<span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
+
+<span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="SpanMarkerModel"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerModel</span><span class="p">(</span><span class="n">PreTrainedModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This SpanMarker model allows for Named Entity Recognition (NER) using a variety of underlying encoders,</span>
+<span class="sd">    such as BERT and RoBERTa. The model should be initialized using :meth:`~SpanMarkerModel.from_pretrained`,</span>
+<span class="sd">    e.g. like so:</span>
+
+<span class="sd">    &gt;&gt;&gt; # Initialize a SpanMarkerModel using a pretrained encoder</span>
+<span class="sd">    &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(&quot;bert-base-cased&quot;, labels=[&quot;O&quot;, &quot;B-PER&quot;, &quot;I-PER&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, ...])</span>
+<span class="sd">    &gt;&gt;&gt; # Load a pretrained SpanMarker model</span>
+<span class="sd">    &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;)</span>
+
+<span class="sd">    After the model is loaded (and finetuned if it wasn&#39;t already), it can be used to predict entities:</span>
+
+<span class="sd">    &gt;&gt;&gt; model.predict(&quot;A prototype was fitted in the mid-&#39;60s in a one-off DB5 extended 4&#39;&#39; after the doors and &quot;</span>
+<span class="sd">    ... &quot;driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.&quot;)</span>
+<span class="sd">    [{&#39;span&#39;: &#39;DB5&#39;, &#39;label&#39;: &#39;product-car&#39;, &#39;score&#39;: 0.8675689101219177, &#39;char_start_index&#39;: 52, &#39;char_end_index&#39;: 55},</span>
+<span class="sd">     {&#39;span&#39;: &#39;Marek&#39;, &#39;label&#39;: &#39;person-other&#39;, &#39;score&#39;: 0.9100819230079651, &#39;char_start_index&#39;: 99, &#39;char_end_index&#39;: 104},</span>
+<span class="sd">     {&#39;span&#39;: &#39;Aston Martin DB7&#39;, &#39;label&#39;: &#39;product-car&#39;, &#39;score&#39;: 0.9931442737579346, &#39;char_start_index&#39;: 143, &#39;char_end_index&#39;: 159}]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">config_class</span> <span class="o">=</span> <span class="n">SpanMarkerConfig</span>
+    <span class="n">base_model_prefix</span> <span class="o">=</span> <span class="s2">&quot;encoder&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+        <span class="c1"># `encoder` will be specified if this Model is initializer via .from_pretrained with an encoder</span>
+        <span class="c1"># If .from_pretrained is called with a SpanMarkerModel instance, then we use the &quot;traditional&quot;</span>
+        <span class="c1"># PreTrainedModel.from_pretrained, which won&#39;t include an encoder keyword argument. In that case,</span>
+        <span class="c1"># we must create an &quot;empty&quot; encoder for PreTrainedModel.from_pretrained to fill with the correct</span>
+        <span class="c1"># weights.</span>
+        <span class="k">if</span> <span class="n">encoder</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Load the encoder via the Config to prevent having to use AutoModel.from_pretrained, which</span>
+            <span class="c1"># could load e.g. all of `roberta-large` from the Hub unnecessarily.</span>
+            <span class="c1"># However, use the SpanMarkerModel updated vocab_size</span>
+            <span class="n">encoder_config</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">encoder</span><span class="p">[</span><span class="s2">&quot;_name_or_path&quot;</span><span class="p">],</span> <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">encoder</span><span class="p">)</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">encoder_config</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder</span>
+
+        <span class="n">dropout_rate</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">([</span><span class="s2">&quot;hidden_dropout_prob&quot;</span><span class="p">,</span> <span class="s2">&quot;dropout_rate&quot;</span><span class="p">],</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dropout_rate</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">dropout_rate</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Identity</span><span class="p">()</span>
+        <span class="c1"># TODO: Get a less arbitrary default</span>
+        <span class="n">hidden_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;hidden_size&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mi">768</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">hidden_size</span> <span class="o">*</span> <span class="mi">2</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">loss_func</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">CrossEntropyLoss</span><span class="p">()</span>
+
+        <span class="c1"># tokenizer and data collator are filled using set_tokenizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Initialize weights and apply final processing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">post_init</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">set_tokenizer</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="n">SpanMarkerDataCollator</span><span class="p">(</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">marker_max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_init_weights</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">module</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the weights&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="p">(</span><span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Embedding</span><span class="p">)):</span>
+            <span class="c1"># Slightly different from the TF version which uses truncated_normal for initialization</span>
+            <span class="c1"># cf https://github.com/pytorch/pytorch/pull/5617</span>
+            <span class="n">initializer_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;initializer_range&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="mf">0.02</span><span class="p">)</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">normal_</span><span class="p">(</span><span class="n">mean</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">std</span><span class="o">=</span><span class="n">initializer_range</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">LayerNorm</span><span class="p">):</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">weight</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">fill_</span><span class="p">(</span><span class="mf">1.0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">module</span><span class="p">,</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">)</span> <span class="ow">and</span> <span class="n">module</span><span class="o">.</span><span class="n">bias</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">module</span><span class="o">.</span><span class="n">bias</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">zero_</span><span class="p">()</span>
+
+<div class="viewcode-block" id="SpanMarkerModel.forward"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward">[docs]</a>    <span class="k">def</span> <span class="nf">forward</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">input_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">attention_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">position_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">num_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpanMarkerOutput</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward call of the SpanMarkerModel.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            input_ids (torch.Tensor): Input IDs including start/end markers.</span>
+<span class="sd">            attention_mask (torch.Tensor): Attention mask matrix including one-directional attention for markers.</span>
+<span class="sd">            position_ids (torch.Tensor): Position IDs including start/end markers.</span>
+<span class="sd">            labels (Optional[torch.Tensor], optional): The labels for each span candidate. Defaults to None.</span>
+<span class="sd">            num_words (Optional[torch.Tensor], optional): The number of words for each batch sample. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SpanMarkerOutput: The output dataclass.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">token_type_ids</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span><span class="p">(</span>
+            <span class="n">input_ids</span><span class="p">,</span>
+            <span class="n">attention_mask</span><span class="o">=</span><span class="n">attention_mask</span><span class="p">,</span>
+            <span class="n">token_type_ids</span><span class="o">=</span><span class="n">token_type_ids</span><span class="p">,</span>
+            <span class="n">position_ids</span><span class="o">=</span><span class="n">position_ids</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">last_hidden_state</span><span class="p">)</span>
+
+        <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">last_hidden_state</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">start_marker_idx</span> <span class="o">=</span> <span class="n">sequence_length</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span>
+        <span class="n">end_marker_idx</span> <span class="o">=</span> <span class="n">start_marker_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span>
+        <span class="c1"># TODO: Can we use view, which may be more efficient?</span>
+        <span class="c1"># Answer: Yes, but only if we move to using start-end-...-start-end instead</span>
+        <span class="c1"># of start-start-...-end-end.</span>
+
+        <span class="c1"># The start marker embeddings concatenated with the end marker embeddings</span>
+        <span class="n">feature_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">(</span>
+                <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="n">start_marker_idx</span><span class="p">:</span><span class="n">end_marker_idx</span><span class="p">],</span>
+                <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="n">end_marker_idx</span><span class="p">:],</span>
+            <span class="p">),</span>
+            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># NOTE: This was wrong in the older tests</span>
+        <span class="n">feature_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_func</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">SpanMarkerOutput</span><span class="p">(</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span> <span class="o">*</span><span class="n">outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">num_words</span><span class="o">=</span><span class="n">num_words</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpanMarkerModel.from_pretrained"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pretrained</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">T</span><span class="p">],</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">model_args</span><span class="p">,</span>
+        <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a pretrained pytorch model from a pre-trained model configuration.</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">            &gt;&gt;&gt; # Initialize a SpanMarkerModel using a pretrained encoder</span>
+<span class="sd">            &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(&quot;bert-base-cased&quot;, labels=[&quot;O&quot;, &quot;B-PER&quot;, &quot;I-PER&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, ...])</span>
+<span class="sd">            &gt;&gt;&gt; # Load a pretrained SpanMarker model</span>
+<span class="sd">            &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;)</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pretrained_model_name_or_path (Union[str, os.PathLike]):</span>
+<span class="sd">                Either a pretrained encoder (e.g. `bert-base-cased`, `roberta-large`, etc.), or a pretrained SpanMarkerModel.</span>
+<span class="sd">                Can be either:</span>
+
+<span class="sd">                    - A string, the *model id* of a pretrained model hosted inside a model repo on huggingface.co.</span>
+<span class="sd">                      Valid model ids can be located at the root-level, like `bert-base-uncased`, or namespaced under a</span>
+<span class="sd">                      user or organization name, like `dbmdz/bert-base-german-cased`.</span>
+<span class="sd">                    - A path to a *directory* containing model weights saved using</span>
+<span class="sd">                      `.save_pretrained`, e.g., `./my_model_directory/`.</span>
+<span class="sd">                    - A path or url to a *tensorflow index checkpoint file* (e.g, `./tf_model/model.ckpt.index`). In</span>
+<span class="sd">                      this case, `from_tf` should be set to `True` and a configuration object should be provided as</span>
+<span class="sd">                      `config` argument. This loading path is slower than converting the TensorFlow checkpoint in a</span>
+<span class="sd">                      PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.</span>
+<span class="sd">                    - A path or url to a model folder containing a *flax checkpoint file* in *.msgpack* format (e.g,</span>
+<span class="sd">                      `./flax_model/` containing `flax_model.msgpack`). In this case, `from_flax` should be set to</span>
+<span class="sd">                      `True`.</span>
+
+<span class="sd">            labels (List[str], optional): A list of string labels corresponding to the `ner_tags` in your datasets.</span>
+<span class="sd">                Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</span>
+
+<span class="sd">        Additional arguments are passed to the `from_pretrained` methods of `AutoConfig`, `AutoModel` and</span>
+<span class="sd">        `SpanMarkerTokenizer`.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            SpanMarkerModel: A SpanMarkerModel instance, either ready for training using the `Trainer` or for</span>
+<span class="sd">                inference via `model.predict()`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># If loading a SpanMarkerConfig, then we don&#39;t want to override id2label and label2id</span>
+        <span class="c1"># Create an encoder or SpanMarker config</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">PretrainedConfig</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># if &#39;pretrained_model_name_or_path&#39; refers to a SpanMarkerModel instance, initialize it directly</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">):</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># If &#39;pretrained_model_name_or_path&#39; refers to an encoder (roberta, bert, distilbert, electra, etc.),</span>
+        <span class="c1"># then initialize it and create the SpanMarker config and model using the encoder and its config.</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">encoder</span> <span class="o">=</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;&gt;&gt;&gt; SpanMarkerModel.from_pretrained(</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s1">&#39;...     &quot;bert-base-cased&quot;,</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39;...     labels=[&quot;O&quot;, &quot;B-PER&quot;, &quot;I-PER&quot;, &quot;B-ORG&quot;, &quot;I-ORG&quot;, ...]</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s2">&quot;... )</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;or</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s2">&quot;&gt;&gt;&gt; SpanMarkerModel.from_pretrained(</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="s1">&#39;...     &quot;bert-base-cased&quot;,</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s1">&#39;...     labels=[&quot;O&quot;, &quot;PER&quot;, &quot;ORG&quot;, &quot;LOC&quot;, &quot;MISC&quot;]</span><span class="se">\n</span><span class="s1">&#39;</span>
+                    <span class="s2">&quot;... )&quot;</span>
+                <span class="p">)</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">id2label</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">labels</span><span class="p">))</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">label2id</span> <span class="o">=</span> <span class="p">{</span><span class="n">v</span><span class="p">:</span> <span class="n">k</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">id2label</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">(</span><span class="n">encoder_config</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">to_dict</span><span class="p">())</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="c1"># Pass the tokenizer directly to the model for convenience, this way the user doesn&#39;t have to</span>
+        <span class="c1"># make it themselves.</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">SpanMarkerTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">config</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_name_or_path&quot;</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="p">),</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">set_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">model</span></div>
+
+<div class="viewcode-block" id="SpanMarkerModel.predict"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">allow_overlapping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict named entities from input texts.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            inputs (Union[str, List[str], List[List[str]]]): Input sentences from which to extract entities.</span>
+<span class="sd">                Valid datastructures are:</span>
+
+<span class="sd">                * str: a string sentence.</span>
+<span class="sd">                * List[str]: a pre-tokenized string sentence, i.e. a list of words.</span>
+<span class="sd">                * List[str]: a list of multiple string sentences.</span>
+<span class="sd">                * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.</span>
+<span class="sd">            allow_overlapping (bool, optional): Whether to allow entity spans to overlap. The model does not</span>
+<span class="sd">                have good support for this, so False is recommended. Defaults to False.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:</span>
+<span class="sd">                If the input is a single sentence, then we output a list of dictionaries. Each dictionary</span>
+<span class="sd">                represents one predicted entity, and contains the following keys:</span>
+
+<span class="sd">                * `label`: The predicted entity label.</span>
+<span class="sd">                * `span`: The text that the model deems an entity.</span>
+<span class="sd">                * `score`: The model its confidence.</span>
+<span class="sd">                * `word_start_index` &amp; `word_end_index`: The word indices for the start/end of the entity,</span>
+<span class="sd">                  if the input is pre-tokenized.</span>
+<span class="sd">                * `char_start_index` &amp; `char_end_index`: The character indices for the start/end of the entity,</span>
+<span class="sd">                  if the input is a string.</span>
+
+<span class="sd">                If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">inputs</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="c1"># Check if inputs is a string, i.e. a string sentence, or</span>
+        <span class="c1"># if it is a list of strings without spaces, i.e. if it&#39;s 1 tokenized sentence</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
+            <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">all</span><span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">element</span> <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">)</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_one</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">allow_overlapping</span><span class="o">=</span><span class="n">allow_overlapping</span><span class="p">)</span>
+
+        <span class="c1"># Otherwise, we likely have a list of strings, i.e. a list of string sentences,</span>
+        <span class="c1"># or a list of lists of strings, i.e. a list of tokenized sentences</span>
+        <span class="c1"># if isinstance(inputs, list) and all(isinstance(element, str) and &quot; &quot; not in element for element in inputs):</span>
+        <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_predict_one</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span> <span class="k">for</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">_predict_one</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">sentence</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">allow_overlapping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
+        <span class="c1"># Tokenization, i.e. computing spans, adding span markers to position_ids</span>
+        <span class="n">tokenized</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="n">return_num_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">num_words</span> <span class="o">=</span> <span class="n">tokenized</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;num_words&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">batch_encoding</span> <span class="o">=</span> <span class="n">tokenized</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_encoding&quot;</span><span class="p">)</span>
+        <span class="c1"># Converting into a common batch format like the data collator wants</span>
+        <span class="n">tokenized</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">tokenized</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenized</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]))</span>
+        <span class="p">]</span>
+        <span class="c1"># Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.</span>
+        <span class="n">collated</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">(</span><span class="n">tokenized</span><span class="p">)</span>
+        <span class="c1"># Moving the inputs to the right device</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">collated</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="c1"># Computing probabilities based on the logits</span>
+        <span class="n">probs</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Get the labels and the correponding probability scores</span>
+        <span class="n">scores</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+        <span class="c1"># Reduce the dimensionality and convert to normal Python lists</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="c1"># Get all of the valid spans to match with the score and labels</span>
+        <span class="n">spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">))</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">id2label</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">id2label</span>
+        <span class="c1"># If we don&#39;t allow overlapping, then we keep track of a boolean for each word, indicating if it has been</span>
+        <span class="c1"># selected already by a previous, higher score entity span</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overlapping</span><span class="p">:</span>
+            <span class="n">word_selected</span> <span class="o">=</span> <span class="p">[</span><span class="kc">False</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_words</span>
+        <span class="k">for</span> <span class="p">(</span><span class="n">word_start_index</span><span class="p">,</span> <span class="n">word_end_index</span><span class="p">),</span> <span class="n">score</span><span class="p">,</span> <span class="n">label_id</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="nb">zip</span><span class="p">(</span><span class="n">spans</span><span class="p">,</span> <span class="n">scores</span><span class="p">,</span> <span class="n">labels</span><span class="p">),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">tup</span><span class="p">:</span> <span class="n">tup</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">):</span>
+            <span class="k">if</span> <span class="n">label_id</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outside_id</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="n">allow_overlapping</span> <span class="ow">or</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span><span class="n">word_selected</span><span class="p">[</span><span class="n">word_start_index</span><span class="p">:</span><span class="n">word_end_index</span><span class="p">])</span>
+            <span class="p">):</span>
+                <span class="n">char_start_index</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_chars</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">word_start_index</span><span class="p">)</span><span class="o">.</span><span class="n">start</span>
+                <span class="n">char_end_index</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_chars</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">word_end_index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">end</span>
+                <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;span&quot;</span><span class="p">:</span> <span class="n">sentence</span><span class="p">[</span><span class="n">char_start_index</span><span class="p">:</span><span class="n">char_end_index</span><span class="p">]</span>
+                        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span>
+                        <span class="k">else</span> <span class="n">sentence</span><span class="p">[</span><span class="n">word_start_index</span><span class="p">:</span><span class="n">word_end_index</span><span class="p">],</span>
+                        <span class="s2">&quot;label&quot;</span><span class="p">:</span> <span class="n">id2label</span><span class="p">[</span><span class="n">label_id</span><span class="p">],</span>
+                        <span class="s2">&quot;score&quot;</span><span class="p">:</span> <span class="n">score</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                    <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;char_start_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">char_start_index</span>
+                    <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;char_end_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">char_end_index</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_start_index</span>
+                    <span class="n">output</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">word_end_index</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">allow_overlapping</span><span class="p">:</span>
+                    <span class="n">word_selected</span><span class="p">[</span><span class="n">word_start_index</span><span class="p">:</span><span class="n">word_end_index</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">True</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="n">word_end_index</span> <span class="o">-</span> <span class="n">word_start_index</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="n">output</span><span class="p">,</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">entity</span><span class="p">:</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;char_start_index&quot;</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sentence</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="k">else</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">],</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

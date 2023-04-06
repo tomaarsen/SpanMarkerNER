@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.tokenizer</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.tokenizer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">PreTrainedTokenizer</span>
+
+<span class="kn">from</span> <span class="nn">span_marker.configuration</span> <span class="kn">import</span> <span class="n">SpanMarkerConfig</span>
+
+
+<div class="viewcode-block" id="SpanMarkerTokenizer"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerTokenizer</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">PreTrainedTokenizer</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
+
+        <span class="n">tokenizer</span><span class="o">.</span><span class="n">add_tokens</span><span class="p">([</span><span class="s2">&quot;&lt;start&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;end&gt;&quot;</span><span class="p">],</span> <span class="n">special_tokens</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_marker_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_marker_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_ids</span><span class="p">([</span><span class="s2">&quot;&lt;start&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;end&gt;&quot;</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">&gt;</span> <span class="mf">1e29</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The underlying </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> tokenizer nor </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; specify `model_max_length`: defaulting to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length_default</span><span class="si">}</span><span class="s2"> tokens.&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length_default</span>
+        <span class="p">)</span>
+
+<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">for</span> <span class="n">start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_words</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">end_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_words</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">entity_max_length</span><span class="p">)):</span>
+                <span class="k">yield</span> <span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans_and_labels"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans_and_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans_and_labels</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">span_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
+        <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">span</span><span class="p">,</span> <span class="n">span_to_label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_num_words</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+        <span class="c1"># TODO: Increase robustness of this</span>
+        <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">inputs</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+            <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="n">batch_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="n">is_split_into_words</span><span class="o">=</span><span class="n">is_split_into_words</span><span class="p">,</span>
+            <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
+            <span class="n">truncation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">max_length</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
+            <span class="n">return_tensors</span><span class="o">=</span><span class="s2">&quot;pt&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">all_input_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_num_spans</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_start_position_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_end_position_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_num_words</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">input_ids</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch_encoding</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]):</span>
+            <span class="n">word_ids</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word_id</span><span class="p">:</span> <span class="n">word_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_ids</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="n">num_words</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">word_ids</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="ow">in</span> <span class="n">input_ids</span><span class="p">:</span>
+                <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="n">span_to_label</span> <span class="o">=</span> <span class="p">{(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span> <span class="n">label</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]}</span>
+                <span class="n">spans</span><span class="p">,</span> <span class="n">span_labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
+                    <span class="o">*</span><span class="nb">list</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans_and_labels</span><span class="p">(</span>
+                            <span class="n">num_words</span><span class="p">,</span> <span class="n">span_to_label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outside_id</span>
+                        <span class="p">)</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">))</span>
+
+            <span class="k">for</span> <span class="n">group_start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spans</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">):</span>
+                <span class="n">group_spans</span> <span class="o">=</span> <span class="n">spans</span><span class="p">[</span><span class="n">group_start_idx</span> <span class="p">:</span> <span class="n">group_start_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">]</span>
+                <span class="n">group_num_spans</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_spans</span><span class="p">)</span>
+
+                <span class="n">start_position_ids</span><span class="p">,</span> <span class="n">end_position_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">start_word_i</span><span class="p">,</span> <span class="n">end_word_i</span> <span class="ow">in</span> <span class="n">group_spans</span><span class="p">:</span>
+                    <span class="n">start_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">start_word_i</span><span class="p">)</span>
+                    <span class="n">start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_token_span</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="n">start_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+
+                    <span class="n">end_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">end_word_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="n">end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_token_span</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">end_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+
+                <span class="n">all_input_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_ids</span><span class="p">[:</span><span class="n">num_tokens</span><span class="p">])</span>
+                <span class="n">all_num_spans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_num_spans</span><span class="p">)</span>
+                <span class="n">all_start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_position_ids</span><span class="p">)</span>
+                <span class="n">all_end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_position_ids</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+                    <span class="n">group_labels</span> <span class="o">=</span> <span class="n">span_labels</span><span class="p">[</span><span class="n">group_start_idx</span> <span class="p">:</span> <span class="n">group_start_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">]</span>
+                    <span class="n">all_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_labels</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">return_num_words</span><span class="p">:</span>
+                    <span class="n">all_num_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num_words</span><span class="p">)</span>
+
+        <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">all_input_ids</span><span class="p">,</span>
+            <span class="s2">&quot;num_spans&quot;</span><span class="p">:</span> <span class="n">all_num_spans</span><span class="p">,</span>
+            <span class="s2">&quot;start_position_ids&quot;</span><span class="p">:</span> <span class="n">all_start_position_ids</span><span class="p">,</span>
+            <span class="s2">&quot;end_position_ids&quot;</span><span class="p">:</span> <span class="n">all_end_position_ids</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_labels</span>
+        <span class="k">if</span> <span class="n">return_num_words</span><span class="p">:</span>
+            <span class="c1"># Store the number of words, useful for computing the spans in the evaluation and model.predict() method</span>
+            <span class="n">output</span><span class="p">[</span><span class="s2">&quot;num_words&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">all_num_words</span>
+        <span class="k">if</span> <span class="n">return_batch_encoding</span><span class="p">:</span>
+            <span class="c1"># Store the batch encoding, useful for converting word IDs to characters in the model.predict() method</span>
+            <span class="n">output</span><span class="p">[</span><span class="s2">&quot;batch_encoding&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">batch_encoding</span>
+        <span class="k">return</span> <span class="n">output</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
+
+<div class="viewcode-block" id="SpanMarkerTokenizer.from_pretrained"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_pretrained</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">add_prefix_space</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

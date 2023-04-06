@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.trainer</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.trainer</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">EvalPrediction</span><span class="p">,</span>
+    <span class="n">TrainerCallback</span><span class="p">,</span>
+    <span class="n">TrainingArguments</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span> <span class="k">as</span> <span class="n">TransformersTrainer</span>
+<span class="kn">from</span> <span class="nn">transformers.trainer_utils</span> <span class="kn">import</span> <span class="n">PredictionOutput</span>
+
+<span class="kn">from</span> <span class="nn">span_marker.evaluation</span> <span class="kn">import</span> <span class="n">compute_f1_via_seqeval</span>
+<span class="kn">from</span> <span class="nn">span_marker.label_normalizer</span> <span class="kn">import</span> <span class="n">AutoLabelNormalizer</span><span class="p">,</span> <span class="n">LabelNormalizer</span>
+<span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
+
+
+<div class="viewcode-block" id="Trainer"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer">[docs]</a><span class="k">class</span> <span class="nc">Trainer</span><span class="p">(</span><span class="n">TransformersTrainer</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Trainer is a simple but feature-complete training and eval loop for SpanMarker,</span>
+<span class="sd">    built tightly on top of the 🤗 Transformers `Trainer &lt;https://huggingface.co/docs/transformers/main_classes/trainer&gt;`_.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model (Optional[SpanMarkerModel]):</span>
+<span class="sd">            The model to train, evaluate or use for predictions. If not provided, a `model_init` must be passed.</span>
+<span class="sd">        args (Optional[TrainingArguments]):</span>
+<span class="sd">            The arguments to tweak for training. Will default to a basic instance of [`TrainingArguments`] with the</span>
+<span class="sd">            `output_dir` set to a directory named *tmp_trainer* in the current directory if not provided.</span>
+<span class="sd">        train_dataset (Optional[datasets.Dataset]):</span>
+<span class="sd">            The dataset to use for training.</span>
+<span class="sd">        eval_dataset (Optional[datasets.Dataset]):</span>
+<span class="sd">             The dataset to use for evaluation.</span>
+<span class="sd">        model_init (Optional[Callable[[], SpanMarkerModel]]):</span>
+<span class="sd">            A function that instantiates the model to be used. If provided, each call to `Trainer.train` will start</span>
+<span class="sd">            from a new instance of the model as given by this function.</span>
+
+<span class="sd">            The function may have zero argument, or a single one containing the optuna/Ray Tune/SigOpt trial object, to</span>
+<span class="sd">            be able to choose different architectures according to hyper parameters (such as layer count, sizes of</span>
+<span class="sd">            inner layers, dropout probabilities etc).</span>
+<span class="sd">        compute_metrics (Optional[Callable[[EvalPrediction], Dict]]):</span>
+<span class="sd">            The function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return</span>
+<span class="sd">            a dictionary string to metric values.</span>
+<span class="sd">        callbacks (Optional[List[TrainerCallback]]):</span>
+<span class="sd">            A list of callbacks to customize the training loop. Will add those to the list of default callbacks</span>
+<span class="sd">            detailed in [here](https://huggingface.co/docs/transformers/main/en/main_classes/callback).</span>
+
+<span class="sd">            If you want to remove one of the default callbacks used, use the [`Trainer.remove_callback`] method.</span>
+<span class="sd">        optimizers (Tuple[Optional[torch.optim.Optimizer], Optional[torch.optim.lr_scheduler.LambdaLR]]): A tuple</span>
+<span class="sd">            containing the optimizer and the scheduler to use. Will default to an instance of `AdamW` on your model</span>
+<span class="sd">            and a scheduler given by `get_linear_schedule_with_warmup` controlled by `args`.</span>
+<span class="sd">        preprocess_logits_for_metrics (Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]]):</span>
+<span class="sd">            A function that preprocess the logits right before caching them at each evaluation step. Must take two</span>
+<span class="sd">            tensors, the logits and the labels, and return the logits once processed as desired. The modifications made</span>
+<span class="sd">            by this function will be reflected in the predictions received by `compute_metrics`.</span>
+
+<span class="sd">            Note that the labels (second parameter) will be `None` if the dataset does not have them.</span>
+
+<span class="sd">    Important attributes:</span>
+
+<span class="sd">        - **model** -- Always points to the core model.</span>
+<span class="sd">        - **model_wrapped** -- Always points to the most external model in case one or more other modules wrap the</span>
+<span class="sd">          original model. This is the model that should be used for the forward pass. For example, under `DeepSpeed`,</span>
+<span class="sd">          the inner model is wrapped in `DeepSpeed` and then again in `torch.nn.DistributedDataParallel`. If the inner</span>
+<span class="sd">          model hasn&#39;t been wrapped, then `self.model_wrapped` is the same as `self.model`.</span>
+<span class="sd">        - **is_model_parallel** -- Whether or not a model has been switched to a model parallel mode (different from</span>
+<span class="sd">          data parallelism, this means some of the model layers are split on different GPUs).</span>
+<span class="sd">        - **place_model_on_device** -- Whether or not to automatically place the model on the device - it will be set</span>
+<span class="sd">          to `False` if model parallel or deepspeed is used, or if the default</span>
+<span class="sd">          `TrainingArguments.place_model_on_device` is overridden to return `False` .</span>
+<span class="sd">        - **is_in_train** -- Whether or not a model is currently running `train` (e.g. when `evaluate` is called while</span>
+<span class="sd">          in `train`)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanMarkerModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrainingArguments</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">train_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_init</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">SpanMarkerModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">compute_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">EvalPrediction</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">callbacks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TrainerCallback</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">optimizers</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">preprocess_logits_for_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Extract the model from an initializer function</span>
+        <span class="k">if</span> <span class="n">model_init</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_init</span> <span class="o">=</span> <span class="n">model_init</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">call_model_init</span><span class="p">()</span>
+
+        <span class="c1"># To convert dataset labels to a common format (list of label-start-end tuples)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span> <span class="o">=</span> <span class="n">AutoLabelNormalizer</span><span class="o">.</span><span class="n">from_config</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="p">)</span>
+
+        <span class="c1"># Set some Training arguments that must be set for SpanMarker</span>
+        <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/my_span_marker_model&quot;</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">include_inputs_for_metrics</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">remove_unused_columns</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="c1"># Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics</span>
+        <span class="k">if</span> <span class="n">compute_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">compute_metrics_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="p">{</span>
+                <span class="o">**</span><span class="n">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">eval_prediction</span><span class="p">),</span>
+            <span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">compute_metrics_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+            <span class="n">data_collator</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">data_collator</span><span class="p">,</span>
+            <span class="n">train_dataset</span><span class="o">=</span><span class="n">train_dataset</span><span class="p">,</span>
+            <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
+            <span class="n">tokenizer</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span>
+            <span class="n">model_init</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">compute_metrics</span><span class="o">=</span><span class="n">compute_metrics_func</span><span class="p">,</span>
+            <span class="n">callbacks</span><span class="o">=</span><span class="n">callbacks</span><span class="p">,</span>
+            <span class="n">optimizers</span><span class="o">=</span><span class="n">optimizers</span><span class="p">,</span>
+            <span class="n">preprocess_logits_for_metrics</span><span class="o">=</span><span class="n">preprocess_logits_for_metrics</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># We have to provide the __init__ with None for model_init and then override it here again</span>
+        <span class="c1"># We do this because we need `model` to already be defined in this SpanMarker Trainer class</span>
+        <span class="c1"># and the Transformers Trainer would complain if we provide both a model and a model_init</span>
+        <span class="c1"># in its __init__.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_init</span> <span class="o">=</span> <span class="n">model_init</span>
+
+<div class="viewcode-block" id="Trainer.preprocess_dataset"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_dataset</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+        <span class="n">label_normalizer</span><span class="p">:</span> <span class="n">LabelNormalizer</span><span class="p">,</span>
+        <span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span><span class="p">,</span>
+        <span class="n">dataset_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span><span class="p">,</span>
+        <span class="n">is_evaluate</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Normalize the `ner_tags` labels and call tokenizer on `tokens`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset (Dataset): A Hugging Face dataset with `tokens` and `ner_tags` columns.</span>
+<span class="sd">            label_normalizer (LabelNormalizer): A callable that normalizes `ner_tags` into start-end-label tuples.</span>
+<span class="sd">            tokenizer (SpanMarkerTokenizer): The tokenizer responsible for tokenizing `tokens` into input IDs,</span>
+<span class="sd">                and adding start and end markers.</span>
+<span class="sd">            dataset_name (str, optional): The name of the dataset. Defaults to &quot;train&quot;.</span>
+<span class="sd">            is_evaluate (bool, optional): Whether to return the number of words for each sample.</span>
+<span class="sd">                Required for evaluation. Defaults to False.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the `dataset` does not contain `tokens` and `ner_tags` columns.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dataset: The normalized and tokenized version of the input dataset.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset must contain a </span><span class="si">{</span><span class="n">column</span><span class="si">!r}</span><span class="s2"> column.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Normalize the labels to a common format (list of label-start-end tuples)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="n">label_normalizer</span><span class="p">,</span>
+            <span class="n">input_columns</span><span class="o">=</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">,</span>
+            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Label normalizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="c1"># Tokenize and add start/end markers</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">batch</span><span class="p">:</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">],</span> <span class="n">return_num_words</span><span class="o">=</span><span class="n">is_evaluate</span><span class="p">),</span>
+            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">remove_columns</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tokenizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+    <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed training DataLoader.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_train_dataloader</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">get_eval_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed evaluation DataLoader.&quot;&quot;&quot;</span>
+        <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">eval_dataset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span>
+        <span class="k">if</span> <span class="n">eval_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">eval_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_dataset</span><span class="p">(</span>
+                <span class="n">eval_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;evaluation&quot;</span><span class="p">,</span> <span class="n">is_evaluate</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_eval_dataloader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed evaluation DataLoader.&quot;&quot;&quot;</span>
+        <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_dataset</span><span class="p">(</span>
+            <span class="n">test_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">is_evaluate</span><span class="o">=</span><span class="kc">True</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_test_dataloader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PredictionOutput</span><span class="p">:</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;`Trainer.predict` is not recommended for a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Consider using `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.predict` instead.&quot;</span><span class="p">,</span>
+            <span class="ne">UserWarning</span><span class="p">,</span>
+            <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">)</span></div>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

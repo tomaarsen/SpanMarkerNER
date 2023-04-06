@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: SpanMarker for Named Entity Recognition</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <div class="open-in-colab__wrapper">
+<a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/model_loading.ipynb" target="_blank">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
+</a>
+</div><section id="SpanMarker-for-Named-Entity-Recognition">
+<h1>SpanMarker for Named Entity Recognition<a class="headerlink" href="#SpanMarker-for-Named-Entity-Recognition" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
+<p>In this notebook, we’ll have a look at how to load a SpanMarker model from the hub for inference.</p>
+<section id="Setup">
+<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
+<p>First of all, the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module needs to be installed.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%pip install span_marker
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Loading-the-Model">
+<h2>Loading the Model<a class="headerlink" href="#Loading-the-Model" title="Permalink to this heading">¶</a></h2>
+<p>We’re going to load the <a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super">tomaarsen/span-marker-bert-base-fewnerd-fine-super</a> model from the hub, which has previously been trained to 0.7020 Test F1 on the finegrained supervised FewNERD dataset. Note that we place it on the GPU with <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import SpanMarkerModel
+
+model_name = &quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;
+model = SpanMarkerModel.from_pretrained(model_name).cuda()
+</pre></div>
+</div>
+</div>
+<p>Let’s try the model out with some predictions. For this we can use the <code class="docutils literal notranslate"><span class="pre">model.predict</span></code> method, which accepts either:</p>
+<ul class="simple">
+<li><p>A sentence as a string.</p></li>
+<li><p>A tokenized sentence as a list of strings.</p></li>
+<li><p>A list of sentences as a list of strings.</p></li>
+<li><p>A list of tokenized sentences as a list of lists of strings.</p></li>
+</ul>
+<p>The method returns a list of dictionaries for each sentence, with the following keys:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;label&quot;</span></code>: The string label for the found entity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;score&quot;</span></code>: The probability score indicating the model its confidence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;span&quot;</span></code>: The entity span as a string.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;word_start_index&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;word_end_index&quot;</span></code>: Integers useful for indexing the entity from a tokenized sentence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;char_start_index&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;char_end_index&quot;</span></code>: Integers useful for indexing the entity from a string sentence.</p></li>
+</ul>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sentences = [
+    &quot;The Ninth suffered a serious defeat at the Battle of Camulodunum under Quintus Petillius Cerialis in the rebellion of Boudica (61), when most of the foot-soldiers were killed in a disastrous attempt to relieve the besieged city of Camulodunum (Colchester).&quot;,
+    &quot;He was born in Wellingborough, Northamptonshire, where he attended Victoria Junior School, Westfield Boys School and Sir Christopher Hatton School.&quot;,
+    &quot;Nintendo continued to sell the revised Wii model and the Wii Mini alongside the Wii U during the Wii U&#39;s first release year.&quot;,
+    &quot;Dorsa has a Bachelor of Music in Composition from California State University, Northridge in 2001, Master of Music in Harpsichord Performance at Cal State Northridge in 2004, and a Doctor of Musical Arts at the University of Michigan, Ann Arbor in 2008.&quot;
+]
+
+entities_per_sentence = model.predict(sentences)
+
+for entities in entities_per_sentence:
+    for entity in entities:
+        print(entity[&quot;span&quot;], &quot;=&gt;&quot;, entity[&quot;label&quot;])
+    print()
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Battle of Camulodunum =&gt; event-attack/battle/war/militaryconflict
+Quintus Petillius Cerialis =&gt; person-soldier
+Camulodunum =&gt; location-GPE
+Colchester =&gt; location-GPE
+
+Wellingborough =&gt; location-GPE
+Northamptonshire =&gt; location-GPE
+Victoria Junior School =&gt; organization-education
+Westfield Boys School =&gt; organization-education
+Sir Christopher Hatton School =&gt; organization-education
+
+Nintendo =&gt; organization-company
+Wii =&gt; product-other
+Wii Mini =&gt; product-other
+Wii U =&gt; product-other
+Wii U&#39; =&gt; product-other
+
+Dorsa =&gt; person-other
+Bachelor of Music in Composition =&gt; other-educationaldegree
+California State University =&gt; organization-education
+Northridge =&gt; location-GPE
+Master of Music in Harpsichord Performance =&gt; other-educationaldegree
+Cal State Northridge =&gt; organization-education
+Doctor of Musical Arts =&gt; other-educationaldegree
+University of Michigan =&gt; organization-education
+Ann Arbor =&gt; location-GPE
+
+</pre></div></div>
+</div>
+<p>Feel free to compare this to the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook, which trains a simpler model using <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code> on coarse-grained FewNERD.</p>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/notebooks/model_loading.ipynb.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.trainer module</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="span_marker.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <section id="module-span_marker.trainer">
+<span id="span-marker-trainer-module"></span><h1>span_marker.trainer module<a class="headerlink" href="#module-span_marker.trainer" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.trainer.</span></span><span class="sig-name descname"><span class="pre">Trainer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_init</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_metrics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">callbacks</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">optimizers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(None,</span> <span class="pre">None)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">preprocess_logits_for_metrics</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></p>
+<p>Trainer is a simple but feature-complete training and eval loop for SpanMarker,
+built tightly on top of the 🤗 Transformers <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer">Trainer</a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><em>SpanMarkerModel</em></a><em>]</em>) – The model to train, evaluate or use for predictions. If not provided, a <cite>model_init</cite> must be passed.</p></li>
+<li><p><strong>args</strong> (<em>Optional</em><em>[</em><em>TrainingArguments</em><em>]</em>) – The arguments to tweak for training. Will default to a basic instance of [<cite>TrainingArguments</cite>] with the
+<cite>output_dir</cite> set to a directory named <em>tmp_trainer</em> in the current directory if not provided.</p></li>
+<li><p><strong>train_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>datasets.Dataset</em></a><em>]</em>) – The dataset to use for training.</p></li>
+<li><p><strong>eval_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>datasets.Dataset</em></a><em>]</em>) – The dataset to use for evaluation.</p></li>
+<li><p><strong>model_init</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>]</em><em>, </em><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><em>SpanMarkerModel</em></a><em>]</em><em>]</em>) – <p>A function that instantiates the model to be used. If provided, each call to <cite>Trainer.train</cite> will start
+from a new instance of the model as given by this function.</p>
+<p>The function may have zero argument, or a single one containing the optuna/Ray Tune/SigOpt trial object, to
+be able to choose different architectures according to hyper parameters (such as layer count, sizes of
+inner layers, dropout probabilities etc).</p>
+</p></li>
+<li><p><strong>compute_metrics</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>EvalPrediction</em><em>]</em><em>, </em><em>Dict</em><em>]</em><em>]</em>) – The function that will be used to compute metrics at evaluation. Must take a [<cite>EvalPrediction</cite>] and return
+a dictionary string to metric values.</p></li>
+<li><p><strong>callbacks</strong> (<em>Optional</em><em>[</em><em>List</em><em>[</em><em>TrainerCallback</em><em>]</em><em>]</em>) – <p>A list of callbacks to customize the training loop. Will add those to the list of default callbacks
+detailed in [here](<a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/callback">https://huggingface.co/docs/transformers/main/en/main_classes/callback</a>).</p>
+<p>If you want to remove one of the default callbacks used, use the [<cite>Trainer.remove_callback</cite>] method.</p>
+</p></li>
+<li><p><strong>optimizers</strong> (<em>Tuple</em><em>[</em><em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/optim.html#torch.optim.Optimizer" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.optim.Optimizer</em></a><em>]</em><em>, </em><em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/generated/torch.optim.lr_scheduler.LambdaLR.html#torch.optim.lr_scheduler.LambdaLR" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.optim.lr_scheduler.LambdaLR</em></a><em>]</em><em>]</em>) – A tuple
+containing the optimizer and the scheduler to use. Will default to an instance of <cite>AdamW</cite> on your model
+and a scheduler given by <cite>get_linear_schedule_with_warmup</cite> controlled by <cite>args</cite>.</p></li>
+<li><p><strong>preprocess_logits_for_metrics</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a><em>, </em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a><em>]</em><em>, </em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git007587a ))"><em>torch.Tensor</em></a><em>]</em><em>]</em>) – <p>A function that preprocess the logits right before caching them at each evaluation step. Must take two
+tensors, the logits and the labels, and return the logits once processed as desired. The modifications made
+by this function will be reflected in the predictions received by <cite>compute_metrics</cite>.</p>
+<p>Note that the labels (second parameter) will be <cite>None</cite> if the dataset does not have them.</p>
+</p></li>
+</ul>
+</dd>
+</dl>
+<p>Important attributes:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p><strong>model</strong> – Always points to the core model.</p></li>
+<li><p><strong>model_wrapped</strong> – Always points to the most external model in case one or more other modules wrap the
+original model. This is the model that should be used for the forward pass. For example, under <cite>DeepSpeed</cite>,
+the inner model is wrapped in <cite>DeepSpeed</cite> and then again in <cite>torch.nn.DistributedDataParallel</cite>. If the inner
+model hasn’t been wrapped, then <cite>self.model_wrapped</cite> is the same as <cite>self.model</cite>.</p></li>
+<li><p><strong>is_model_parallel</strong> – Whether or not a model has been switched to a model parallel mode (different from
+data parallelism, this means some of the model layers are split on different GPUs).</p></li>
+<li><p><strong>place_model_on_device</strong> – Whether or not to automatically place the model on the device - it will be set
+to <cite>False</cite> if model parallel or deepspeed is used, or if the default
+<cite>TrainingArguments.place_model_on_device</cite> is overridden to return <cite>False</cite> .</p></li>
+<li><p><strong>is_in_train</strong> – Whether or not a model is currently running <cite>train</cite> (e.g. when <cite>evaluate</cite> is called while
+in <cite>train</cite>)</p></li>
+</ul>
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.preprocess_dataset">
+<span class="sig-name descname"><span class="pre">preprocess_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_normalizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.preprocess_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.preprocess_dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Normalize the <cite>ner_tags</cite> labels and call tokenizer on <cite>tokens</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<em>Dataset</em>) – A Hugging Face dataset with <cite>tokens</cite> and <cite>ner_tags</cite> columns.</p></li>
+<li><p><strong>label_normalizer</strong> (<a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer" title="span_marker.label_normalizer.LabelNormalizer"><em>LabelNormalizer</em></a>) – A callable that normalizes <cite>ner_tags</cite> into start-end-label tuples.</p></li>
+<li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – The tokenizer responsible for tokenizing <cite>tokens</cite> into input IDs,
+and adding start and end markers.</p></li>
+<li><p><strong>dataset_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dataset. Defaults to “train”.</p></li>
+<li><p><strong>is_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to return the number of words for each sample.
+Required for evaluation. Defaults to False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the <cite>dataset</cite> does not contain <cite>tokens</cite> and <cite>ner_tags</cite> columns.</p>
+</dd>
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The normalized and tokenized version of the input dataset.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.train">
+<span class="sig-prename descclassname"><span class="pre">Trainer.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">resume_from_checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">trial</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_keys_for_eval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/transformers/trainer.html#Trainer.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.train" title="Permalink to this definition">¶</a></dt>
+<dd><p>Main training entry point.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>resume_from_checkpoint</strong> (<cite>str</cite> or <cite>bool</cite>, <em>optional</em>) – If a <cite>str</cite>, local path to a saved checkpoint as saved by a previous instance of [<cite>Trainer</cite>]. If a
+<cite>bool</cite> and equals <cite>True</cite>, load the last checkpoint in <em>args.output_dir</em> as saved by a previous instance
+of [<cite>Trainer</cite>]. If present, training will resume from the model/optimizer/scheduler states loaded here.</p></li>
+<li><p><strong>trial</strong> (<cite>optuna.Trial</cite> or <cite>Dict[str, Any]</cite>, <em>optional</em>) – The trial run or the hyperparameter dictionary for hyperparameter search.</p></li>
+<li><p><strong>ignore_keys_for_eval</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+gathering predictions for evaluation during the training.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments used to hide deprecated arguments</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.evaluate">
+<span class="sig-prename descclassname"><span class="pre">Trainer.</span></span><span class="sig-name descname"><span class="pre">evaluate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">eval_dataset</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ignore_keys</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">metric_key_prefix</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'eval'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/transformers/trainer.html#Trainer.evaluate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.evaluate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run evaluation and returns metrics.</p>
+<p>The calling script will be responsible for providing a method to compute metrics, as they are task-dependent
+(pass it to the init <cite>compute_metrics</cite> argument).</p>
+<p>You can also subclass and override this method to inject custom behavior.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>eval_dataset</strong> (<cite>Dataset</cite>, <em>optional</em>) – Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
+not accepted by the <cite>model.forward()</cite> method are automatically removed. It must implement the <cite>__len__</cite>
+method.</p></li>
+<li><p><strong>ignore_keys</strong> (<cite>Lst[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+gathering predictions.</p></li>
+<li><p><strong>metric_key_prefix</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“eval”</cite>) – An optional prefix to be used as the metrics key prefix. For example the metrics “bleu” will be named
+“eval_bleu” if the prefix is “eval” (default)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A dictionary containing the evaluation loss and the potential metrics computed from the predictions. The
+dictionary also contains the epoch number which comes from the training state.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.push_to_hub">
+<span class="sig-prename descclassname"><span class="pre">Trainer.</span></span><span class="sig-name descname"><span class="pre">push_to_hub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'End</span> <span class="pre">of</span> <span class="pre">training'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">blocking</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/transformers/trainer.html#Trainer.push_to_hub"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.push_to_hub" title="Permalink to this definition">¶</a></dt>
+<dd><p>Upload <em>self.model</em> and <em>self.tokenizer</em> to the 🤗 model hub on the repo <em>self.args.hub_model_id</em>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>commit_message</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“End of training”</cite>) – Message to commit while pushing.</p></li>
+<li><p><strong>blocking</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>True</cite>) – Whether the function should return only when the <cite>git push</cite> has finished.</p></li>
+<li><p><strong>kwargs</strong> – Additional keyword arguments passed along to [<cite>~Trainer.create_model_card</cite>].</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The url of the commit of your model in the given repository if <cite>blocking=False</cite>, a tuple with the url of
+the commit and an object to track the progress of the commit if <cite>blocking=True</cite></p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.hyperparameter_search">
+<span class="sig-prename descclassname"><span class="pre">Trainer.</span></span><span class="sig-name descname"><span class="pre">hyperparameter_search</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">hp_space</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compute_objective</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_trials</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">20</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">direction</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'minimize'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backend</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">hp_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/transformers/trainer.html#Trainer.hyperparameter_search"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.hyperparameter_search" title="Permalink to this definition">¶</a></dt>
+<dd><p>Launch an hyperparameter search using <cite>optuna</cite> or <cite>Ray Tune</cite> or <cite>SigOpt</cite>. The optimized quantity is determined
+by <cite>compute_objective</cite>, which defaults to a function returning the evaluation loss when no metric is provided,
+the sum of all metrics otherwise.</p>
+<p>&lt;Tip warning={true}&gt;</p>
+<p>To use this method, you need to have provided a <cite>model_init</cite> when initializing your [<cite>Trainer</cite>]: we need to
+reinitialize the model at each new run. This is incompatible with the <cite>optimizers</cite> argument, so you need to
+subclass [<cite>Trainer</cite>] and override the method [<cite>~Trainer.create_optimizer_and_scheduler</cite>] for custom
+optimizer/scheduler.</p>
+<p>&lt;/Tip&gt;</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>hp_space</strong> (<cite>Callable[[“optuna.Trial”], Dict[str, float]]</cite>, <em>optional</em>) – A function that defines the hyperparameter search space. Will default to
+[<cite>~trainer_utils.default_hp_space_optuna</cite>] or [<cite>~trainer_utils.default_hp_space_ray</cite>] or
+[<cite>~trainer_utils.default_hp_space_sigopt</cite>] depending on your backend.</p></li>
+<li><p><strong>compute_objective</strong> (<cite>Callable[[Dict[str, float]], float]</cite>, <em>optional</em>) – A function computing the objective to minimize or maximize from the metrics returned by the <cite>evaluate</cite>
+method. Will default to [<cite>~trainer_utils.default_compute_objective</cite>].</p></li>
+<li><p><strong>n_trials</strong> (<cite>int</cite>, <em>optional</em>, defaults to 100) – The number of trial runs to test.</p></li>
+<li><p><strong>direction</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“minimize”</cite>) – Whether to optimize greater or lower objects. Can be <cite>“minimize”</cite> or <cite>“maximize”</cite>, you should pick
+<cite>“minimize”</cite> when optimizing the validation loss, <cite>“maximize”</cite> when optimizing one or several metrics.</p></li>
+<li><p><strong>backend</strong> (<cite>str</cite> or [<cite>~training_utils.HPSearchBackend</cite>], <em>optional</em>) – The backend to use for hyperparameter search. Will default to optuna or Ray Tune or SigOpt, depending
+on which one is installed. If all are installed, will default to optuna.</p></li>
+<li><p><strong>hp_name</strong> (<cite>Callable[[“optuna.Trial”], str]]</cite>, <em>optional</em>) – A function that defines the trial/run name. Will default to None.</p></li>
+<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – <p>Additional keyword arguments passed along to <cite>optuna.create_study</cite> or <cite>ray.tune.run</cite>. For more
+information see:</p>
+<ul>
+<li><p>the documentation of
+[optuna.create_study](<a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html">https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html</a>)</p></li>
+<li><p>the documentation of [tune.run](<a class="reference external" href="https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run">https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run</a>)</p></li>
+<li><p>the documentation of [sigopt](<a class="reference external" href="https://app.sigopt.com/docs/endpoints/experiments/create">https://app.sigopt.com/docs/endpoints/experiments/create</a>)</p></li>
+</ul>
+</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>All the information about the best run. Experiment summary can be found in
+<cite>run_summary</cite> attribute for Ray backend.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>[<cite>trainer_utils.BestRun</cite>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/api/span_marker.trainer.rst.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>
