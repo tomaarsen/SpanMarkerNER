@@ -1,25 +1,38 @@
 import os
-from dataclasses import dataclass
 from typing import Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 from torch import nn
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
-from transformers.modeling_outputs import TokenClassifierOutput
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
+from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 
 T = TypeVar("T", bound="SpanMarkerModel")
 
 
-@dataclass
-class SpanMarkerOutput(TokenClassifierOutput):
-    num_words: Optional[torch.Tensor] = None
-
-
 class SpanMarkerModel(PreTrainedModel):
+    """
+    This SpanMarker model allows for Named Entity Recognition (NER) using a variety of underlying encoders,
+    such as BERT and RoBERTa. The model should be initialized using :meth:`~SpanMarkerModel.from_pretrained`,
+    e.g. like so:
+
+    >>> # Initialize a SpanMarkerModel using a pretrained encoder
+    >>> model = SpanMarkerModel.from_pretrained("bert-base-cased", labels=["O", "B-PER", "I-PER", "B-ORG", "I-ORG", ...])
+    >>> # Load a pretrained SpanMarker model
+    >>> model = SpanMarkerModel.from_pretrained("tomaarsen/span-marker-bert-base-fewnerd-fine-super")
+
+    After the model is loaded (and finetuned if it wasn't already), it can be used to predict entities:
+
+    >>> model.predict("A prototype was fitted in the mid-'60s in a one-off DB5 extended 4'' after the doors and "
+    ... "driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.")
+    [{'span': 'DB5', 'label': 'product-car', 'score': 0.8675689101219177, 'char_start_index': 52, 'char_end_index': 55},
+     {'span': 'Marek', 'label': 'person-other', 'score': 0.9100819230079651, 'char_start_index': 99, 'char_end_index': 104},
+     {'span': 'Aston Martin DB7', 'label': 'product-car', 'score': 0.9931442737579346, 'char_start_index': 143, 'char_end_index': 159}]
+    """
+
     config_class = SpanMarkerConfig
     base_model_prefix = "encoder"
 
@@ -83,6 +96,18 @@ class SpanMarkerModel(PreTrainedModel):
         labels: Optional[torch.Tensor] = None,
         num_words: Optional[torch.Tensor] = None,
     ) -> SpanMarkerOutput:
+        """Forward call of the SpanMarkerModel.
+
+        Args:
+            input_ids (torch.Tensor): Input IDs including start/end markers.
+            attention_mask (torch.Tensor): Attention mask matrix including one-directional attention for markers.
+            position_ids (torch.Tensor): Position IDs including start/end markers.
+            labels (Optional[torch.Tensor], optional): The labels for each span candidate. Defaults to None.
+            num_words (Optional[torch.Tensor], optional): The number of words for each batch sample. Defaults to None.
+
+        Returns:
+            SpanMarkerOutput: The output dataclass.
+        """
         token_type_ids = torch.zeros_like(input_ids)
         outputs = self.encoder(
             input_ids,
@@ -221,17 +246,17 @@ class SpanMarkerModel(PreTrainedModel):
                 have good support for this, so False is recommended. Defaults to False.
 
         Returns:
-            Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]: If
-                the input is a single sentence, then we output a list of dictionaries. Each dictionary
+            Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
+                If the input is a single sentence, then we output a list of dictionaries. Each dictionary
                 represents one predicted entity, and contains the following keys:
 
                 * `label`: The predicted entity label.
                 * `span`: The text that the model deems an entity.
                 * `score`: The model its confidence.
                 * `word_start_index` & `word_end_index`: The word indices for the start/end of the entity,
-                    if the input is pre-tokenized.
+                  if the input is pre-tokenized.
                 * `char_start_index` & `char_end_index`: The character indices for the start/end of the entity,
-                    if the input is a string.
+                  if the input is a string.
 
                 If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.
         """

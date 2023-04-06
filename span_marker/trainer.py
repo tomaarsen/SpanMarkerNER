@@ -1,3 +1,4 @@
+import warnings
 from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
@@ -8,9 +9,8 @@ from transformers import (
     TrainerCallback,
     TrainingArguments,
 )
-from transformers import (
-    Trainer as TransformersTrainer,
-)
+from transformers import Trainer as TransformersTrainer
+from transformers.trainer_utils import PredictionOutput
 
 from span_marker.evaluation import compute_f1_via_seqeval
 from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
@@ -21,37 +21,37 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 class Trainer(TransformersTrainer):
     """
     Trainer is a simple but feature-complete training and eval loop for SpanMarker,
-    built tightly on top of the 🤗 Transformers Trainer.
+    built tightly on top of the 🤗 Transformers `Trainer <https://huggingface.co/docs/transformers/main_classes/trainer>`_.
 
     Args:
-        model (`SpanMarkerModel`, *optional*):
+        model (Optional[SpanMarkerModel]):
             The model to train, evaluate or use for predictions. If not provided, a `model_init` must be passed.
-        args (`TrainingArguments`, *optional*):
+        args (Optional[TrainingArguments]):
             The arguments to tweak for training. Will default to a basic instance of [`TrainingArguments`] with the
             `output_dir` set to a directory named *tmp_trainer* in the current directory if not provided.
-        train_dataset (`datasets.Dataset`, *optional*):
+        train_dataset (Optional[datasets.Dataset]):
             The dataset to use for training.
-        eval_dataset (`datasets.Dataset`, *optional*):
+        eval_dataset (Optional[datasets.Dataset]):
              The dataset to use for evaluation.
-        model_init (`Callable[[], SpanMarkerModel]`, *optional*):
+        model_init (Optional[Callable[[], SpanMarkerModel]]):
             A function that instantiates the model to be used. If provided, each call to `Trainer.train` will start
             from a new instance of the model as given by this function.
 
             The function may have zero argument, or a single one containing the optuna/Ray Tune/SigOpt trial object, to
             be able to choose different architectures according to hyper parameters (such as layer count, sizes of
             inner layers, dropout probabilities etc).
-        compute_metrics (`Callable[[EvalPrediction], Dict]`, *optional*):
+        compute_metrics (Optional[Callable[[EvalPrediction], Dict]]):
             The function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return
             a dictionary string to metric values.
-        callbacks (List of [`TrainerCallback`], *optional*):
+        callbacks (Optional[List[TrainerCallback]]):
             A list of callbacks to customize the training loop. Will add those to the list of default callbacks
             detailed in [here](https://huggingface.co/docs/transformers/main/en/main_classes/callback).
 
             If you want to remove one of the default callbacks used, use the [`Trainer.remove_callback`] method.
-        optimizers (`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*): A tuple
+        optimizers (Tuple[Optional[torch.optim.Optimizer], Optional[torch.optim.lr_scheduler.LambdaLR]]): A tuple
             containing the optimizer and the scheduler to use. Will default to an instance of `AdamW` on your model
             and a scheduler given by `get_linear_schedule_with_warmup` controlled by `args`.
-        preprocess_logits_for_metrics (`Callable[[torch.Tensor, torch.Tensor], torch.Tensor]`, *optional*):
+        preprocess_logits_for_metrics (Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]]):
             A function that preprocess the logits right before caching them at each evaluation step. Must take two
             tensors, the logits and the labels, and return the logits once processed as desired. The modifications made
             by this function will be reflected in the predictions received by `compute_metrics`.
@@ -76,15 +76,15 @@ class Trainer(TransformersTrainer):
 
     def __init__(
         self,
-        model: SpanMarkerModel = None,
-        args: TrainingArguments = None,
+        model: Optional[SpanMarkerModel] = None,
+        args: Optional[TrainingArguments] = None,
         train_dataset: Optional[Dataset] = None,
         eval_dataset: Optional[Dataset] = None,
         model_init: Callable[[], SpanMarkerModel] = None,
         compute_metrics: Optional[Callable[[EvalPrediction], Dict]] = None,
         callbacks: Optional[List[TrainerCallback]] = None,
-        optimizers: Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR] = (None, None),
-        preprocess_logits_for_metrics: Callable[[torch.Tensor, torch.Tensor], torch.Tensor] = None,
+        optimizers: Tuple[Optional[torch.optim.Optimizer], Optional[torch.optim.lr_scheduler.LambdaLR]] = (None, None),
+        preprocess_logits_for_metrics: Optional[Callable[[torch.Tensor, torch.Tensor], torch.Tensor]] = None,
     ) -> None:
         # Extract the model from an initializer function
         if model_init:
@@ -186,3 +186,21 @@ class Trainer(TransformersTrainer):
                 eval_dataset, self.label_normalizer, self.tokenizer, dataset_name="evaluation", is_evaluate=True
             )
         return super().get_eval_dataloader(eval_dataset)
+
+    def get_test_dataloader(self, test_dataset: Dataset) -> DataLoader:
+        """Return the preprocessed evaluation DataLoader."""
+        test_dataset = self.preprocess_dataset(
+            test_dataset, self.label_normalizer, self.tokenizer, dataset_name="test", is_evaluate=True
+        )
+        return super().get_test_dataloader(test_dataset)
+
+    def predict(
+        self, test_dataset: Dataset, ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
+    ) -> PredictionOutput:
+        warnings.warn(
+            f"`Trainer.predict` is not recommended for a {self.model.__class__.__name__}. "
+            f"Consider using `{self.model.__class__.__name__}.predict` instead.",
+            UserWarning,
+            stacklevel=2,
+        )
+        return super().predict(test_dataset, ignore_keys, metric_key_prefix)

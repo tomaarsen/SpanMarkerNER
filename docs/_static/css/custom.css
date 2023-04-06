@@ -1,0 +1,27 @@
+
+/* Move "open in colab" to the right */
+.open-in-colab__wrapper{
+    display: inline-flex;
+    width: 100%;
+    justify-content: right;
+}
+
+/* Disable cell numbers */
+.prompt {
+    display: none;
+}
+
+/* Disable children under API Reference, while allowing children under Notebooks */
+#side-menu .toctree-l1:nth-child(2) .toctree-l2 {
+    display: none;
+}
+
+/* No margin on nested ul's */
+#side-menu ul{
+    margin-bottom: 0;
+}
+
+/* Only on outermost ul's */
+#side-menu > ul{
+    margin-bottom: 1em;
+}

@@ -40,6 +40,14 @@ dev = [
     "pytest",
     "pytest-cov"
 ]
+docs = [
+    "sphinx",
+    "m2r2",
+    "better-apidoc",
+    "nbsphinx",
+    "nbconvert<7",
+    "pandoc<3"
+]
 wandb = [
     "wandb"
 ]

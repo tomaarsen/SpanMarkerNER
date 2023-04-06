@@ -47,7 +47,7 @@ class SpanMarkerDataCollator:
                     Required for some evaluation metrics.
 
         Returns:
-            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into `model.forward`.
+            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~SpanMarkerModel.forward`.
         """
         total_size = self.tokenizer.model_max_length + 2 * self.marker_max_length
         start_marker_idx = self.tokenizer.model_max_length
