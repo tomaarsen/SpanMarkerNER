@@ -19,6 +19,11 @@ jobs:
         with:
           python-version: 3.9
 
+      - name: Setup pandoc, required for nbsphinx
+        uses: r-lib/actions/setup-pandoc@v2
+        with:
+          pandoc-version: "2.17.1"
+
       - name: Try to load cached dependencies
         uses: actions/cache@v3
         id: restore-cache
