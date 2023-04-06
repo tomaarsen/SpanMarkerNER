@@ -1,8 +1,8 @@
 from pathlib import Path
-from typing import Dict
+from typing import Dict, List
 
 import pytest
-from datasets import DatasetDict
+from datasets import Dataset, DatasetDict
 from transformers import EvalPrediction
 
 from span_marker.modeling import SpanMarkerModel
@@ -65,3 +65,16 @@ def test_trainer_compute_metrics(
     trainer = Trainer(model, args=DEFAULT_ARGS, eval_dataset=eval_dataset, compute_metrics=compute_metrics)
     metrics = trainer.evaluate()
     assert "eval_custom_metric" in metrics.keys()
+
+
+@pytest.mark.parametrize("column_names", [["tokens", "tags"], ["text", "ner_tags"], ["id", "text", "labels"]])
+def test_trainer_incorrect_columns(finetuned_conll_span_marker_model: SpanMarkerModel, column_names: List[str]) -> None:
+    model = finetuned_conll_span_marker_model
+    dataset = Dataset.from_dict({column_name: [] for column_name in column_names})
+
+    trainer = Trainer(model, args=DEFAULT_ARGS, train_dataset=dataset, eval_dataset=dataset)
+    with pytest.raises(ValueError, match="The train dataset must contain a '.*?' column."):
+        trainer.train()
+
+    with pytest.raises(ValueError, match="The evaluation dataset must contain a '.*?' column."):
+        trainer.evaluate()
