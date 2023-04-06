@@ -4,8 +4,7 @@ SpanMarker for Named Entity Recognition
 <div align="center">
 
 [🤗 Models](https://huggingface.co/models?other=span-marker) |
-<img src="https://ssl.gstatic.com/colaboratory-static/common/d42b9041c87c7f85d49a93be9c3c668a/img/favicon.ico" width=20 style="margin-bottom:-5px; margin-left:2px;">
-[Getting Started In Google Colab](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb) |
+[🛠️ Getting Started In Google Colab](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb) |
 [📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER)
 </div>
 
