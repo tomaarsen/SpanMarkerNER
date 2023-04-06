@@ -38,7 +38,7 @@ jobs:
         if: steps.restore-cache.outputs.cache-hit != 'true'
 
       - name: Build Sphinx
-        run: make html
+        run: python -m sphinx -Ea docs build
 
       - name: Deploy Sphinx
         uses: peaceiris/actions-gh-pages@v3
