@@ -53,6 +53,27 @@ def test_trainer_standard(
     assert isinstance(output, list)
 
 
+def test_trainer_model_init(
+    finetuned_conll_span_marker_model: SpanMarkerModel, conll_dataset_dict: DatasetDict
+) -> None:
+    model = finetuned_conll_span_marker_model
+    dataset = conll_dataset_dict
+
+    def model_init() -> SpanMarkerModel:
+        return model
+
+    trainer = Trainer(
+        model_init=model_init, args=DEFAULT_ARGS, train_dataset=dataset["train"], eval_dataset=dataset["test"]
+    )
+    trainer.train()
+    metrics = trainer.evaluate()
+    assert isinstance(metrics, dict)
+    output = trainer.model.predict(
+        "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."
+    )
+    assert isinstance(output, list)
+
+
 def test_trainer_compute_metrics(
     finetuned_conll_span_marker_model: SpanMarkerModel, conll_dataset_dict: DatasetDict
 ) -> None:
