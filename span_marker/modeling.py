@@ -298,12 +298,15 @@ class SpanMarkerModel(PreTrainedModel):
                         else sentence[word_start_index:word_end_index],
                         "label": id2label[label_id],
                         "score": score,
-                        "word_start_index": word_start_index if not isinstance(sentence, str) else None,
-                        "word_end_index": word_end_index if not isinstance(sentence, str) else None,
-                        "char_start_index": char_start_index if isinstance(sentence, str) else None,
-                        "char_end_index": char_end_index if isinstance(sentence, str) else None,
                     }
                 )
+                if isinstance(sentence, str):
+                    output[-1]["char_start_index"] = char_start_index
+                    output[-1]["char_end_index"] = char_end_index
+                else:
+                    output[-1]["word_start_index"] = word_start_index
+                    output[-1]["word_end_index"] = word_end_index
+
                 if not allow_overlapping:
                     word_selected[word_start_index:word_end_index] = [True] * (word_end_index - word_start_index)
         return sorted(
