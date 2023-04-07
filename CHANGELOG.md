@@ -17,6 +17,16 @@ Types of changes
 
 ## [Unreleased]
 
+## [0.2.1] - 2023-04-07
+
+### Added
+
+- Save `span_marker_version` in config files from now on.
+
+### Changed
+
+- `SpanMarkerModel.save_pretrained` and `SpanMarkerModel.push_to_hub` now also pushes the tokenizer and a simple model card.
+
 ## [0.2.0] - 2023-04-06
 
 ### Added
