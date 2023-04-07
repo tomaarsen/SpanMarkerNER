@@ -71,6 +71,7 @@ Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf
 
 * [`tomaarsen/span-marker-bert-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super) is a model that I have trained in just 4 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.7020 Test F1, competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup). My training script resembles the one that you can see above.
   * See this [Weights and Biases report](https://api.wandb.ai/links/tomaarsen/dm21vbbm) for training details.
+  * Try the model out online using this [🤗 Space](https://huggingface.co/spaces/tomaarsen/span-marker-bert-base-fewnerd-fine-super).
 
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
