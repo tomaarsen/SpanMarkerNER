@@ -1,5 +1,5 @@
 import os
-from typing import Dict, List, Optional, Type, TypeVar, Union
+from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 from torch import nn
@@ -8,6 +8,7 @@ from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedMode
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
+from span_marker.model_card import MODEL_CARD_TEMPLATE
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -340,3 +341,47 @@ class SpanMarkerModel(PreTrainedModel):
             output,
             key=lambda entity: entity["char_start_index"] if isinstance(sentence, str) else entity["word_start_index"],
         )
+
+    def save_pretrained(
+        self,
+        save_directory: Union[str, os.PathLike],
+        is_main_process: bool = True,
+        state_dict: Optional[dict] = None,
+        save_function: Callable = torch.save,
+        push_to_hub: bool = False,
+        max_shard_size: Union[int, str] = "10GB",
+        safe_serialization: bool = False,
+        variant: Optional[str] = None,
+        **kwargs,
+    ) -> None:
+        super().save_pretrained(
+            save_directory,
+            is_main_process=is_main_process,
+            state_dict=state_dict,
+            save_function=save_function,
+            push_to_hub=push_to_hub,
+            max_shard_size=max_shard_size,
+            safe_serialization=safe_serialization,
+            variant=variant,
+            **kwargs,
+        )
+        self.tokenizer.save_pretrained(
+            save_directory,
+            is_main_process=is_main_process,
+            state_dict=state_dict,
+            save_function=save_function,
+            push_to_hub=push_to_hub,
+            max_shard_size=max_shard_size,
+            safe_serialization=safe_serialization,
+            variant=variant,
+            **kwargs,
+        )
+        if "_name_or_path" in self.config.encoder:
+            encoder_name_or_path = repr(self.config.encoder["_name_or_path"])
+        else:
+            encoder_name_or_path = "an unknown model"
+        model_card_content = MODEL_CARD_TEMPLATE.format(
+            model_name=save_directory, encoder_name_or_path=encoder_name_or_path
+        )
+        with open(os.path.join(save_directory, "README.md"), "w", encoding="utf-8") as f:
+            f.write(model_card_content)

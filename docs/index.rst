@@ -110,11 +110,6 @@ To the 🤗 Hub
 
    model_name = "span-marker-bert-base-fewnerd-fine-super"
    model.push_to_hub(model_name)
-   model.tokenizer.push_to_hub(model_name)
-
-.. note::
-   Be sure to also push the ``model.tokenizer``!
-   Otherwise, the model can't be easily loaded with ``SpanMarkerModel.from_pretrained`` again.
 
 
 .. toctree::
