@@ -21,6 +21,7 @@ class SpanMarkerConfig(PretrainedConfig):
         self.model_max_length_default = 512
         self.marker_max_length = marker_max_length
         self.entity_max_length = entity_max_length
+        self.span_marker_version = kwargs.pop("span_marker_version", None)
         super().__init__(**kwargs)
 
         # label2id and id2label are automatically set by super().__init__, but we want to rely on

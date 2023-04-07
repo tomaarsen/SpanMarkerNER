@@ -5,6 +5,7 @@ import torch
 from torch import nn
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 
+from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.output import SpanMarkerOutput
@@ -216,7 +217,8 @@ class SpanMarkerModel(PreTrainedModel):
                 )
             config.id2label = dict(enumerate(labels))
             config.label2id = {v: k for k, v in config.id2label.items()}
-            config = cls.config_class(encoder_config=config.to_dict())
+            # Set the span_marker version for freshly initialized models
+            config = cls.config_class(encoder_config=config.to_dict(), span_marker_version=span_marker_version)
             model = cls(config, encoder, *model_args, **kwargs)
 
         # Pass the tokenizer directly to the model for convenience, this way the user doesn't have to
