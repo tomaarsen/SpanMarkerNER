@@ -31,7 +31,7 @@ from span_marker import SpanMarkerModel
 # Download from Hub and run inference
 model = SpanMarkerModel.from_pretrained("span_marker_model_name")
 # Run inference
-preds = model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.")
+entities = model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.")
 ```
 
 See the [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) repository for documentation and additional information on this model framework.
