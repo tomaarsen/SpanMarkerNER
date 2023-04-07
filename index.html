@@ -200,13 +200,7 @@ much like in 🤗 Transformers.</p>
 <h4>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
 <span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
-<span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 </pre></div>
-</div>
-<div class="admonition note">
-<p class="admonition-title">Note</p>
-<p>Be sure to also push the <code class="docutils literal notranslate"><span class="pre">model.tokenizer</span></code>!
-Otherwise, the model can’t be easily loaded with <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code> again.</p>
 </div>
 <div class="toctree-wrapper compound">
 </div>
