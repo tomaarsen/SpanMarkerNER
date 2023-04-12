@@ -72,6 +72,7 @@ class SpanMarkerDataCollator:
             # Prepare position IDs
             position_ids = torch.arange(num_tokens, dtype=torch.int) + 2
             position_ids = F.pad(position_ids, (0, total_size - len(position_ids)), value=0)
+            position_ids[num_tokens]=1
             position_ids[start_marker_idx : start_marker_idx + num_spans] = (
                 torch.tensor(sample["start_position_ids"]) + 2
             )
