@@ -16,6 +16,7 @@ span_marker.modeling module
     :show-inheritance:
     :member-order: bysource
 
+.. autoproperty:: SpanMarkerModel.push_to_hub
 .. autoproperty:: SpanMarkerModel.device
 .. automethod:: SpanMarkerModel.cuda
 .. automethod:: SpanMarkerModel.cpu
