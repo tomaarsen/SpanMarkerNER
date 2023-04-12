@@ -219,7 +219,9 @@ class SpanMarkerModel(PreTrainedModel):
             config.id2label = dict(enumerate(labels))
             config.label2id = {v: k for k, v in config.id2label.items()}
             # Set the span_marker version for freshly initialized models
-            config = cls.config_class(encoder_config=config.to_dict(), span_marker_version=span_marker_version)
+            config = cls.config_class(
+                encoder_config=config.to_dict(), span_marker_version=span_marker_version, **kwargs
+            )
             model = cls(config, encoder, *model_args, **kwargs)
 
         # Pass the tokenizer directly to the model for convenience, this way the user doesn't have to
