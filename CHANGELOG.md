@@ -17,6 +17,10 @@ Types of changes
 
 ## [Unreleased]
 
+### Fixed
+
+- Resolved tricky issue causing models to learn to never predict the last token as an entity (Closes #1).
+
 ## [0.2.2] - 2023-04-13
 
 ### Fixed

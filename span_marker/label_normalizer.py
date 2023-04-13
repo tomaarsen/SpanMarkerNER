@@ -45,7 +45,7 @@ class LabelNormalizerScheme(LabelNormalizer):
                 start_idx = idx
 
         if start_idx is not None:
-            yield (reduced_label_id, start_idx, idx)
+            yield (reduced_label_id, start_idx, idx + 1)
 
     def __call__(self, ner_tags: List[int]) -> Dict[str, List[Any]]:
         batch_entities = []
@@ -93,7 +93,7 @@ class LabelNormalizerNoScheme(LabelNormalizer):
                 start_idx = idx
 
         if start_idx is not None:
-            yield (entity_label_id, start_idx, idx)
+            yield (entity_label_id, start_idx, idx + 1)
 
     def __call__(self, ner_tags: List[int]) -> Dict[str, List[Any]]:
         batch_entities = []
