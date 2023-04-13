@@ -31,8 +31,8 @@ class SpanMarkerConfig(PretrainedConfig):
         )
 
     Raises:
-        ValueError: If the labels provided to `SpanMarkerModel.from_pretrained` does not contain a "O",
-            a ValueError is raised.
+        ValueError: If the labels provided to :meth:`~span_marker.modeling.SpanMarkerModel.from_pretrained` do not
+            contain the required `"O"` label.
     """
 
     model_type: str = "span-marker"
