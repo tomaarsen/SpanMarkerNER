@@ -17,6 +17,12 @@ Types of changes
 
 ## [Unreleased]
 
+## [0.2.2] - 2023-04-13
+
+### Fixed
+
+- Correctly propagate `SpanMarkerModel.from_pretrained` kwargs to Config initialisation.
+
 ## [0.2.1] - 2023-04-07
 
 ### Added
