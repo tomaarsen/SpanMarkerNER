@@ -19,7 +19,7 @@ Types of changes
 
 ### Fixed
 
-- Resolved tricky issue causing models to learn to never predict the last token as an entity (Closes #1).
+- Resolved tricky issue causing models to learn to never predict the last token as an entity (Closes [#1](https://github.com/tomaarsen/SpanMarkerNER/pull/1)).
 
 ## [0.2.2] - 2023-04-13
 
