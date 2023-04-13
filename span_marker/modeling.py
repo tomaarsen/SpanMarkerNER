@@ -193,8 +193,8 @@ class SpanMarkerModel(PreTrainedModel):
             labels (List[str], optional): A list of string labels corresponding to the ``ner_tags`` in your datasets.
                 Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.
 
-        Additional arguments are passed to the ``from_pretrained`` methods of :class:`~transformers.AutoConfig`,
-        :class:`~transformers.AutoModel` and :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.
+        Additional arguments are passed to :class:`~span_marker.configuration.SpanMarkerConfig` and the ``from_pretrained`` methods of
+        :class:`~transformers.AutoConfig`, :class:`~transformers.AutoModel` and :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.
 
         Returns:
             SpanMarkerModel: A :class:`SpanMarkerModel` instance, either ready for training using the :class:`Trainer` or\
