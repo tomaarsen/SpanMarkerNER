@@ -112,7 +112,7 @@
 <dl class="py function">
 <dt class="sig sig-object py" id="span_marker.evaluation.compute_f1_via_seqeval">
 <span class="sig-prename descclassname"><span class="pre">span_marker.evaluation.</span></span><span class="sig-name descname"><span class="pre">compute_f1_via_seqeval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_prediction</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/evaluation.html#compute_f1_via_seqeval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.evaluation.compute_f1_via_seqeval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Compute micro-F1, recall, precision and accuracy scores using <cite>seqeval</cite> for the evaluation predictions.</p>
+<dd><p>Compute micro-F1, recall, precision and accuracy scores using <code class="docutils literal notranslate"><span class="pre">seqeval</span></code> for the evaluation predictions.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>We assume that samples are not shuffled for the evaluation/prediction.
@@ -121,13 +121,13 @@ With other words, don’t use this on the (shuffled) train dataset!</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – </p></li>
-<li><p><strong>eval_prediction</strong> (<em>EvalPrediction</em>) – _description_</p></li>
+<li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – The model its tokenizer.</p></li>
+<li><p><strong>eval_prediction</strong> (<a class="reference external" href="https://huggingface.co/docs/transformers/main/en/internal/trainer_utils#transformers.EvalPrediction" title="(in transformers vmain)"><em>EvalPrediction</em></a>) – The predictions resulting from the evaluations.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><dl class="simple">
-<dt>Dictionary with <cite>“overall_precision”</cite>, <cite>“overall_recall”</cite>, <cite>“overall_f1”</cite></dt><dd><p>and <cite>“overall_accuracy”</cite> keys.</p>
+<dt>Dictionary with <code class="docutils literal notranslate"><span class="pre">&quot;overall_precision&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;overall_recall&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;overall_f1&quot;</span></code></dt><dd><p>and <code class="docutils literal notranslate"><span class="pre">&quot;overall_accuracy&quot;</span></code> keys.</p>
 </dd>
 </dl>
 </p>

@@ -117,26 +117,27 @@
 <div class="viewcode-block" id="SpanMarkerOutput"><a class="viewcode-back" href="../../api/span_marker.output.html#span_marker.output.SpanMarkerOutput">[docs]</a><span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SpanMarkerOutput</span><span class="p">(</span><span class="n">TokenClassifierOutput</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Class for outputs of SpanMarker models.</span>
+<span class="sd">    Class for outputs of :class:`~span_marker.modeling.SpanMarkerModel`.</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        loss (`torch.FloatTensor` of shape `(1,)`, *optional*, returned when `labels` is provided):</span>
-<span class="sd">            Classification loss.</span>
-<span class="sd">        logits (`torch.FloatTensor` of shape `(batch_size, sequence_length, config.num_labels)`):</span>
-<span class="sd">            Classification scores (before SoftMax).</span>
-<span class="sd">        hidden_states (`tuple(torch.FloatTensor)`, *optional*, returned when `config.output_hidden_states=True`):</span>
-<span class="sd">            Tuple of `torch.FloatTensor` (one for the output of the embeddings, if the model has an embedding layer, +</span>
-<span class="sd">            one for the output of each layer) of shape `(batch_size, sequence_length, hidden_size)`.</span>
+<span class="sd">        loss (Optional[torch.FloatTensor]):</span>
+<span class="sd">            Classification loss of shape ``(1,)``, returned when ``labels`` is provided.</span>
+<span class="sd">        logits (torch.FloatTensor):</span>
+<span class="sd">            Classification scores before softmax with shape ``(batch_size, sequence_length, config.num_labels)``.</span>
+<span class="sd">        hidden_states (Optional[Tuple[torch.FloatTensor]]):</span>
+<span class="sd">            Tuple of :class:`~torch.FloatTensor` (one for the output of the embeddings, if the model has an embedding layer, +</span>
+<span class="sd">            one for the output of each layer) of shape ``(batch_size, sequence_length, hidden_size)``.</span>
+<span class="sd">            Returned when ``config.output_hidden_states=True``.</span>
 
 <span class="sd">            Hidden-states of the model at the output of each layer plus the optional initial embedding outputs.</span>
-<span class="sd">        attentions (`tuple(torch.FloatTensor)`, *optional*, returned when `config.output_attentions=True`):</span>
-<span class="sd">            Tuple of `torch.FloatTensor` (one for each layer) of shape `(batch_size, num_heads, sequence_length,</span>
-<span class="sd">            sequence_length)`.</span>
+<span class="sd">        attentions (Optional[Tuple[torch.FloatTensor]]):</span>
+<span class="sd">            Tuple of :class:`~torch.FloatTensor` (one for each layer) of shape ``(batch_size, num_heads, sequence_length,</span>
+<span class="sd">            sequence_length)``. Returned when ``config.output_attentions=True``.</span>
 
 <span class="sd">            Attentions weights after the attention softmax, used to compute the weighted average in the self-attention</span>
 <span class="sd">            heads.</span>
-<span class="sd">        num_words (`torch.Tensor`, *optional*):</span>
-<span class="sd">            A vector with length `batch_size` that tracks how many words were in the input of each sample in the batch.</span>
+<span class="sd">        num_words (Optional[~torch.Tensor]):</span>
+<span class="sd">            A vector with shape ``(batch_size,)`` that tracks how many words were in the input of each sample in the batch.</span>
 <span class="sd">            Required for evaluation purposes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

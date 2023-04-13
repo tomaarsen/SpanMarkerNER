@@ -109,12 +109,24 @@
           
   <section id="module-span_marker.label_normalizer">
 <span id="span-marker-label-normalizer-module"></span><h1>span_marker.label_normalizer module<a class="headerlink" href="#module-span_marker.label_normalizer" title="Permalink to this heading">¶</a></h1>
+<dl class="py data">
+<dt class="sig sig-object py" id="span_marker.label_normalizer.Entity">
+<span class="sig-prename descclassname"><span class="pre">span_marker.label_normalizer.</span></span><span class="sig-name descname"><span class="pre">Entity</span></span><a class="headerlink" href="#span_marker.label_normalizer.Entity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tuple of:</p>
+<ul class="simple">
+<li><p>Entity label</p></li>
+<li><p>Word start index</p></li>
+<li><p>Word end index</p></li>
+</ul>
+<p>alias of <code class="xref py py-class docutils literal notranslate"><span class="pre">Tuple</span></code>[<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a>]</p>
+</dd></dl>
+
 <dl class="py class">
 <dt class="sig sig-object py" id="span_marker.label_normalizer.LabelNormalizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.label_normalizer.</span></span><span class="sig-name descname"><span class="pre">LabelNormalizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/label_normalizer.html#LabelNormalizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.label_normalizer.LabelNormalizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/abc.html#abc.ABC" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ABC</span></code></a></p>
-<p>Class to convert NER training data into a common format used in the SpanMarkerModel.</p>
-<p>The common format involves tokenized texts and labels as Entity instances.</p>
+<p>Class to convert NER training data into a common format used in the <a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerTokenizer</span></code></a>.</p>
+<p>The common format involves 3-tuples with entity labels, word start indices and word end indices.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a>) – </p>

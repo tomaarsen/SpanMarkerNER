@@ -147,7 +147,16 @@
     <span class="n">config_class</span> <span class="o">=</span> <span class="n">SpanMarkerConfig</span>
     <span class="n">base_model_prefix</span> <span class="o">=</span> <span class="s2">&quot;encoder&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="n">encoder</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PreTrainedModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a SpanMarkerModel using configuration.</span>
+
+<span class="sd">        Do not manually initialize a SpanMarkerModel this way! Use :meth:`~SpanMarkerModel.from_pretrained` instead.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            config (SpanMarkerConfig): The configuration for this model.</span>
+<span class="sd">            encoder (Optional[PreTrainedModel]): A PreTrainedModel acting as the underlying encoder.</span>
+<span class="sd">                Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
         <span class="c1"># `encoder` will be specified if this Model is initializer via .from_pretrained with an encoder</span>
@@ -210,11 +219,11 @@
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Forward call of the SpanMarkerModel.</span>
 
 <span class="sd">        Args:</span>
-<span class="sd">            input_ids (torch.Tensor): Input IDs including start/end markers.</span>
-<span class="sd">            attention_mask (torch.Tensor): Attention mask matrix including one-directional attention for markers.</span>
-<span class="sd">            position_ids (torch.Tensor): Position IDs including start/end markers.</span>
-<span class="sd">            labels (Optional[torch.Tensor], optional): The labels for each span candidate. Defaults to None.</span>
-<span class="sd">            num_words (Optional[torch.Tensor], optional): The number of words for each batch sample. Defaults to None.</span>
+<span class="sd">            input_ids (~torch.Tensor): Input IDs including start/end markers.</span>
+<span class="sd">            attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.</span>
+<span class="sd">            position_ids (~torch.Tensor): Position IDs including start/end markers.</span>
+<span class="sd">            labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.</span>
+<span class="sd">            num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            SpanMarkerOutput: The output dataclass.</span>
@@ -274,31 +283,31 @@
 
 <span class="sd">        Args:</span>
 <span class="sd">            pretrained_model_name_or_path (Union[str, os.PathLike]):</span>
-<span class="sd">                Either a pretrained encoder (e.g. `bert-base-cased`, `roberta-large`, etc.), or a pretrained SpanMarkerModel.</span>
+<span class="sd">                Either a pretrained encoder (e.g. ``bert-base-cased``, ``roberta-large``, etc.), or a pretrained SpanMarkerModel.</span>
 <span class="sd">                Can be either:</span>
 
 <span class="sd">                    - A string, the *model id* of a pretrained model hosted inside a model repo on huggingface.co.</span>
-<span class="sd">                      Valid model ids can be located at the root-level, like `bert-base-uncased`, or namespaced under a</span>
-<span class="sd">                      user or organization name, like `dbmdz/bert-base-german-cased`.</span>
+<span class="sd">                      Valid model ids can be located at the root-level, like ``bert-base-uncased``, or namespaced under a</span>
+<span class="sd">                      user or organization name, like ``dbmdz/bert-base-german-cased``.</span>
 <span class="sd">                    - A path to a *directory* containing model weights saved using</span>
-<span class="sd">                      `.save_pretrained`, e.g., `./my_model_directory/`.</span>
-<span class="sd">                    - A path or url to a *tensorflow index checkpoint file* (e.g, `./tf_model/model.ckpt.index`). In</span>
-<span class="sd">                      this case, `from_tf` should be set to `True` and a configuration object should be provided as</span>
-<span class="sd">                      `config` argument. This loading path is slower than converting the TensorFlow checkpoint in a</span>
+<span class="sd">                      :meth:`SpanMarkerModel.save_pretrained`, e.g., ``./my_model_directory/``.</span>
+<span class="sd">                    - A path or url to a *tensorflow index checkpoint file* (e.g, ``./tf_model/model.ckpt.index``). In</span>
+<span class="sd">                      this case, ``from_tf`` should be set to ``True`` and a configuration object should be provided as</span>
+<span class="sd">                      ``config`` argument. This loading path is slower than converting the TensorFlow checkpoint in a</span>
 <span class="sd">                      PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.</span>
 <span class="sd">                    - A path or url to a model folder containing a *flax checkpoint file* in *.msgpack* format (e.g,</span>
-<span class="sd">                      `./flax_model/` containing `flax_model.msgpack`). In this case, `from_flax` should be set to</span>
-<span class="sd">                      `True`.</span>
+<span class="sd">                      ``./flax_model/`` containing ``flax_model.msgpack``). In this case, ``from_flax`` should be set to</span>
+<span class="sd">                      ``True``.</span>
 
-<span class="sd">            labels (List[str], optional): A list of string labels corresponding to the `ner_tags` in your datasets.</span>
+<span class="sd">            labels (List[str], optional): A list of string labels corresponding to the ``ner_tags`` in your datasets.</span>
 <span class="sd">                Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</span>
 
-<span class="sd">        Additional arguments are passed to the `from_pretrained` methods of `AutoConfig`, `AutoModel` and</span>
-<span class="sd">        `SpanMarkerTokenizer`.</span>
+<span class="sd">        Additional arguments are passed to the ``from_pretrained`` methods of :class:`~transformers.AutoConfig`,</span>
+<span class="sd">        :class:`~transformers.AutoModel` and :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            SpanMarkerModel: A SpanMarkerModel instance, either ready for training using the `Trainer` or for</span>
-<span class="sd">                inference via `model.predict()`.</span>
+<span class="sd">            SpanMarkerModel: A :class:`SpanMarkerModel` instance, either ready for training using the :class:`Trainer` or\</span>
+<span class="sd">                for inference via :meth:`SpanMarkerModel.predict`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If loading a SpanMarkerConfig, then we don&#39;t want to override id2label and label2id</span>
         <span class="c1"># Create an encoder or SpanMarker config</span>
@@ -348,7 +357,7 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict named entities from input texts.</span>
 
-<span class="sd">        Example:</span>
+<span class="sd">        Example::</span>
 
 <span class="sd">            &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(...)</span>
 <span class="sd">            &gt;&gt;&gt; model.predict(&quot;Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.&quot;)</span>
@@ -378,12 +387,12 @@
 <span class="sd">                If the input is a single sentence, then we output a list of dictionaries. Each dictionary</span>
 <span class="sd">                represents one predicted entity, and contains the following keys:</span>
 
-<span class="sd">                * `label`: The predicted entity label.</span>
-<span class="sd">                * `span`: The text that the model deems an entity.</span>
-<span class="sd">                * `score`: The model its confidence.</span>
-<span class="sd">                * `word_start_index` &amp; `word_end_index`: The word indices for the start/end of the entity,</span>
+<span class="sd">                * ``label``: The predicted entity label.</span>
+<span class="sd">                * ``span``: The text that the model deems an entity.</span>
+<span class="sd">                * ``score``: The model its confidence.</span>
+<span class="sd">                * ``word_start_index`` &amp; ``word_end_index``: The word indices for the start/end of the entity,</span>
 <span class="sd">                  if the input is pre-tokenized.</span>
-<span class="sd">                * `char_start_index` &amp; `char_end_index`: The character indices for the start/end of the entity,</span>
+<span class="sd">                * ``char_start_index`` &amp; ``char_end_index``: The character indices for the start/end of the entity,</span>
 <span class="sd">                  if the input is a string.</span>
 
 <span class="sd">                If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.</span>

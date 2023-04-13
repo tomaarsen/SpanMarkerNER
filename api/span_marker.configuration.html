@@ -113,9 +113,41 @@
 <dt class="sig sig-object py" id="span_marker.configuration.SpanMarkerConfig">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.configuration.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/configuration.html#SpanMarkerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.configuration.SpanMarkerConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code></p>
+<p>Configuration class for SpanMarkerModel instances.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>encoder_config</strong> (<cite>Optional[Dict[str, Any]]</cite>) – The configuration dictionary for the
+underlying encoder used by the SpanMarkerModel instance. Defaults to None.</p></li>
+<li><p><strong>model_max_length</strong> (<cite>Optional[int]</cite>) – The total number of tokens that can be processed before
+truncation. If None, the tokenizer its <cite>model_max_length</cite> is used, and if that value is
+not defined, it becomes 512 instead. Defaults to None.</p></li>
+<li><p><strong>marker_max_length</strong> (<cite>int</cite>) – The maximum length for each of the span markers. A value of 256
+means that each training and inferencing sample contains a maximum of 256 start markers
+and 256 end markers. Defaults to 256.</p></li>
+<li><p><strong>entity_max_length</strong> (<cite>int</cite>) – The maximum length of an entity span in terms of words.
+Defaults to 16.</p></li>
+</ul>
+</dd>
+</dl>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># These configuration settings are provided via kwargs to `SpanMarkerModel.from_pretrained`:</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;bert-base-cased&quot;</span><span class="p">,</span>
+    <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+    <span class="n">marker_max_length</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span>
+    <span class="n">entity_max_length</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the labels provided to <cite>SpanMarkerModel.from_pretrained</cite> does not contain a “O”,
+    a ValueError is raised.</p>
+</dd>
+<dt class="field-even">Parameters<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
 <li><p><strong>encoder_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.11)"><em>Any</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
 <li><p><strong>model_max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>marker_max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>

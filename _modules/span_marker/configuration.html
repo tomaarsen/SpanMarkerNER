@@ -114,6 +114,36 @@
 
 
 <div class="viewcode-block" id="SpanMarkerConfig"><a class="viewcode-back" href="../../api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerConfig</span><span class="p">(</span><span class="n">PretrainedConfig</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Configuration class for SpanMarkerModel instances.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        encoder_config (`Optional[Dict[str, Any]]`): The configuration dictionary for the</span>
+<span class="sd">            underlying encoder used by the SpanMarkerModel instance. Defaults to None.</span>
+<span class="sd">        model_max_length (`Optional[int]`): The total number of tokens that can be processed before</span>
+<span class="sd">            truncation. If None, the tokenizer its `model_max_length` is used, and if that value is</span>
+<span class="sd">            not defined, it becomes 512 instead. Defaults to None.</span>
+<span class="sd">        marker_max_length (`int`): The maximum length for each of the span markers. A value of 256</span>
+<span class="sd">            means that each training and inferencing sample contains a maximum of 256 start markers</span>
+<span class="sd">            and 256 end markers. Defaults to 256.</span>
+<span class="sd">        entity_max_length (`int`): The maximum length of an entity span in terms of words.</span>
+<span class="sd">            Defaults to 16.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        # These configuration settings are provided via kwargs to `SpanMarkerModel.from_pretrained`:</span>
+<span class="sd">        model = SpanMarkerModel.from_pretrained(</span>
+<span class="sd">            &quot;bert-base-cased&quot;,</span>
+<span class="sd">            labels=labels,</span>
+<span class="sd">            model_max_length=256,</span>
+<span class="sd">            marker_max_length=128,</span>
+<span class="sd">            entity_max_length=8,</span>
+<span class="sd">        )</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the labels provided to `SpanMarkerModel.from_pretrained` does not contain a &quot;O&quot;,</span>
+<span class="sd">            a ValueError is raised.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="n">model_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;span-marker&quot;</span>
     <span class="n">is_composition</span> <span class="o">=</span> <span class="kc">True</span>
 
@@ -125,35 +155,6 @@
         <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">16</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Configuration class for SpanMarkerModel instances.</span>
-
-<span class="sd">        Args:</span>
-<span class="sd">            encoder_config (`Optional[Dict[str, Any]]`): The configuration dictionary for the</span>
-<span class="sd">                underlying encoder used by the SpanMarkerModel instance. Defaults to None.</span>
-<span class="sd">            model_max_length (`Optional[int]`): The total number of tokens that can be processed before</span>
-<span class="sd">                truncation. If None, the tokenizer its `model_max_length` is used, and if that value is</span>
-<span class="sd">                not defined, it becomes 512 instead. Defaults to None.</span>
-<span class="sd">            marker_max_length (`int`): The maximum length for each of the span markers. A value of 256</span>
-<span class="sd">                means that each training and inferencing sample contains a maximum of 256 start markers</span>
-<span class="sd">                and 256 end markers. Defaults to 256.</span>
-<span class="sd">            entity_max_length (`int`): The maximum length of an entity span in terms of words.</span>
-<span class="sd">                Defaults to 16.</span>
-
-<span class="sd">        Example::</span>
-
-<span class="sd">            # These configuration settings are provided via kwargs to `SpanMarkerModel.from_pretrained`:</span>
-<span class="sd">            model = SpanMarkerModel.from_pretrained(</span>
-<span class="sd">                &quot;bert-base-cased&quot;,</span>
-<span class="sd">                labels=labels,</span>
-<span class="sd">                model_max_length=256,</span>
-<span class="sd">                marker_max_length=128,</span>
-<span class="sd">                entity_max_length=8,</span>
-<span class="sd">            )</span>
-
-<span class="sd">        Raises:</span>
-<span class="sd">            ValueError: If the labels provided to `SpanMarkerModel.from_pretrained` does not contain a &quot;O&quot;,</span>
-<span class="sd">                a ValueError is raised.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder_config</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">=</span> <span class="n">model_max_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length_default</span> <span class="o">=</span> <span class="mi">512</span>

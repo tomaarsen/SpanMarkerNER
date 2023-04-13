@@ -121,11 +121,11 @@
 <span class="k">class</span> <span class="nc">SpanMarkerDataCollator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Data Collator class responsible for converting the minimal outputs from the tokenizer into</span>
-<span class="sd">    complete and meaningful inputs to the model. In particular, the `input_ids` from the tokenizer</span>
+<span class="sd">    complete and meaningful inputs to the model. In particular, the ``input_ids`` from the tokenizer</span>
 <span class="sd">    features are padded, and the correct amount of start and end markers (with padding) are added.</span>
 
-<span class="sd">    Furthermore, the position IDs are generated for the input IDs, and `start_position_ids` and</span>
-<span class="sd">    `end_position_ids` are used alongside some padding to create a full position ID vector.</span>
+<span class="sd">    Furthermore, the position IDs are generated for the input IDs, and ``start_position_ids`` and</span>
+<span class="sd">    ``end_position_ids`` are used alongside some padding to create a full position ID vector.</span>
 
 <span class="sd">    Lastly, the attention matrix is computed.</span>
 
@@ -141,22 +141,22 @@
     <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span>
 
 <div class="viewcode-block" id="SpanMarkerDataCollator.__call__"><a class="viewcode-back" href="../../api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the minimal tokenizer outputs into inputs ready for `model.forward`.</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the minimal tokenizer outputs into inputs ready for :meth:`~span_marker.modeling.SpanMarkerModel.forward`.</span>
 
 <span class="sd">        Args:</span>
 <span class="sd">            features (List[Dict[str, Any]]): A list of dictionaries, one element per sample in the batch.</span>
 <span class="sd">                The dictionaries contain the following keys:</span>
 
-<span class="sd">                * `input_ids`: The non-padded input IDs.</span>
-<span class="sd">                * `num_spans`: The number of spans that should be encoded in each sample.</span>
-<span class="sd">                * `start_position_ids`: The position IDs of the start markers in the sample.</span>
-<span class="sd">                * `end_position_ids`: The position IDs of the end markers in the sample.</span>
-<span class="sd">                * `labels` (optional): The labels corresponding to each of the spans in the sample.</span>
-<span class="sd">                * `num_words` (optional): The number of words in the input sample.</span>
+<span class="sd">                * ``input_ids``: The non-padded input IDs.</span>
+<span class="sd">                * ``num_spans``: The number of spans that should be encoded in each sample.</span>
+<span class="sd">                * ``start_position_ids``: The position IDs of the start markers in the sample.</span>
+<span class="sd">                * ``end_position_ids``: The position IDs of the end markers in the sample.</span>
+<span class="sd">                * ``labels`` (optional): The labels corresponding to each of the spans in the sample.</span>
+<span class="sd">                * ``num_words`` (optional): The number of words in the input sample.</span>
 <span class="sd">                    Required for some evaluation metrics.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~SpanMarkerModel.forward`.</span>
+<span class="sd">            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~span_marker.modeling.SpanMarkerModel.forward`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">total_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span>
         <span class="n">start_marker_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span>

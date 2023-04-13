@@ -132,7 +132,10 @@ e.g. like so:</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a>) – </p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a>) – </p></li>
+<li><p><strong>encoder</strong> (<em>PreTrainedModel</em><em> | </em><em>None</em>) – </p></li>
+</ul>
 </dd>
 </dl>
 <dl class="py method">
@@ -142,11 +145,11 @@ e.g. like so:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>input_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>torch.Tensor</em></a>) – Input IDs including start/end markers.</p></li>
-<li><p><strong>attention_mask</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>torch.Tensor</em></a>) – Attention mask matrix including one-directional attention for markers.</p></li>
-<li><p><strong>position_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>torch.Tensor</em></a>) – Position IDs including start/end markers.</p></li>
-<li><p><strong>labels</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>torch.Tensor</em></a><em>]</em><em>, </em><em>optional</em>) – The labels for each span candidate. Defaults to None.</p></li>
-<li><p><strong>num_words</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>torch.Tensor</em></a><em>]</em><em>, </em><em>optional</em>) – The number of words for each batch sample. Defaults to None.</p></li>
+<li><p><strong>input_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>Tensor</em></a>) – Input IDs including start/end markers.</p></li>
+<li><p><strong>attention_mask</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>Tensor</em></a>) – Attention mask matrix including one-directional attention for markers.</p></li>
+<li><p><strong>position_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>Tensor</em></a>) – Position IDs including start/end markers.</p></li>
+<li><p><strong>labels</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>Tensor</em></a><em>]</em>) – The labels for each span candidate. Defaults to None.</p></li>
+<li><p><strong>num_words</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))"><em>Tensor</em></a><em>]</em>) – The number of words for each batch sample. Defaults to None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -172,26 +175,26 @@ e.g. like so:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pretrained_model_name_or_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>os.PathLike</em></a><em>]</em>) – <p>Either a pretrained encoder (e.g. <cite>bert-base-cased</cite>, <cite>roberta-large</cite>, etc.), or a pretrained SpanMarkerModel.
+<li><p><strong>pretrained_model_name_or_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>os.PathLike</em></a><em>]</em>) – <p>Either a pretrained encoder (e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>, <code class="docutils literal notranslate"><span class="pre">roberta-large</span></code>, etc.), or a pretrained SpanMarkerModel.
 Can be either:</p>
 <blockquote>
 <div><ul>
 <li><p>A string, the <em>model id</em> of a pretrained model hosted inside a model repo on huggingface.co.
-Valid model ids can be located at the root-level, like <cite>bert-base-uncased</cite>, or namespaced under a
-user or organization name, like <cite>dbmdz/bert-base-german-cased</cite>.</p></li>
+Valid model ids can be located at the root-level, like <code class="docutils literal notranslate"><span class="pre">bert-base-uncased</span></code>, or namespaced under a
+user or organization name, like <code class="docutils literal notranslate"><span class="pre">dbmdz/bert-base-german-cased</span></code>.</p></li>
 <li><p>A path to a <em>directory</em> containing model weights saved using
-<cite>.save_pretrained</cite>, e.g., <cite>./my_model_directory/</cite>.</p></li>
-<li><p>A path or url to a <em>tensorflow index checkpoint file</em> (e.g, <cite>./tf_model/model.ckpt.index</cite>). In
-this case, <cite>from_tf</cite> should be set to <cite>True</cite> and a configuration object should be provided as
-<cite>config</cite> argument. This loading path is slower than converting the TensorFlow checkpoint in a
+<a class="reference internal" href="#span_marker.modeling.SpanMarkerModel.save_pretrained" title="span_marker.modeling.SpanMarkerModel.save_pretrained"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SpanMarkerModel.save_pretrained()</span></code></a>, e.g., <code class="docutils literal notranslate"><span class="pre">./my_model_directory/</span></code>.</p></li>
+<li><p>A path or url to a <em>tensorflow index checkpoint file</em> (e.g, <code class="docutils literal notranslate"><span class="pre">./tf_model/model.ckpt.index</span></code>). In
+this case, <code class="docutils literal notranslate"><span class="pre">from_tf</span></code> should be set to <code class="docutils literal notranslate"><span class="pre">True</span></code> and a configuration object should be provided as
+<code class="docutils literal notranslate"><span class="pre">config</span></code> argument. This loading path is slower than converting the TensorFlow checkpoint in a
 PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.</p></li>
 <li><p>A path or url to a model folder containing a <em>flax checkpoint file</em> in <em>.msgpack</em> format (e.g,
-<cite>./flax_model/</cite> containing <cite>flax_model.msgpack</cite>). In this case, <cite>from_flax</cite> should be set to
-<cite>True</cite>.</p></li>
+<code class="docutils literal notranslate"><span class="pre">./flax_model/</span></code> containing <code class="docutils literal notranslate"><span class="pre">flax_model.msgpack</span></code>). In this case, <code class="docutils literal notranslate"><span class="pre">from_flax</span></code> should be set to
+<code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <cite>ner_tags</cite> in your datasets.
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> in your datasets.
 Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</p></li>
 </ul>
 </dd>
@@ -199,15 +202,11 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 <dd class="field-even"><p><em>T</em></p>
 </dd>
 </dl>
-<p>Additional arguments are passed to the <cite>from_pretrained</cite> methods of <cite>AutoConfig</cite>, <cite>AutoModel</cite> and
-<cite>SpanMarkerTokenizer</cite>.</p>
+<p>Additional arguments are passed to the <code class="docutils literal notranslate"><span class="pre">from_pretrained</span></code> methods of <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/model_doc/auto#transformers.AutoConfig" title="(in transformers vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoConfig</span></code></a>,
+<a class="reference external" href="https://huggingface.co/docs/transformers/main/en/model_doc/auto#transformers.AutoModel" title="(in transformers vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">AutoModel</span></code></a> and <a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerTokenizer</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p><dl class="simple">
-<dt>A SpanMarkerModel instance, either ready for training using the <cite>Trainer</cite> or for</dt><dd><p>inference via <cite>model.predict()</cite>.</p>
-</dd>
-</dl>
-</p>
+<dd class="field-odd"><p>A <a class="reference internal" href="#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a> instance, either ready for training using the <code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code> or                for inference via <a class="reference internal" href="#span_marker.modeling.SpanMarkerModel.predict" title="span_marker.modeling.SpanMarkerModel.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">SpanMarkerModel.predict()</span></code></a>.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p><a class="reference internal" href="#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel">SpanMarkerModel</a></p>
@@ -225,8 +224,8 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.predict">
 <span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overlapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict named entities from input texts.</p>
-<p class="rubric">Example</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.&quot;</span><span class="p">)</span>
 <span class="go">[{&#39;span&#39;: &#39;Amelia Earhart&#39;, &#39;label&#39;: &#39;person-other&#39;, &#39;score&#39;: 0.7629689574241638, &#39;char_start_index&#39;: 0, &#39;char_end_index&#39;: 14},</span>
 <span class="go"> {&#39;span&#39;: &#39;Lockheed Vega 5B&#39;, &#39;label&#39;: &#39;product-airplane&#39;, &#39;score&#39;: 0.9833564758300781, &#39;char_start_index&#39;: 38, &#39;char_end_index&#39;: 54},</span>
@@ -259,12 +258,12 @@ have good support for this, so False is recommended. Defaults to False.</p></li>
 <dd class="field-even"><p><p>If the input is a single sentence, then we output a list of dictionaries. Each dictionary
 represents one predicted entity, and contains the following keys:</p>
 <ul class="simple">
-<li><p><cite>label</cite>: The predicted entity label.</p></li>
-<li><p><cite>span</cite>: The text that the model deems an entity.</p></li>
-<li><p><cite>score</cite>: The model its confidence.</p></li>
-<li><p><cite>word_start_index</cite> &amp; <cite>word_end_index</cite>: The word indices for the start/end of the entity,
+<li><p><code class="docutils literal notranslate"><span class="pre">label</span></code>: The predicted entity label.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">span</span></code>: The text that the model deems an entity.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">score</span></code>: The model its confidence.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">word_start_index</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">word_end_index</span></code>: The word indices for the start/end of the entity,
 if the input is pre-tokenized.</p></li>
-<li><p><cite>char_start_index</cite> &amp; <cite>char_end_index</cite>: The character indices for the start/end of the entity,
+<li><p><code class="docutils literal notranslate"><span class="pre">char_start_index</span></code> &amp; <code class="docutils literal notranslate"><span class="pre">char_end_index</span></code>: The character indices for the start/end of the entity,
 if the input is a string.</p></li>
 </ul>
 <p>If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.</p>

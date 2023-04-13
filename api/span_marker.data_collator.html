@@ -114,10 +114,10 @@
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.data_collator.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerDataCollator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Data Collator class responsible for converting the minimal outputs from the tokenizer into
-complete and meaningful inputs to the model. In particular, the <cite>input_ids</cite> from the tokenizer
+complete and meaningful inputs to the model. In particular, the <code class="docutils literal notranslate"><span class="pre">input_ids</span></code> from the tokenizer
 features are padded, and the correct amount of start and end markers (with padding) are added.</p>
-<p>Furthermore, the position IDs are generated for the input IDs, and <cite>start_position_ids</cite> and
-<cite>end_position_ids</cite> are used alongside some padding to create a full position ID vector.</p>
+<p>Furthermore, the position IDs are generated for the input IDs, and <code class="docutils literal notranslate"><span class="pre">start_position_ids</span></code> and
+<code class="docutils literal notranslate"><span class="pre">end_position_ids</span></code> are used alongside some padding to create a full position ID vector.</p>
 <p>Lastly, the attention matrix is computed.</p>
 <p>The expected usage is something like:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">collator</span> <span class="o">=</span> <span class="n">SpanMarkerDataCollator</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -147,19 +147,19 @@ features are padded, and the correct amount of start and end markers (with paddi
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator.__call__">
 <span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.__call__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Convert the minimal tokenizer outputs into inputs ready for <cite>model.forward</cite>.</p>
+<dd><p>Convert the minimal tokenizer outputs into inputs ready for <a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward" title="span_marker.modeling.SpanMarkerModel.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><p><strong>features</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – <p>A list of dictionaries, one element per sample in the batch.
 The dictionaries contain the following keys:</p>
 <ul class="simple">
-<li><p><cite>input_ids</cite>: The non-padded input IDs.</p></li>
-<li><p><cite>num_spans</cite>: The number of spans that should be encoded in each sample.</p></li>
-<li><p><cite>start_position_ids</cite>: The position IDs of the start markers in the sample.</p></li>
-<li><p><cite>end_position_ids</cite>: The position IDs of the end markers in the sample.</p></li>
-<li><p><cite>labels</cite> (optional): The labels corresponding to each of the spans in the sample.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">input_ids</span></code>: The non-padded input IDs.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">num_spans</span></code>: The number of spans that should be encoded in each sample.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_position_ids</span></code>: The position IDs of the start markers in the sample.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_position_ids</span></code>: The position IDs of the end markers in the sample.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">labels</span></code> (optional): The labels corresponding to each of the spans in the sample.</p></li>
 <li><dl class="simple">
-<dt><cite>num_words</cite> (optional): The number of words in the input sample.</dt><dd><p>Required for some evaluation metrics.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">num_words</span></code> (optional): The number of words in the input sample.</dt><dd><p>Required for some evaluation metrics.</p>
 </dd>
 </dl>
 </li>
@@ -167,7 +167,7 @@ The dictionaries contain the following keys:</p>
 </p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Batch dictionary ready to be fed into <code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code>.</p>
+<dd class="field-even"><p>Batch dictionary ready to be fed into <a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward" title="span_marker.modeling.SpanMarkerModel.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+git9a2a6fc ))">torch.Tensor</a>]</p>

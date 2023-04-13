@@ -117,19 +117,19 @@
 
 
 <div class="viewcode-block" id="compute_f1_via_seqeval"><a class="viewcode-back" href="../../api/span_marker.evaluation.html#span_marker.evaluation.compute_f1_via_seqeval">[docs]</a><span class="k">def</span> <span class="nf">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">EvalPrediction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute micro-F1, recall, precision and accuracy scores using `seqeval` for the evaluation predictions.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute micro-F1, recall, precision and accuracy scores using ``seqeval`` for the evaluation predictions.</span>
 
 <span class="sd">    Note:</span>
 <span class="sd">        We assume that samples are not shuffled for the evaluation/prediction.</span>
 <span class="sd">        With other words, don&#39;t use this on the (shuffled) train dataset!</span>
 
 <span class="sd">    Args:</span>
-<span class="sd">        tokenizer (SpanMarkerTokenizer):</span>
-<span class="sd">        eval_prediction (EvalPrediction): _description_</span>
+<span class="sd">        tokenizer (SpanMarkerTokenizer): The model its tokenizer.</span>
+<span class="sd">        eval_prediction (~transformers.EvalPrediction): The predictions resulting from the evaluations.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Dict[str, float]: Dictionary with `&quot;overall_precision&quot;`, `&quot;overall_recall&quot;`, `&quot;overall_f1&quot;`</span>
-<span class="sd">            and `&quot;overall_accuracy&quot;` keys.</span>
+<span class="sd">        Dict[str, float]: Dictionary with ``&quot;overall_precision&quot;``, ``&quot;overall_recall&quot;``, ``&quot;overall_f1&quot;``</span>
+<span class="sd">            and ``&quot;overall_accuracy&quot;`` keys.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">inputs</span> <span class="o">=</span> <span class="n">eval_prediction</span><span class="o">.</span><span class="n">inputs</span>
     <span class="n">gold_labels</span> <span class="o">=</span> <span class="n">eval_prediction</span><span class="o">.</span><span class="n">label_ids</span>
