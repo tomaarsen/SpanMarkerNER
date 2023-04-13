@@ -12,11 +12,11 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 class SpanMarkerDataCollator:
     """
     Data Collator class responsible for converting the minimal outputs from the tokenizer into
-    complete and meaningful inputs to the model. In particular, the `input_ids` from the tokenizer
+    complete and meaningful inputs to the model. In particular, the ``input_ids`` from the tokenizer
     features are padded, and the correct amount of start and end markers (with padding) are added.
 
-    Furthermore, the position IDs are generated for the input IDs, and `start_position_ids` and
-    `end_position_ids` are used alongside some padding to create a full position ID vector.
+    Furthermore, the position IDs are generated for the input IDs, and ``start_position_ids`` and
+    ``end_position_ids`` are used alongside some padding to create a full position ID vector.
 
     Lastly, the attention matrix is computed.
 
@@ -32,22 +32,22 @@ class SpanMarkerDataCollator:
     marker_max_length: int
 
     def __call__(self, features: List[Dict[str, Any]]) -> Dict[str, torch.Tensor]:
-        """Convert the minimal tokenizer outputs into inputs ready for `model.forward`.
+        """Convert the minimal tokenizer outputs into inputs ready for :meth:`~span_marker.modeling.SpanMarkerModel.forward`.
 
         Args:
             features (List[Dict[str, Any]]): A list of dictionaries, one element per sample in the batch.
                 The dictionaries contain the following keys:
 
-                * `input_ids`: The non-padded input IDs.
-                * `num_spans`: The number of spans that should be encoded in each sample.
-                * `start_position_ids`: The position IDs of the start markers in the sample.
-                * `end_position_ids`: The position IDs of the end markers in the sample.
-                * `labels` (optional): The labels corresponding to each of the spans in the sample.
-                * `num_words` (optional): The number of words in the input sample.
+                * ``input_ids``: The non-padded input IDs.
+                * ``num_spans``: The number of spans that should be encoded in each sample.
+                * ``start_position_ids``: The position IDs of the start markers in the sample.
+                * ``end_position_ids``: The position IDs of the end markers in the sample.
+                * ``labels`` (optional): The labels corresponding to each of the spans in the sample.
+                * ``num_words`` (optional): The number of words in the input sample.
                     Required for some evaluation metrics.
 
         Returns:
-            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~SpanMarkerModel.forward`.
+            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~span_marker.modeling.SpanMarkerModel.forward`.
         """
         total_size = self.tokenizer.model_max_length + 2 * self.marker_max_length
         start_marker_idx = self.tokenizer.model_max_length

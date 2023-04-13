@@ -8,19 +8,19 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 
 
 def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: EvalPrediction) -> Dict[str, float]:
-    """Compute micro-F1, recall, precision and accuracy scores using `seqeval` for the evaluation predictions.
+    """Compute micro-F1, recall, precision and accuracy scores using ``seqeval`` for the evaluation predictions.
 
     Note:
         We assume that samples are not shuffled for the evaluation/prediction.
         With other words, don't use this on the (shuffled) train dataset!
 
     Args:
-        tokenizer (SpanMarkerTokenizer):
-        eval_prediction (EvalPrediction): _description_
+        tokenizer (SpanMarkerTokenizer): The model its tokenizer.
+        eval_prediction (~transformers.EvalPrediction): The predictions resulting from the evaluations.
 
     Returns:
-        Dict[str, float]: Dictionary with `"overall_precision"`, `"overall_recall"`, `"overall_f1"`
-            and `"overall_accuracy"` keys.
+        Dict[str, float]: Dictionary with ``"overall_precision"``, ``"overall_recall"``, ``"overall_f1"``
+            and ``"overall_accuracy"`` keys.
     """
     inputs = eval_prediction.inputs
     gold_labels = eval_prediction.label_ids

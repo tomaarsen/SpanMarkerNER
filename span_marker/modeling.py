@@ -38,7 +38,16 @@ class SpanMarkerModel(PreTrainedModel):
     config_class = SpanMarkerConfig
     base_model_prefix = "encoder"
 
-    def __init__(self, config: SpanMarkerConfig, encoder=None, **kwargs) -> None:
+    def __init__(self, config: SpanMarkerConfig, encoder: Optional[PreTrainedModel] = None, **kwargs) -> None:
+        """Initialize a SpanMarkerModel using configuration.
+
+        Do not manually initialize a SpanMarkerModel this way! Use :meth:`~SpanMarkerModel.from_pretrained` instead.
+
+        Args:
+            config (SpanMarkerConfig): The configuration for this model.
+            encoder (Optional[PreTrainedModel]): A PreTrainedModel acting as the underlying encoder.
+                Defaults to None.
+        """
         super().__init__(config)
         self.config = config
         # `encoder` will be specified if this Model is initializer via .from_pretrained with an encoder
@@ -101,11 +110,11 @@ class SpanMarkerModel(PreTrainedModel):
         """Forward call of the SpanMarkerModel.
 
         Args:
-            input_ids (torch.Tensor): Input IDs including start/end markers.
-            attention_mask (torch.Tensor): Attention mask matrix including one-directional attention for markers.
-            position_ids (torch.Tensor): Position IDs including start/end markers.
-            labels (Optional[torch.Tensor], optional): The labels for each span candidate. Defaults to None.
-            num_words (Optional[torch.Tensor], optional): The number of words for each batch sample. Defaults to None.
+            input_ids (~torch.Tensor): Input IDs including start/end markers.
+            attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.
+            position_ids (~torch.Tensor): Position IDs including start/end markers.
+            labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
+            num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
 
         Returns:
             SpanMarkerOutput: The output dataclass.
@@ -165,31 +174,31 @@ class SpanMarkerModel(PreTrainedModel):
 
         Args:
             pretrained_model_name_or_path (Union[str, os.PathLike]):
-                Either a pretrained encoder (e.g. `bert-base-cased`, `roberta-large`, etc.), or a pretrained SpanMarkerModel.
+                Either a pretrained encoder (e.g. ``bert-base-cased``, ``roberta-large``, etc.), or a pretrained SpanMarkerModel.
                 Can be either:
 
                     - A string, the *model id* of a pretrained model hosted inside a model repo on huggingface.co.
-                      Valid model ids can be located at the root-level, like `bert-base-uncased`, or namespaced under a
-                      user or organization name, like `dbmdz/bert-base-german-cased`.
+                      Valid model ids can be located at the root-level, like ``bert-base-uncased``, or namespaced under a
+                      user or organization name, like ``dbmdz/bert-base-german-cased``.
                     - A path to a *directory* containing model weights saved using
-                      `.save_pretrained`, e.g., `./my_model_directory/`.
-                    - A path or url to a *tensorflow index checkpoint file* (e.g, `./tf_model/model.ckpt.index`). In
-                      this case, `from_tf` should be set to `True` and a configuration object should be provided as
-                      `config` argument. This loading path is slower than converting the TensorFlow checkpoint in a
+                      :meth:`SpanMarkerModel.save_pretrained`, e.g., ``./my_model_directory/``.
+                    - A path or url to a *tensorflow index checkpoint file* (e.g, ``./tf_model/model.ckpt.index``). In
+                      this case, ``from_tf`` should be set to ``True`` and a configuration object should be provided as
+                      ``config`` argument. This loading path is slower than converting the TensorFlow checkpoint in a
                       PyTorch model using the provided conversion scripts and loading the PyTorch model afterwards.
                     - A path or url to a model folder containing a *flax checkpoint file* in *.msgpack* format (e.g,
-                      `./flax_model/` containing `flax_model.msgpack`). In this case, `from_flax` should be set to
-                      `True`.
+                      ``./flax_model/`` containing ``flax_model.msgpack``). In this case, ``from_flax`` should be set to
+                      ``True``.
 
-            labels (List[str], optional): A list of string labels corresponding to the `ner_tags` in your datasets.
+            labels (List[str], optional): A list of string labels corresponding to the ``ner_tags`` in your datasets.
                 Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.
 
-        Additional arguments are passed to the `from_pretrained` methods of `AutoConfig`, `AutoModel` and
-        `SpanMarkerTokenizer`.
+        Additional arguments are passed to the ``from_pretrained`` methods of :class:`~transformers.AutoConfig`,
+        :class:`~transformers.AutoModel` and :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.
 
         Returns:
-            SpanMarkerModel: A SpanMarkerModel instance, either ready for training using the `Trainer` or for
-                inference via `model.predict()`.
+            SpanMarkerModel: A :class:`SpanMarkerModel` instance, either ready for training using the :class:`Trainer` or\
+                for inference via :meth:`SpanMarkerModel.predict`.
         """
         # If loading a SpanMarkerConfig, then we don't want to override id2label and label2id
         # Create an encoder or SpanMarker config
@@ -239,7 +248,7 @@ class SpanMarkerModel(PreTrainedModel):
     ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
         """Predict named entities from input texts.
 
-        Example:
+        Example::
 
             >>> model = SpanMarkerModel.from_pretrained(...)
             >>> model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.")
@@ -269,12 +278,12 @@ class SpanMarkerModel(PreTrainedModel):
                 If the input is a single sentence, then we output a list of dictionaries. Each dictionary
                 represents one predicted entity, and contains the following keys:
 
-                * `label`: The predicted entity label.
-                * `span`: The text that the model deems an entity.
-                * `score`: The model its confidence.
-                * `word_start_index` & `word_end_index`: The word indices for the start/end of the entity,
+                * ``label``: The predicted entity label.
+                * ``span``: The text that the model deems an entity.
+                * ``score``: The model its confidence.
+                * ``word_start_index`` & ``word_end_index``: The word indices for the start/end of the entity,
                   if the input is pre-tokenized.
-                * `char_start_index` & `char_end_index`: The character indices for the start/end of the entity,
+                * ``char_start_index`` & ``char_end_index``: The character indices for the start/end of the entity,
                   if the input is a string.
 
                 If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.

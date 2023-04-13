@@ -4,12 +4,19 @@ from typing import Any, Dict, Iterator, List, Tuple
 from span_marker.configuration import SpanMarkerConfig
 
 Entity = Tuple[int, int, int]
+"""
+Tuple of:
+
+* Entity label
+* Word start index
+* Word end index
+"""
 
 
 class LabelNormalizer(ABC):
-    """Class to convert NER training data into a common format used in the SpanMarkerModel.
+    """Class to convert NER training data into a common format used in the :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.
 
-    The common format involves tokenized texts and labels as Entity instances.
+    The common format involves 3-tuples with entity labels, word start indices and word end indices.
     """
 
     def __init__(self, config: SpanMarkerConfig) -> None:
