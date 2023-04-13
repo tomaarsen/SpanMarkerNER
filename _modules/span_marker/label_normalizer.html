@@ -154,7 +154,7 @@
                 <span class="n">start_idx</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="k">if</span> <span class="n">start_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">reduced_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">reduced_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
         <span class="n">batch_entities</span> <span class="o">=</span> <span class="p">[]</span>
@@ -202,7 +202,7 @@
                 <span class="n">start_idx</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="k">if</span> <span class="n">start_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">entity_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">entity_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
         <span class="n">batch_entities</span> <span class="o">=</span> <span class="p">[]</span>
