@@ -25,7 +25,7 @@ maintainers = [
 ]
 dependencies = [
     "torch",
-    "transformers>4.19.0", # required for EvalPrediction.inputs
+    "transformers>=4.19.0", # required for EvalPrediction.inputs
     "datasets",
     "evaluate",
     "seqeval"
