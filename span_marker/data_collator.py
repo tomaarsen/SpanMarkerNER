@@ -50,14 +50,18 @@ class SpanMarkerDataCollator:
             Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~span_marker.modeling.SpanMarkerModel.forward`.
         """
         total_size = self.tokenizer.model_max_length + 2 * self.marker_max_length
-        start_marker_idx = self.tokenizer.model_max_length
-        end_marker_idx = self.tokenizer.model_max_length + self.marker_max_length
         batch = defaultdict(list)
         num_words = []
+        start_marker_indices = []
+        num_marker_pairs = []
         for sample in features:
             input_ids = sample["input_ids"]
             num_spans = sample["num_spans"]
             num_tokens = len(input_ids)
+
+            # The start markers start after the input IDs, rounded up to the nearest even number
+            start_marker_idx = num_tokens + num_tokens % 2
+            end_marker_idx = start_marker_idx + num_spans
 
             # Prepare input_ids by padding and adding start and end markers
             if not isinstance(input_ids, torch.Tensor):
@@ -94,9 +98,13 @@ class SpanMarkerDataCollator:
             attention_mask[end_index_list, end_index_list] = 1
             batch["attention_mask"].append(attention_mask)
 
+            # Add start of the markers, so the model knows where the input IDs end and where the markers start
+            start_marker_indices.append(start_marker_idx)
+            num_marker_pairs.append(end_marker_idx - start_marker_idx)
+
             if "labels" in sample:
                 labels = torch.tensor(sample["labels"])
-                labels = F.pad(labels, (0, self.marker_max_length - len(labels)), value=-100)
+                labels = F.pad(labels, (0, (total_size // 2) - len(labels)), value=-100)
                 batch["labels"].append(labels)
 
             if "num_words" in sample:
@@ -106,5 +114,6 @@ class SpanMarkerDataCollator:
         # Used for evaluation, does not need to be padded/stacked
         if num_words:
             batch["num_words"] = torch.tensor(num_words)
-
+        batch["start_marker_indices"] = torch.tensor(start_marker_indices)
+        batch["num_marker_pairs"] = torch.tensor(num_marker_pairs)
         return batch

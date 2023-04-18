@@ -13,11 +13,11 @@ class SpanMarkerConfig(PretrainedConfig):
         model_max_length (`Optional[int]`): The total number of tokens that can be processed before
             truncation. If None, the tokenizer its `model_max_length` is used, and if that value is
             not defined, it becomes 512 instead. Defaults to None.
-        marker_max_length (`int`): The maximum length for each of the span markers. A value of 256
-            means that each training and inferencing sample contains a maximum of 256 start markers
-            and 256 end markers. Defaults to 256.
+        marker_max_length (`int`): The maximum length for each of the span markers. A value of 128
+            means that each training and inferencing sample contains a maximum of 128 start markers
+            and 128 end markers, for a total of 256 markers per sample. Defaults to 128.
         entity_max_length (`int`): The maximum length of an entity span in terms of words.
-            Defaults to 16.
+            Defaults to 8.
 
     Example::
 
@@ -42,8 +42,8 @@ class SpanMarkerConfig(PretrainedConfig):
         self,
         encoder_config: Optional[Dict[str, Any]] = None,
         model_max_length: Optional[int] = None,
-        marker_max_length: int = 256,
-        entity_max_length: int = 16,
+        marker_max_length: int = 128,
+        entity_max_length: int = 8,
         **kwargs,
     ) -> None:
         self.encoder = encoder_config

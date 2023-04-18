@@ -17,6 +17,12 @@ Types of changes
 
 ## [Unreleased]
 
+### Changed
+
+- Updated where in the input IDs the span markers are stored, results in 40% training and inferencing speed increase.
+- Updated default `marker_max_length` in SpanMarkerConfig from 256 to 128.
+- Updated default `entity_max_length` in SpanMarkerConfig from 16 to 8.
+
 ### Fixed
 
 - Resolved tricky issue causing models to learn to never predict the last token as an entity (Closes [#1](https://github.com/tomaarsen/SpanMarkerNER/pull/1)).

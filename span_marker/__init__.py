@@ -1,4 +1,4 @@
-__version__ = "0.2.3.dev"
+__version__ = "1.0.0.dev"
 
 from transformers import AutoConfig, AutoModel, TrainingArguments
 

@@ -2,6 +2,7 @@ import os
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
+import torch.nn.functional as F
 from torch import nn
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 
@@ -104,6 +105,8 @@ class SpanMarkerModel(PreTrainedModel):
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
         position_ids: torch.Tensor,
+        start_marker_indices: torch.Tensor,
+        num_marker_pairs: torch.Tensor,
         labels: Optional[torch.Tensor] = None,
         num_words: Optional[torch.Tensor] = None,
     ) -> SpanMarkerOutput:
@@ -113,6 +116,8 @@ class SpanMarkerModel(PreTrainedModel):
             input_ids (~torch.Tensor): Input IDs including start/end markers.
             attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.
             position_ids (~torch.Tensor): Position IDs including start/end markers.
+            start_marker_indices (~torch.Tensor): The indices where the start markers begin per batch sample.
+            num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.
             labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
             num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
 
@@ -129,21 +134,31 @@ class SpanMarkerModel(PreTrainedModel):
         last_hidden_state = outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
 
+        batch_size = last_hidden_state.size(0)
         sequence_length = last_hidden_state.size(1)
-        start_marker_idx = sequence_length - 2 * self.config.marker_max_length
-        end_marker_idx = start_marker_idx + self.config.marker_max_length
-        # TODO: Can we use view, which may be more efficient?
-        # Answer: Yes, but only if we move to using start-end-...-start-end instead
-        # of start-start-...-end-end.
 
-        # The start marker embeddings concatenated with the end marker embeddings
-        feature_vector = torch.cat(
-            (
-                last_hidden_state[:, start_marker_idx:end_marker_idx],
-                last_hidden_state[:, end_marker_idx:],
-            ),
-            dim=-1,
-        )
+        # Get the indices where the end markers start
+        end_marker_indices = start_marker_indices + num_marker_pairs
+
+        # The start marker embeddings concatenated with the end marker embeddings.
+        # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
+        # the batch iteratively per sample, but every sample produces a different shape matrix
+        # and this is the most convenient way to recombine them into a matrix.
+        embeddings = [
+            torch.cat(
+                (
+                    last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
+                    last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
+                ),
+                dim=-1,
+            )
+            for i in range(batch_size)
+        ]
+        padded_embeddings = [
+            F.pad(embedding, (0, 0, 0, sequence_length // 2 - len(embedding))) for embedding in embeddings
+        ]
+        feature_vector = torch.stack(padded_embeddings)
+
         # NOTE: This was wrong in the older tests
         feature_vector = self.dropout(feature_vector)
         logits = self.classifier(feature_vector)

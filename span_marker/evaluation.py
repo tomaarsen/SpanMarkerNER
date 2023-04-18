@@ -39,17 +39,19 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
         token_hash = hash(text)
         if token_hash not in sample_dict:
             spans = list(tokenizer.get_all_valid_spans(num_words[sample_idx], tokenizer.config.entity_max_length))
+            mask = gold_labels[sample_idx] != -100
             sample_dict[token_hash] = {
                 "text": text,
                 "spans": spans,
-                "gold_labels": gold_labels[sample_idx].tolist(),
-                "pred_labels": pred_labels[sample_idx].tolist(),
+                "gold_labels": gold_labels[sample_idx][mask].tolist(),
+                "pred_labels": pred_labels[sample_idx][mask].tolist(),
                 "scores": scores[sample_idx].tolist(),
                 "num_words": num_words[sample_idx],
             }
         else:
-            sample_dict[token_hash]["gold_labels"] += gold_labels[sample_idx].tolist()
-            sample_dict[token_hash]["pred_labels"] += pred_labels[sample_idx].tolist()
+            mask = gold_labels[sample_idx] != -100
+            sample_dict[token_hash]["gold_labels"] += gold_labels[sample_idx][mask].tolist()
+            sample_dict[token_hash]["pred_labels"] += pred_labels[sample_idx][mask].tolist()
             sample_dict[token_hash]["scores"] += scores[sample_idx].tolist()
 
     outside_id = tokenizer.config.outside_id

@@ -86,13 +86,18 @@ class SpanMarkerTokenizer:
             else:
                 spans = list(self.get_all_valid_spans(num_words, self.config.entity_max_length))
 
-            for group_start_idx in range(0, len(spans), self.config.marker_max_length):
-                group_spans = spans[group_start_idx : group_start_idx + self.config.marker_max_length]
+            # Compute the total number of start and end marker pairs we can include in this sample
+            num_marker_pairs = (self.model_max_length + 2 * self.config.marker_max_length - num_tokens) // 2
+
+            for group_start_idx in range(0, len(spans), num_marker_pairs):
+                group_end_idx = group_start_idx + num_marker_pairs
+                group_spans = spans[group_start_idx:group_end_idx]
                 group_num_spans = len(group_spans)
 
                 start_position_ids, end_position_ids = [], []
                 for start_word_i, end_word_i in group_spans:
                     start_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=start_word_i)
+                    # The if ... else 0 exists because of words like '\u2063'
                     start_position_ids.append(start_token_span.start if start_token_span else 0)
 
                     end_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=end_word_i - 1)
@@ -104,7 +109,7 @@ class SpanMarkerTokenizer:
                 all_end_position_ids.append(end_position_ids)
 
                 if labels:
-                    group_labels = span_labels[group_start_idx : group_start_idx + self.config.marker_max_length]
+                    group_labels = span_labels[group_start_idx:group_end_idx]
                     all_labels.append(group_labels)
 
                 if return_num_words:
