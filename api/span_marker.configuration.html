@@ -111,7 +111,7 @@
 <span id="span-marker-configuration-module"></span><h1>span_marker.configuration module<a class="headerlink" href="#module-span_marker.configuration" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="span_marker.configuration.SpanMarkerConfig">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.configuration.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">16</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/configuration.html#SpanMarkerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.configuration.SpanMarkerConfig" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.configuration.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerConfig</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">encoder_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">128</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">entity_max_length</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/configuration.html#SpanMarkerConfig"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.configuration.SpanMarkerConfig" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PretrainedConfig</span></code></p>
 <p>Configuration class for SpanMarkerModel instances.</p>
 <dl class="field-list simple">
@@ -122,11 +122,11 @@ underlying encoder used by the SpanMarkerModel instance. Defaults to None.</p></
 <li><p><strong>model_max_length</strong> (<cite>Optional[int]</cite>) – The total number of tokens that can be processed before
 truncation. If None, the tokenizer its <cite>model_max_length</cite> is used, and if that value is
 not defined, it becomes 512 instead. Defaults to None.</p></li>
-<li><p><strong>marker_max_length</strong> (<cite>int</cite>) – The maximum length for each of the span markers. A value of 256
-means that each training and inferencing sample contains a maximum of 256 start markers
-and 256 end markers. Defaults to 256.</p></li>
+<li><p><strong>marker_max_length</strong> (<cite>int</cite>) – The maximum length for each of the span markers. A value of 128
+means that each training and inferencing sample contains a maximum of 128 start markers
+and 128 end markers, for a total of 256 markers per sample. Defaults to 128.</p></li>
 <li><p><strong>entity_max_length</strong> (<cite>int</cite>) – The maximum length of an entity span in terms of words.
-Defaults to 16.</p></li>
+Defaults to 8.</p></li>
 </ul>
 </dd>
 </dl>

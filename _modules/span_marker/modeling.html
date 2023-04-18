@@ -111,6 +111,7 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoConfig</span><span class="p">,</span> <span class="n">AutoModel</span><span class="p">,</span> <span class="n">PretrainedConfig</span><span class="p">,</span> <span class="n">PreTrainedModel</span>
 
@@ -213,6 +214,8 @@
         <span class="n">input_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">attention_mask</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">position_ids</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">start_marker_indices</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
+        <span class="n">num_marker_pairs</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">num_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">SpanMarkerOutput</span><span class="p">:</span>
@@ -222,6 +225,8 @@
 <span class="sd">            input_ids (~torch.Tensor): Input IDs including start/end markers.</span>
 <span class="sd">            attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.</span>
 <span class="sd">            position_ids (~torch.Tensor): Position IDs including start/end markers.</span>
+<span class="sd">            start_marker_indices (~torch.Tensor): The indices where the start markers begin per batch sample.</span>
+<span class="sd">            num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.</span>
 <span class="sd">            labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.</span>
 <span class="sd">            num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.</span>
 
@@ -238,21 +243,31 @@
         <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">last_hidden_state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">last_hidden_state</span><span class="p">)</span>
 
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">last_hidden_state</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
         <span class="n">sequence_length</span> <span class="o">=</span> <span class="n">last_hidden_state</span><span class="o">.</span><span class="n">size</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">start_marker_idx</span> <span class="o">=</span> <span class="n">sequence_length</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span>
-        <span class="n">end_marker_idx</span> <span class="o">=</span> <span class="n">start_marker_idx</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span>
-        <span class="c1"># TODO: Can we use view, which may be more efficient?</span>
-        <span class="c1"># Answer: Yes, but only if we move to using start-end-...-start-end instead</span>
-        <span class="c1"># of start-start-...-end-end.</span>
 
-        <span class="c1"># The start marker embeddings concatenated with the end marker embeddings</span>
-        <span class="n">feature_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
-            <span class="p">(</span>
-                <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="n">start_marker_idx</span><span class="p">:</span><span class="n">end_marker_idx</span><span class="p">],</span>
-                <span class="n">last_hidden_state</span><span class="p">[:,</span> <span class="n">end_marker_idx</span><span class="p">:],</span>
-            <span class="p">),</span>
-            <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="c1"># Get the indices where the end markers start</span>
+        <span class="n">end_marker_indices</span> <span class="o">=</span> <span class="n">start_marker_indices</span> <span class="o">+</span> <span class="n">num_marker_pairs</span>
+
+        <span class="c1"># The start marker embeddings concatenated with the end marker embeddings.</span>
+        <span class="c1"># This is kind of breaking the cardinal rule of GPU-based ML, as this is processing</span>
+        <span class="c1"># the batch iteratively per sample, but every sample produces a different shape matrix</span>
+        <span class="c1"># and this is the most convenient way to recombine them into a matrix.</span>
+        <span class="n">embeddings</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+                <span class="p">(</span>
+                    <span class="n">last_hidden_state</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">start_marker_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">:</span> <span class="n">end_marker_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                    <span class="n">last_hidden_state</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">end_marker_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">:</span> <span class="n">end_marker_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">+</span> <span class="n">num_marker_pairs</span><span class="p">[</span><span class="n">i</span><span class="p">]],</span>
+                <span class="p">),</span>
+                <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="n">padded_embeddings</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">embedding</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">sequence_length</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">embedding</span><span class="p">)))</span> <span class="k">for</span> <span class="n">embedding</span> <span class="ow">in</span> <span class="n">embeddings</span>
+        <span class="p">]</span>
+        <span class="n">feature_vector</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span><span class="n">padded_embeddings</span><span class="p">)</span>
+
         <span class="c1"># NOTE: This was wrong in the older tests</span>
         <span class="n">feature_vector</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dropout</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)</span>
         <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span><span class="p">(</span><span class="n">feature_vector</span><span class="p">)</span>

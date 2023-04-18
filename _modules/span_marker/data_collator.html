@@ -159,14 +159,18 @@
 <span class="sd">            Dict[str, torch.Tensor]: Batch dictionary ready to be fed into :meth:`~span_marker.modeling.SpanMarkerModel.forward`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">total_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span>
-        <span class="n">start_marker_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span>
-        <span class="n">end_marker_idx</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span>
         <span class="n">batch</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
         <span class="n">num_words</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">start_marker_indices</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">num_marker_pairs</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">features</span><span class="p">:</span>
             <span class="n">input_ids</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span>
             <span class="n">num_spans</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;num_spans&quot;</span><span class="p">]</span>
             <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
+
+            <span class="c1"># The start markers start after the input IDs, rounded up to the nearest even number</span>
+            <span class="n">start_marker_idx</span> <span class="o">=</span> <span class="n">num_tokens</span> <span class="o">+</span> <span class="n">num_tokens</span> <span class="o">%</span> <span class="mi">2</span>
+            <span class="n">end_marker_idx</span> <span class="o">=</span> <span class="n">start_marker_idx</span> <span class="o">+</span> <span class="n">num_spans</span>
 
             <span class="c1"># Prepare input_ids by padding and adding start and end markers</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_ids</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
@@ -203,9 +207,13 @@
             <span class="n">attention_mask</span><span class="p">[</span><span class="n">end_index_list</span><span class="p">,</span> <span class="n">end_index_list</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
             <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;attention_mask&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">attention_mask</span><span class="p">)</span>
 
+            <span class="c1"># Add start of the markers, so the model knows where the input IDs end and where the markers start</span>
+            <span class="n">start_marker_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_marker_idx</span><span class="p">)</span>
+            <span class="n">num_marker_pairs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_marker_idx</span> <span class="o">-</span> <span class="n">start_marker_idx</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="s2">&quot;labels&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
                 <span class="n">labels</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">])</span>
-                <span class="n">labels</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)),</span> <span class="n">value</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="n">F</span><span class="o">.</span><span class="n">pad</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="p">(</span><span class="n">total_size</span> <span class="o">//</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)),</span> <span class="n">value</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
                 <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="s2">&quot;num_words&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
@@ -215,7 +223,8 @@
         <span class="c1"># Used for evaluation, does not need to be padded/stacked</span>
         <span class="k">if</span> <span class="n">num_words</span><span class="p">:</span>
             <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;num_words&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">num_words</span><span class="p">)</span>
-
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;start_marker_indices&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">start_marker_indices</span><span class="p">)</span>
+        <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;num_marker_pairs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">num_marker_pairs</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">batch</span></div></div>
 </pre></div>
 
