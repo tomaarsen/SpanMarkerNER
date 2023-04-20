@@ -16,6 +16,16 @@ accessibility and ease of use. Crucially, SpanMarker works out of the box with m
 `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU`
 or no label annotation scheme.
 
+.. raw:: html
+
+   <iframe
+      src="https://tomaarsen-span-marker-bert-base-fewnerd-fine-super.hf.space"
+      frameborder="0"
+      width="850"
+      height="650"
+   ></iframe>
+
+
 ***************
 Quick Reference
 ***************
