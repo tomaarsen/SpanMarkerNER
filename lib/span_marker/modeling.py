@@ -1,8 +1,10 @@
 import os
+import warnings
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 import torch.nn.functional as F
+from packaging.version import Version, parse
 from torch import nn
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 
@@ -221,6 +223,16 @@ class SpanMarkerModel(PreTrainedModel):
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         if isinstance(config, cls.config_class):
+            model_span_marker_version = config.get("span_marker_version") or "0.1.0"
+            if parse(model_span_marker_version) < Version("1.0.0.dev"):
+                warnings.warn(
+                    f"Loading a model trained using SpanMarker v{model_span_marker_version},"
+                    f" while SpanMarker v{span_marker_version} is installed. Due to large changes"
+                    " introduced in v1.0.0, this is not recommended. Either retrain your model for"
+                    f" v{span_marker_version}, or install `span_marker < 1.0.0`.",
+                    UserWarning,
+                    stacklevel=2,
+                )
             model = super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
 
         # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.),
