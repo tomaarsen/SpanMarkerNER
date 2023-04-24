@@ -1,4 +1,5 @@
 import os
+import re
 import warnings
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
@@ -238,7 +239,9 @@ class SpanMarkerModel(PreTrainedModel):
         # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.),
         # then initialize it and create the SpanMarker config and model using the encoder and its config.
         else:
-            encoder = AutoModel.from_pretrained(pretrained_model_name_or_path, *model_args, config=config)
+            encoder = SpanMarkerModel._load_encoder_with_kwargs(
+                pretrained_model_name_or_path, config, *model_args, **kwargs
+            )
             if labels is None:
                 raise ValueError(
                     "Please provide a `labels` list to `SpanMarkerModel.from_pretrained()`, e.g.\n"
@@ -269,6 +272,47 @@ class SpanMarkerModel(PreTrainedModel):
         model.resize_token_embeddings(len(tokenizer))
 
         return model
+
+    @classmethod
+    def _load_encoder_with_kwargs(
+        cls, pretrained_model_name_or_path: str, config: PretrainedConfig, *model_args, **kwargs
+    ) -> PreTrainedModel:
+        """Load an underlying encoder using keyword arguments, even if those kwargs are not (all) supported.
+
+        Args:
+            pretrained_model_name_or_path (str): The model name or path, e.g. ``bert-base-cased``.
+            config (PretrainedConfig): The config corresponding with the encoder.
+
+        Returns:
+            PreTrainedModel: The loaded encoder.
+        """
+        kwargs = kwargs.copy()
+        exception_pattern = re.compile("\S+ got an unexpected keyword argument '([^']*)'")
+        while kwargs:
+            try:
+                return AutoModel.from_pretrained(
+                    pretrained_model_name_or_path,
+                    *model_args,
+                    config=config,
+                    **kwargs,
+                )
+            except TypeError as exc:
+                # If we can find a specific keyword that is causing issues, remove it and try again
+                match = exception_pattern.search(str(exc))
+                if match:
+                    problematic_keyword = match.group(1)
+                    if problematic_keyword in kwargs:
+                        kwargs.pop(problematic_keyword)
+                        # Try again:
+                        continue
+                # Otherwise, just raise the exception
+                raise exc
+        # Otherwise, don't provide kwargs
+        return AutoModel.from_pretrained(
+            pretrained_model_name_or_path,
+            *model_args,
+            config=config,
+        )
 
     def predict(
         self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False

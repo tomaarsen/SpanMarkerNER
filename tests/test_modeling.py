@@ -88,3 +88,24 @@ def test_correct_predictions(
     pred_entity_list = model.predict([inputs] * 3)
     for pred_entities in pred_entity_list:
         compare_entities(pred_entities, gold_entities)
+
+
+@pytest.mark.parametrize(
+    "kwargs",
+    [
+        # Reasonable kwargs that will be used by SpanMarkerConfig
+        {
+            "model_max_length": 256,
+            "marker_max_length": 128,
+            "entity_max_length": 8,
+        },
+        # Kwargs that will be used by from_pretrained of the Encoder
+        {"low_cpu_mem_usage": True},
+        # Completely arbitrary kwargs that should be discarded/ignored
+        {"this_is_completely_unused_I_hope": True},
+    ],
+)
+def test_load_with_kwargs(kwargs):
+    # We only test that the model can be loaded without issues
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, kwargs=kwargs)
+    assert isinstance(model, SpanMarkerModel)
