@@ -31,38 +31,43 @@ from datasets import load_dataset
 from span_marker import SpanMarkerModel, Trainer
 from transformers import TrainingArguments
 
-dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
-labels = dataset["train"].features["ner_tags"].feature.names
+def main():
+    dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
+    labels = dataset["train"].features["ner_tags"].feature.names
 
-model_name = "bert-base-cased"
-model = SpanMarkerModel.from_pretrained(model_name, labels=labels)
+    model_name = "bert-base-cased"
+    model = SpanMarkerModel.from_pretrained(model_name, labels=labels)
 
-args = TrainingArguments(
-    output_dir="my_span_marker_model",
-    learning_rate=5e-5,
-    gradient_accumulation_steps=2,
-    per_device_train_batch_size=4,
-    per_device_eval_batch_size=4,
-    num_train_epochs=1,
-    save_strategy="steps",
-    eval_steps=200,
-    logging_steps=50,
-    fp16=True,
-    warmup_ratio=0.1,
-)
+    args = TrainingArguments(
+        output_dir="my_span_marker_model",
+        learning_rate=5e-5,
+        gradient_accumulation_steps=2,
+        per_device_train_batch_size=4,
+        per_device_eval_batch_size=4,
+        num_train_epochs=1,
+        save_strategy="steps",
+        eval_steps=200,
+        logging_steps=50,
+        fp16=True,
+        warmup_ratio=0.1,
+        dataloader_num_workers=1,
+    )
 
-trainer = Trainer(
-    model=model,
-    args=args,
-    train_dataset=dataset["train"].select(range(8000)),
-    eval_dataset=dataset["validation"].select(range(2000)),
-)
+    trainer = Trainer(
+        model=model,
+        args=args,
+        train_dataset=dataset["train"].select(range(8000)),
+        eval_dataset=dataset["validation"].select(range(2000)),
+    )
 
-trainer.train()
-trainer.save_model("my_span_marker_model/checkpoint-final")
+    trainer.train()
+    trainer.save_model("my_span_marker_model/checkpoint-final")
 
-metrics = trainer.evaluate()
-print(metrics)
+    metrics = trainer.evaluate()
+    print(metrics)
+
+if __name__ == "__main__":
+    main()
 ```
 
 Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction) results. Tests, documentation and further information on expected performance will come soon.
