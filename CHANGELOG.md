@@ -22,6 +22,9 @@ Types of changes
 - Updated where in the input IDs the span markers are stored, results in 40% training and inferencing speed increase.
 - Updated default `marker_max_length` in SpanMarkerConfig from 256 to 128.
 - Updated default `entity_max_length` in SpanMarkerConfig from 16 to 8.
+- Add support for `datasets<2.6.0`.
+- Add warning if a `<v1.0.0` model is loaded using `v1.0.0` or newer.
+- Propagate `SpanMarkerModel.from_pretrained` kwargs to the encoder its `AutoModel.from_pretrained`.
 
 ### Fixed
 
@@ -31,7 +34,7 @@ Types of changes
 
 ### Fixed
 
-- Correctly propagate `SpanMarkerModel.from_pretrained` kwargs to Config initialisation.
+- Correctly propagate `SpanMarkerModel.from_pretrained` kwargs to the config initialisation.
 
 ## [0.2.1] - 2023-04-07
 
