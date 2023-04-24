@@ -269,8 +269,7 @@
         <span class="c1"># Normalize the labels to a common format (list of label-start-end tuples)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="n">label_normalizer</span><span class="p">,</span>
-            <span class="n">input_columns</span><span class="o">=</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">,</span>
-            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">input_columns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">),</span>
             <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Label normalizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="c1"># Tokenize and add start/end markers</span>

@@ -225,7 +225,7 @@ gathering predictions for evaluation during the training.</p></li>
 <li><p><strong>eval_dataset</strong> (<cite>Dataset</cite>, <em>optional</em>) – Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
 not accepted by the <cite>model.forward()</cite> method are automatically removed. It must implement the <cite>__len__</cite>
 method.</p></li>
-<li><p><strong>ignore_keys</strong> (<cite>Lst[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+<li><p><strong>ignore_keys</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
 gathering predictions.</p></li>
 <li><p><strong>metric_key_prefix</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“eval”</cite>) – An optional prefix to be used as the metrics key prefix. For example the metrics “bleu” will be named
 “eval_bleu” if the prefix is “eval” (default)</p></li>

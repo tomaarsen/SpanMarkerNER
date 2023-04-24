@@ -138,7 +138,6 @@
 <span class="kn">import</span> <span class="nn">time</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
-<span class="kn">from</span> <span class="nn">distutils.util</span> <span class="kn">import</span> <span class="n">strtobool</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -206,6 +205,7 @@
     <span class="n">distributed_broadcast_scalars</span><span class="p">,</span>
     <span class="n">distributed_concat</span><span class="p">,</span>
     <span class="n">find_batch_size</span><span class="p">,</span>
+    <span class="n">get_model_param_count</span><span class="p">,</span>
     <span class="n">get_module_class_from_name</span><span class="p">,</span>
     <span class="n">get_parameter_names</span><span class="p">,</span>
     <span class="n">nested_concat</span><span class="p">,</span>
@@ -244,6 +244,8 @@
 <span class="kn">from</span> <span class="nn">.training_args</span> <span class="kn">import</span> <span class="n">OptimizerNames</span><span class="p">,</span> <span class="n">ParallelMode</span><span class="p">,</span> <span class="n">TrainingArguments</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CONFIG_NAME</span><span class="p">,</span>
+    <span class="n">SAFE_WEIGHTS_INDEX_NAME</span><span class="p">,</span>
+    <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">,</span>
     <span class="n">WEIGHTS_INDEX_NAME</span><span class="p">,</span>
     <span class="n">WEIGHTS_NAME</span><span class="p">,</span>
     <span class="n">can_return_loss</span><span class="p">,</span>
@@ -254,12 +256,14 @@
     <span class="n">is_datasets_available</span><span class="p">,</span>
     <span class="n">is_in_notebook</span><span class="p">,</span>
     <span class="n">is_ipex_available</span><span class="p">,</span>
+    <span class="n">is_safetensors_available</span><span class="p">,</span>
     <span class="n">is_sagemaker_dp_enabled</span><span class="p">,</span>
     <span class="n">is_sagemaker_mp_enabled</span><span class="p">,</span>
     <span class="n">is_torch_compile_available</span><span class="p">,</span>
     <span class="n">is_torch_neuroncore_available</span><span class="p">,</span>
     <span class="n">is_torch_tpu_available</span><span class="p">,</span>
     <span class="n">logging</span><span class="p">,</span>
+    <span class="n">strtobool</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.utils.generic</span> <span class="kn">import</span> <span class="n">ContextManagers</span>
 
@@ -304,6 +308,10 @@
     <span class="kn">from</span> <span class="nn">.trainer_pt_utils</span> <span class="kn">import</span> <span class="n">smp_forward_backward</span><span class="p">,</span> <span class="n">smp_forward_only</span><span class="p">,</span> <span class="n">smp_gather</span><span class="p">,</span> <span class="n">smp_nested_concat</span>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">IS_SAGEMAKER_MP_POST_1_10</span> <span class="o">=</span> <span class="kc">False</span>
+
+
+<span class="k">if</span> <span class="n">is_safetensors_available</span><span class="p">():</span>
+    <span class="kn">import</span> <span class="nn">safetensors.torch</span>
 
 
 <span class="n">skip_first_batches</span> <span class="o">=</span> <span class="kc">None</span>
@@ -478,6 +486,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">is_model_parallel</span> <span class="o">=</span> <span class="kc">False</span>
 
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;hf_device_map&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="nb">len</span><span class="p">([</span><span class="n">device</span> <span class="k">for</span> <span class="n">device</span> <span class="ow">in</span> <span class="nb">set</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">hf_device_map</span><span class="o">.</span><span class="n">values</span><span class="p">())</span> <span class="k">if</span> <span class="n">device</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="s2">&quot;disk&quot;</span><span class="p">]])</span> <span class="o">&gt;</span> <span class="mi">1</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_model_parallel</span>
+        <span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">is_model_parallel</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># warn users</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;You have loaded a model on multiple GPUs. `is_model_parallel` attribute will be force-set&quot;</span>
+                <span class="s2">&quot; to `True` to avoid any unexpected behavior such as device placement mismatching.&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># At this stage the model is already loaded</span>
         <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_8bit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;_is_int8_training_enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -550,9 +571,9 @@
             <span class="k">if</span> <span class="s2">&quot;backward_prefetch&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span> <span class="ow">and</span> <span class="s2">&quot;backward_pos&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">backward_prefetch</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">backward_prefetch</span> <span class="o">=</span> <span class="n">BackwardPrefetch</span><span class="o">.</span><span class="n">BACKWARD_POST</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">forword_prefetch</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;forword_prefect&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">forword_prefetch</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">forward_prefetch</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;forward_prefect&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">forward_prefetch</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">limit_all_gathers</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;limit_all_gathers&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
@@ -652,7 +673,10 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;max_steps is given, it will override any value given in num_train_epochs&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">train_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_length</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">max_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;train_dataset does not implement __len__, max_steps has to be specified&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;The train_dataset does not implement __len__, max_steps has to be specified. &quot;</span>
+                <span class="s2">&quot;The number of steps needs to be known in advance for the learning rate scheduler.&quot;</span>
+            <span class="p">)</span>
 
         <span class="k">if</span> <span class="p">(</span>
             <span class="n">train_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
@@ -706,7 +730,7 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">half_precision_backend</span><span class="si">}</span><span class="s2"> half precision backend&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">do_grad_scaling</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">fp16</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed</span> <span class="ow">or</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span> <span class="ow">or</span> <span class="n">is_torch_tpu_available</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">fp16</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed</span> <span class="ow">or</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()):</span>
             <span class="c1"># deepspeed and SageMaker Model Parallel manage their own half precision</span>
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">half_precision_backend</span> <span class="o">==</span> <span class="s2">&quot;cuda_amp&quot;</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda_amp</span> <span class="o">=</span> <span class="kc">True</span>
@@ -1469,9 +1493,6 @@
         <span class="k">return</span> <span class="n">model</span>
 
     <span class="k">def</span> <span class="nf">_wrap_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">dataloader</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile</span><span class="p">:</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile_backend</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile_mode</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">use_ipex</span><span class="p">:</span>
             <span class="n">dtype</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_amp</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">float32</span>
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ipex_optimize_model</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">training</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
@@ -1494,8 +1515,8 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_apex</span> <span class="ow">and</span> <span class="n">training</span><span class="p">:</span>
             <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="o">=</span> <span class="n">amp</span><span class="o">.</span><span class="n">initialize</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="n">opt_level</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fp16_opt_level</span><span class="p">)</span>
 
-        <span class="c1"># Multi-gpu training (should be after apex fp16 initialization)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">n_gpu</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># Multi-gpu training (should be after apex fp16 initialization) / 8bit models does not support DDP</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">n_gpu</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_8bit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">DataParallel</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">jit_mode_eval</span><span class="p">:</span>
@@ -1569,6 +1590,11 @@
                     <span class="n">mixed_precision_policy</span> <span class="o">=</span> <span class="n">MixedPrecision</span><span class="p">(</span><span class="n">param_dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">reduce_dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span> <span class="n">buffer_dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">)</span>
                 <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="o">!=</span> <span class="n">FSDP</span><span class="p">:</span>
                     <span class="c1"># XXX: Breaking the self.model convention but I see no way around it for now.</span>
+                    <span class="n">signature</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">FSDP</span><span class="o">.</span><span class="fm">__init__</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+                    <span class="n">kwargs</span> <span class="o">=</span> <span class="p">{}</span>
+                    <span class="k">for</span> <span class="n">arg</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;limit_all_gathers&quot;</span><span class="p">,</span> <span class="s2">&quot;forward_prefetch&quot;</span><span class="p">,</span> <span class="s2">&quot;backward_prefetch&quot;</span><span class="p">]:</span>
+                        <span class="k">if</span> <span class="n">arg</span> <span class="ow">in</span> <span class="n">signature</span><span class="p">:</span>
+                            <span class="n">kwargs</span><span class="p">[</span><span class="n">arg</span><span class="p">]</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">arg</span><span class="p">)</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span> <span class="o">=</span> <span class="n">FSDP</span><span class="p">(</span>
                         <span class="n">model</span><span class="p">,</span>
                         <span class="n">sharding_strategy</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span><span class="p">,</span>
@@ -1576,9 +1602,7 @@
                         <span class="n">auto_wrap_policy</span><span class="o">=</span><span class="n">auto_wrap_policy</span><span class="p">,</span>
                         <span class="n">mixed_precision</span><span class="o">=</span><span class="n">mixed_precision_policy</span><span class="p">,</span>
                         <span class="n">device_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">,</span>
-                        <span class="n">backward_prefetch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">backward_prefetch</span><span class="p">,</span>
-                        <span class="n">forward_prefetch</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">forword_prefetch</span><span class="p">,</span>
-                        <span class="n">limit_all_gathers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">limit_all_gathers</span><span class="p">,</span>
+                        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
                     <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">try</span><span class="p">:</span>
@@ -1657,6 +1681,11 @@
                 <span class="n">output_device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">_n_gpu</span> <span class="o">!=</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
                 <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="p">)</span>
+
+        <span class="c1"># torch.compile() needs to be called after wrapping the model with FSDP or DDP</span>
+        <span class="c1"># to ensure that it accounts for the graph breaks required by those wrappers</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile</span><span class="p">:</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">backend</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile_backend</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">torch_compile_mode</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">model</span>
 
@@ -1847,15 +1876,13 @@
 
         <span class="c1"># Train!</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running training *****&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num examples = </span><span class="si">{</span><span class="n">num_examples</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num Epochs = </span><span class="si">{</span><span class="n">num_train_epochs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Instantaneous batch size per device = </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total train batch size (w. parallel, distributed &amp; accumulation) = </span><span class="si">{</span><span class="n">total_train_batch_size</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num examples = </span><span class="si">{</span><span class="n">num_examples</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num Epochs = </span><span class="si">{</span><span class="n">num_train_epochs</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Instantaneous batch size per device = </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total train batch size (w. parallel, distributed &amp; accumulation) = </span><span class="si">{</span><span class="n">total_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Gradient Accumulation steps = </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total optimization steps = </span><span class="si">{</span><span class="n">max_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;  Number of trainable parameters = </span><span class="si">{</span><span class="nb">sum</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">p</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">model</span><span class="o">.</span><span class="n">parameters</span><span class="p">()</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">p</span><span class="o">.</span><span class="n">requires_grad</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total optimization steps = </span><span class="si">{</span><span class="n">max_steps</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Number of trainable parameters = </span><span class="si">{</span><span class="n">get_model_param_count</span><span class="p">(</span><span class="n">model</span><span class="p">,</span><span class="w"> </span><span class="n">trainable_only</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
@@ -2183,15 +2210,22 @@
         <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">))</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_INDEX_NAME</span><span class="p">)</span>
+        <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">CONFIG_NAME</span><span class="p">)</span>
+
+        <span class="n">weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">)</span>
+        <span class="n">weights_index_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_INDEX_NAME</span><span class="p">)</span>
+        <span class="n">safe_weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">)</span>
+        <span class="n">safe_weights_index_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_INDEX_NAME</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="n">weights_file</span><span class="p">,</span> <span class="n">safe_weights_file</span><span class="p">,</span> <span class="n">weights_index_file</span><span class="p">,</span> <span class="n">safe_weights_index_file</span><span class="p">]]</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t find a valid checkpoint at </span><span class="si">{</span><span class="n">resume_from_checkpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading model from </span><span class="si">{</span><span class="n">resume_from_checkpoint</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">CONFIG_NAME</span><span class="p">)):</span>
-            <span class="n">config</span> <span class="o">=</span> <span class="n">PretrainedConfig</span><span class="o">.</span><span class="n">from_json_file</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">CONFIG_NAME</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">config_file</span><span class="p">):</span>
+            <span class="n">config</span> <span class="o">=</span> <span class="n">PretrainedConfig</span><span class="o">.</span><span class="n">from_json_file</span><span class="p">(</span><span class="n">config_file</span><span class="p">)</span>
             <span class="n">checkpoint_version</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">transformers_version</span>
             <span class="k">if</span> <span class="n">checkpoint_version</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">checkpoint_version</span> <span class="o">!=</span> <span class="n">__version__</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -2200,7 +2234,7 @@
                     <span class="s2">&quot;yield to errors or unwanted behaviors.&quot;</span>
                 <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">weights_file</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">safe_weights_file</span><span class="p">):</span>
             <span class="c1"># If the model is on the GPU, it still works!</span>
             <span class="k">if</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">():</span>
                 <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="s2">&quot;user_content.pt&quot;</span><span class="p">)):</span>
@@ -2216,7 +2250,7 @@
                         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                             <span class="s2">&quot;Enabling FP16 and loading from smp &lt; 1.10 checkpoint together is not suppported.&quot;</span>
                         <span class="p">)</span>
-                    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">),</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">weights_file</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
                     <span class="c1"># Required for smp to not auto-translate state_dict from hf to smp (is already smp).</span>
                     <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;_smp_is_partial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                     <span class="n">load_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -2224,7 +2258,11 @@
                     <span class="k">del</span> <span class="n">state_dict</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># We load the model state dict on the CPU to avoid an OOM error.</span>
-                <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">),</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">safe_weights_file</span><span class="p">):</span>
+                    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">safetensors</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">safe_weights_file</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">weights_file</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
                 <span class="c1"># workaround for FSDP bug https://github.com/pytorch/pytorch/issues/82963</span>
                 <span class="c1"># which takes *args instead of **kwargs</span>
                 <span class="n">load_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
@@ -2233,15 +2271,18 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">_issue_warnings_after_load</span><span class="p">(</span><span class="n">load_result</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We load the sharded checkpoint</span>
-            <span class="n">load_result</span> <span class="o">=</span> <span class="n">load_sharded_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">is_sagemaker_mp_enabled</span><span class="p">())</span>
+            <span class="n">load_result</span> <span class="o">=</span> <span class="n">load_sharded_checkpoint</span><span class="p">(</span>
+                <span class="n">model</span><span class="p">,</span> <span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="n">is_sagemaker_mp_enabled</span><span class="p">(),</span> <span class="n">prefer_safe</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">():</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_issue_warnings_after_load</span><span class="p">(</span><span class="n">load_result</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_best_model</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Loading best model from </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span><span class="si">}</span><span class="s2"> (score: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span><span class="si">}</span><span class="s2">).&quot;</span><span class="p">)</span>
         <span class="n">best_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">)</span>
+        <span class="n">best_safe_model_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">)</span>
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span> <span class="k">if</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">)</span> <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">best_safe_model_path</span><span class="p">):</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span><span class="p">:</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="c1"># this removes the pre-hooks from the previous engine</span>
@@ -2273,12 +2314,20 @@
                     <span class="k">else</span><span class="p">:</span>
                         <span class="c1"># If the &#39;user_content.pt&#39; file does NOT exist, load with the old smp api.</span>
                         <span class="c1"># Checkpoint must have been saved with the old smp api.</span>
-                        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">best_safe_model_path</span><span class="p">):</span>
+                            <span class="n">state_dict</span> <span class="o">=</span> <span class="n">safetensors</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">best_safe_model_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
                         <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;_smp_is_partial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="n">load_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="c1"># We load the model state dict on the CPU to avoid an OOM error.</span>
-                    <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">best_safe_model_path</span><span class="p">):</span>
+                        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">safetensors</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">load_file</span><span class="p">(</span><span class="n">best_safe_model_path</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">state_dict</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">best_model_path</span><span class="p">,</span> <span class="n">map_location</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">)</span>
+
                     <span class="c1"># If the model is on the GPU, it still works!</span>
                     <span class="c1"># workaround for FSDP bug https://github.com/pytorch/pytorch/issues/82963</span>
                     <span class="c1"># which takes *args instead of **kwargs</span>
@@ -2335,12 +2384,14 @@
         <span class="n">metrics</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_evaluate</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                <span class="n">metrics</span> <span class="o">=</span> <span class="p">{}</span>
                 <span class="k">for</span> <span class="n">eval_dataset_name</span><span class="p">,</span> <span class="n">eval_dataset</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
+                    <span class="n">dataset_metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span>
                         <span class="n">eval_dataset</span><span class="o">=</span><span class="n">eval_dataset</span><span class="p">,</span>
                         <span class="n">ignore_keys</span><span class="o">=</span><span class="n">ignore_keys_for_eval</span><span class="p">,</span>
                         <span class="n">metric_key_prefix</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;eval_</span><span class="si">{</span><span class="n">eval_dataset_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="p">)</span>
+                    <span class="n">metrics</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">dataset_metrics</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">ignore_keys</span><span class="o">=</span><span class="n">ignore_keys_for_eval</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_report_to_hp_search</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span> <span class="n">metrics</span><span class="p">)</span>
@@ -2525,7 +2576,6 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">optimizer_state</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">lr_scheduler_state</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">map_location</span> <span class="o">=</span> <span class="s2">&quot;cpu&quot;</span> <span class="k">if</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span>
                 <span class="k">if</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">():</span>
                     <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="s2">&quot;user_content.pt&quot;</span><span class="p">)):</span>
                         <span class="c1"># Optimizer checkpoint was saved with smp &gt;= 1.10</span>
@@ -2544,6 +2594,10 @@
 
                     <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span><span class="o">.</span><span class="n">register_post_step_hook</span><span class="p">(</span><span class="n">opt_load_hook</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># We use the CPU when training on one GPU to avoid OOM for GPU RAM when training big models.</span>
+                    <span class="c1"># In distributed training however, we load directly on each GPU and risk the GPU OOM as it&#39;s more</span>
+                    <span class="c1"># likely to get OOM on CPU (since we load num_gpu times the optimizer state</span>
+                    <span class="n">map_location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
                         <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">),</span> <span class="n">map_location</span><span class="o">=</span><span class="n">map_location</span><span class="p">)</span>
                     <span class="p">)</span>
@@ -2924,17 +2978,24 @@
         <span class="c1"># Save a trained model and configuration using `save_pretrained()`.</span>
         <span class="c1"># They can then be reloaded using `from_pretrained()`</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">PreTrainedModel</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">state_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+
             <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">unwrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">),</span> <span class="n">PreTrainedModel</span><span class="p">):</span>
-                <span class="k">if</span> <span class="n">state_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
-                <span class="n">unwrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
+                <span class="n">unwrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span>
+                    <span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">safe_serialization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span>
+                <span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Trainer.model is not a `PreTrainedModel`, only saving its state dict.&quot;</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">state_dict</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
-                <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">))</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span><span class="p">:</span>
+                    <span class="n">safetensors</span><span class="o">.</span><span class="n">torch</span><span class="o">.</span><span class="n">save_file</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span>
+                <span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">safe_serialization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span>
+            <span class="p">)</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
 
@@ -3020,7 +3081,7 @@
 <span class="sd">                Pass a dataset if you wish to override `self.eval_dataset`. If it is a [`~datasets.Dataset`], columns</span>
 <span class="sd">                not accepted by the `model.forward()` method are automatically removed. It must implement the `__len__`</span>
 <span class="sd">                method.</span>
-<span class="sd">            ignore_keys (`Lst[str]`, *optional*):</span>
+<span class="sd">            ignore_keys (`List[str]`, *optional*):</span>
 <span class="sd">                A list of keys in the output of your model (if it is a dictionary) that should be ignored when</span>
 <span class="sd">                gathering predictions.</span>
 <span class="sd">            metric_key_prefix (`str`, *optional*, defaults to `&quot;eval&quot;`):</span>
@@ -3085,7 +3146,7 @@
 <span class="sd">            test_dataset (`Dataset`):</span>
 <span class="sd">                Dataset to run the predictions on. If it is an `datasets.Dataset`, columns not accepted by the</span>
 <span class="sd">                `model.forward()` method are automatically removed. Has to implement the method `__len__`</span>
-<span class="sd">            ignore_keys (`Lst[str]`, *optional*):</span>
+<span class="sd">            ignore_keys (`List[str]`, *optional*):</span>
 <span class="sd">                A list of keys in the output of your model (if it is a dictionary) that should be ignored when</span>
 <span class="sd">                gathering predictions.</span>
 <span class="sd">            metric_key_prefix (`str`, *optional*, defaults to `&quot;test&quot;`):</span>
@@ -3419,7 +3480,7 @@
 <span class="sd">                argument `labels`. Check your model&#39;s documentation for all accepted arguments.</span>
 <span class="sd">            prediction_loss_only (`bool`):</span>
 <span class="sd">                Whether or not to return the loss only.</span>
-<span class="sd">            ignore_keys (`Lst[str]`, *optional*):</span>
+<span class="sd">            ignore_keys (`List[str]`, *optional*):</span>
 <span class="sd">                A list of keys in the output of your model (if it is a dictionary) that should be ignored when</span>
 <span class="sd">                gathering predictions.</span>
 
@@ -3633,7 +3694,7 @@
 
         <span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span>
         <span class="c1"># To avoid a new synchronization of all model weights, we just copy the file from the checkpoint folder</span>
-        <span class="n">modeling_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">CONFIG_NAME</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">]</span>
+        <span class="n">modeling_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">CONFIG_NAME</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">modeling_file</span> <span class="ow">in</span> <span class="n">modeling_files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_folder</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">)):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_folder</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">))</span>
