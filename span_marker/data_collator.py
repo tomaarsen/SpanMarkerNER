@@ -74,13 +74,13 @@ class SpanMarkerDataCollator:
             batch["input_ids"].append(input_ids)
 
             # Prepare position IDs
-            position_ids = torch.arange(num_tokens, dtype=torch.int) + 2
+            position_ids = torch.arange(num_tokens, dtype=torch.int)
             position_ids = F.pad(position_ids, (0, total_size - len(position_ids)), value=0)
-            position_ids[start_marker_idx : start_marker_idx + num_spans] = (
-                torch.tensor(sample["start_position_ids"]) + 2
-            )
-            position_ids[end_marker_idx : end_marker_idx + num_spans] = torch.tensor(sample["end_position_ids"]) + 2
-            batch["position_ids"].append(position_ids)
+            position_ids[start_marker_idx : start_marker_idx + num_spans] = torch.tensor(sample["start_position_ids"])
+            position_ids[end_marker_idx : end_marker_idx + num_spans] = torch.tensor(sample["end_position_ids"])
+            # Increase the position_ids by 2, inspired by PL-Marker. The intuition is that these position IDs
+            # better match the circumstances under which the underlying encoders are trained.
+            batch["position_ids"].append(position_ids + 2)
 
             # Prepare attention mask matrix
             attention_mask = torch.zeros((total_size, total_size), dtype=torch.bool)
