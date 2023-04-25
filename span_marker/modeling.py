@@ -18,6 +18,8 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 
 T = TypeVar("T", bound="SpanMarkerModel")
 
+UNEXPECTED_KEYWORD_PATTERN = re.compile("\S+ got an unexpected keyword argument '([^']*)'")
+
 
 class SpanMarkerModel(PreTrainedModel):
     """
@@ -240,7 +242,7 @@ class SpanMarkerModel(PreTrainedModel):
         # then initialize it and create the SpanMarker config and model using the encoder and its config.
         else:
             encoder = SpanMarkerModel._load_encoder_with_kwargs(
-                pretrained_model_name_or_path, config, *model_args, **kwargs
+                pretrained_model_name_or_path, config, *model_args, **kwargs.copy()
             )
             if labels is None:
                 raise ValueError(
@@ -286,33 +288,25 @@ class SpanMarkerModel(PreTrainedModel):
         Returns:
             PreTrainedModel: The loaded encoder.
         """
-        kwargs = kwargs.copy()
-        exception_pattern = re.compile("\S+ got an unexpected keyword argument '([^']*)'")
-        while kwargs:
-            try:
-                return AutoModel.from_pretrained(
-                    pretrained_model_name_or_path,
-                    *model_args,
-                    config=config,
-                    **kwargs,
-                )
-            except TypeError as exc:
-                # If we can find a specific keyword that is causing issues, remove it and try again
-                match = exception_pattern.search(str(exc))
-                if match:
-                    problematic_keyword = match.group(1)
-                    if problematic_keyword in kwargs:
-                        kwargs.pop(problematic_keyword)
-                        # Try again:
-                        continue
-                # Otherwise, just raise the exception
-                raise exc
-        # Otherwise, don't provide kwargs
-        return AutoModel.from_pretrained(
-            pretrained_model_name_or_path,
-            *model_args,
-            config=config,
-        )
+        try:
+            return AutoModel.from_pretrained(
+                pretrained_model_name_or_path,
+                *model_args,
+                config=config,
+                **kwargs,
+            )
+        except TypeError as exc:
+            # If we can find a specific keyword that is causing issues, remove it and try again
+            match = UNEXPECTED_KEYWORD_PATTERN.search(str(exc))
+            if match:
+                problematic_keyword = match.group(1)
+                if problematic_keyword in kwargs:
+                    kwargs.pop(problematic_keyword)
+                    return SpanMarkerModel._load_encoder_with_kwargs(
+                        pretrained_model_name_or_path, config, *model_args, **kwargs
+                    )
+            # Otherwise, just raise the exception
+            raise exc
 
     def predict(
         self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False
