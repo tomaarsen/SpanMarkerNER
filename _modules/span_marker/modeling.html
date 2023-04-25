@@ -127,6 +127,8 @@
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span>
 
+<span class="n">UNEXPECTED_KEYWORD_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\S+ got an unexpected keyword argument &#39;([^&#39;]*)&#39;&quot;</span><span class="p">)</span>
+
 
 <div class="viewcode-block" id="SpanMarkerModel"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerModel</span><span class="p">(</span><span class="n">PreTrainedModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
@@ -349,7 +351,7 @@
         <span class="c1"># then initialize it and create the SpanMarker config and model using the encoder and its config.</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">encoder</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">_load_encoder_with_kwargs</span><span class="p">(</span>
-                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -395,33 +397,25 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            PreTrainedModel: The loaded encoder.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">kwargs</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">exception_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\S+ got an unexpected keyword argument &#39;([^&#39;]*)&#39;&quot;</span><span class="p">)</span>
-        <span class="k">while</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-                    <span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
-                    <span class="o">*</span><span class="n">model_args</span><span class="p">,</span>
-                    <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-                    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                <span class="c1"># If we can find a specific keyword that is causing issues, remove it and try again</span>
-                <span class="n">match</span> <span class="o">=</span> <span class="n">exception_pattern</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
-                    <span class="n">problematic_keyword</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">problematic_keyword</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-                        <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">problematic_keyword</span><span class="p">)</span>
-                        <span class="c1"># Try again:</span>
-                        <span class="k">continue</span>
-                <span class="c1"># Otherwise, just raise the exception</span>
-                <span class="k">raise</span> <span class="n">exc</span>
-        <span class="c1"># Otherwise, don&#39;t provide kwargs</span>
-        <span class="k">return</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-            <span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
-            <span class="o">*</span><span class="n">model_args</span><span class="p">,</span>
-            <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">AutoModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span>
+                <span class="o">*</span><span class="n">model_args</span><span class="p">,</span>
+                <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+            <span class="c1"># If we can find a specific keyword that is causing issues, remove it and try again</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">UNEXPECTED_KEYWORD_PATTERN</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="n">problematic_keyword</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">problematic_keyword</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+                    <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">problematic_keyword</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">_load_encoder_with_kwargs</span><span class="p">(</span>
+                        <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="n">config</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+                    <span class="p">)</span>
+            <span class="c1"># Otherwise, just raise the exception</span>
+            <span class="k">raise</span> <span class="n">exc</span>
 
 <div class="viewcode-block" id="SpanMarkerModel.predict"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]],</span> <span class="n">allow_overlapping</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
