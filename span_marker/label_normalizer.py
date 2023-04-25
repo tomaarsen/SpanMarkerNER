@@ -76,8 +76,8 @@ class LabelNormalizerBIOES(LabelNormalizerScheme):
 class LabelNormalizerBILOU(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
-        self.start_ids = self.label_ids_by_tag["B"] & self.label_ids_by_tag["U"]
-        self.end_ids = self.label_ids_by_tag["B"] & self.label_ids_by_tag["O"] & self.label_ids_by_tag["U"]
+        self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["U"]
+        self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["U"]
 
 
 class LabelNormalizerNoScheme(LabelNormalizer):
