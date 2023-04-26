@@ -31,6 +31,7 @@ Types of changes
 - Add support for `datasets<2.6.0`.
 - Add warning if a `<v1.0.0` model is loaded using `v1.0.0` or newer.
 - Propagate `SpanMarkerModel.from_pretrained` kwargs to the encoder its `AutoModel.from_pretrained`.
+- Ignore `UndefinedMetricWarning` when evaluation f1 is 0.
 
 ### Fixed
 

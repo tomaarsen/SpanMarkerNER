@@ -1,7 +1,9 @@
+import warnings
 from typing import Dict
 
 import evaluate
 import torch
+from sklearn.exceptions import UndefinedMetricWarning
 from transformers import EvalPrediction
 
 from span_marker.tokenizer import SpanMarkerTokenizer
@@ -81,7 +83,9 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
 
         seqeval.add(prediction=pred_labels_per_tokens, reference=gold_labels_per_tokens)
 
-    results = seqeval.compute()
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore", UndefinedMetricWarning)
+        results = seqeval.compute()
     # `results` also contains e.g. "person-athlete": {'precision': 0.5982658959537572, 'recall': 0.9, 'f1': 0.71875, 'number': 230}
     # logging this all is overkill. Tensorboard doesn't even support it, WandB does, but it's not very useful generally.
     # I'd like to revisit this to expose this information somehow still
