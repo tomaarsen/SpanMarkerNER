@@ -19,19 +19,18 @@ class EntityTracker:
 
     Example::
 
-        This SpanMarker model will ignore 0.375176% of all annotated entities in the train dataset due to the SpanMarkerModel its maximum entity length of 8.
-        These are the frequencies of the missed entities out of 12794 total entities:
-        - entities with 9 words occurred 15 times (0.117242%)
-        - entities with 10 words occurred 10 times (0.078162%)
-        - entities with 11 words occurred 12 times (0.093794%)
-        - entities with 12 words occurred 5 times (0.039081%)
-        - entities with 13 words occurred 3 times (0.023448%)
-        - entities with 15 words occurred 1 time (0.007816%)
-        - entities with 17 words occurred 1 time (0.007816%)
-        - entities with 19 words occurred 1 time (0.007816%)
+        This SpanMarker model won't be able to predict 5.930931% of all annotated entities in the evaluation dataset.
+        This is caused by the SpanMarkerModel maximum entity length of 6 words and the maximum model input length of 64 tokens.
+        These are the frequencies of the missed entities due to maximum entity length out of 1332 total entities:
+        - 7 missed entities with 7 words (0.525526%)
+        - 2 missed entities with 8 words (0.150150%)
+        - 2 missed entities with 9 words (0.150150%)
+        - 2 missed entities with 13 words (0.150150%)
+        Additionally, a total of 66 (4.954955%) entities were missed due to the maximum input length.
     """
 
     entity_max_length: int
+    model_max_length: int
     split: str = "train"  # or "evaluation" or "test"
     total_num_entities: int = 0
     skipped_entities: Dict[int, int] = field(default_factory=lambda: defaultdict(int))
@@ -65,25 +64,55 @@ class EntityTracker:
 
     def __exit__(self, exc_type, exc_val, exc_tb) -> None:
         """Trigger the ignored entities warning on exit."""
-        if self.skipped_entities:
-            total_num_missed_entities = sum(self.skipped_entities.values())
-            if self.split == "train":
-                message = "This SpanMarker model will ignore"
-            else:
-                message = "This SpanMarker model won't be able to predict"
+        if not self.skipped_entities:
+            return self.reset()
+
+        entity_max_length_missed_freq = sorted(
+            [(key, value) for key, value in self.skipped_entities.items() if key > self.entity_max_length],
+            key=lambda x: x[0],
+        )
+        model_max_length_missed_total = sum(
+            value for key, value in self.skipped_entities.items() if key <= self.entity_max_length
+        )
+        total_num_missed_entities = sum(self.skipped_entities.values())
+        if self.split == "train":
+            message = "This SpanMarker model will ignore"
+        else:
+            message = "This SpanMarker model won't be able to predict"
+        message += (
+            f" {total_num_missed_entities/self.total_num_entities:%} of all annotated entities in the {self.split}"
+            " dataset. This is caused by the SpanMarkerModel "
+        )
+        if entity_max_length_missed_freq:
             message += (
-                f" {total_num_missed_entities/self.total_num_entities:%} of all annotated entities in the {self.split}"
-                f" dataset due to the SpanMarkerModel maximum entity length of {self.entity_max_length} words."
-                f"\nThese are the frequencies of the missed entities out of {self.total_num_entities} total entities:\n"
+                f"maximum entity length of {self.entity_max_length} word{'s' if self.entity_max_length > 1 else ''}"
             )
+            if model_max_length_missed_total:
+                message += " and the "
+        if model_max_length_missed_total:
+            message += (
+                f"maximum model input length of {self.model_max_length} token{'s' if self.model_max_length > 1 else ''}"
+            )
+        message += "."
+        if entity_max_length_missed_freq:
+            message += f"\nThese are the frequencies of the missed entities due to maximum entity length out of {self.total_num_entities} total entities:\n"
             message += "\n".join(
                 [
-                    f"- entities with {length} word{'s' if length > 1 else ''}"
-                    f" occurred {freq} time{'s' if freq > 1 else ''} ({freq / self.total_num_entities:%})"
-                    for length, freq in sorted(self.skipped_entities.items(), key=lambda x: x[0])
+                    f"- {freq} missed entities with {length} word{'s' if length > 1 else ''}"
+                    f" ({freq / self.total_num_entities:%})"
+                    for length, freq in entity_max_length_missed_freq
                 ]
             )
-            logger.warning(message)
+        if model_max_length_missed_total:
+            if entity_max_length_missed_freq:
+                message += "\nAdditionally, a "
+            else:
+                message += "\nA "
+            message += (
+                f"total of {model_max_length_missed_total} ({model_max_length_missed_total / self.total_num_entities:%})"
+                " entities were missed due to the maximum input length."
+            )
+        logger.warning(message)
         self.reset()
 
     def add(self, num_entities: int) -> None:
@@ -126,7 +155,7 @@ class SpanMarkerTokenizer:
             self.tokenizer.model_max_length, self.config.model_max_length or self.config.model_max_length_default
         )
 
-        self.entity_tracker = EntityTracker(self.config.entity_max_length)
+        self.entity_tracker = EntityTracker(self.config.entity_max_length, self.model_max_length)
 
     def get_all_valid_spans(self, num_words: int, entity_max_length: int) -> Iterator[Tuple[int, int]]:
         for start_idx in range(num_words):

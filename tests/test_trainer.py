@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 from typing import Dict, List
 
@@ -101,13 +102,71 @@ def test_trainer_incorrect_columns(finetuned_conll_span_marker_model: SpanMarker
         trainer.evaluate()
 
 
-def test_trainer_entity_tracker_warning(conll_dataset_dict: DatasetDict, caplog) -> None:
+def test_trainer_entity_tracker_warning_entity_length(conll_dataset_dict: DatasetDict, caplog) -> None:
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, entity_max_length=1)
     trainer = Trainer(
         model, args=DEFAULT_ARGS, train_dataset=conll_dataset_dict["train"], eval_dataset=conll_dataset_dict["train"]
     )
     trainer.train()
-    assert any(["model will ignore" in record.msg for record in caplog.records])
+    train_pattern = re.compile(
+        r"This SpanMarker model will ignore [\d\.]+% of all annotated entities in the train dataset\. "
+        r"This is caused by the SpanMarkerModel maximum entity length of 1 word\.\n"
+        r"These are the frequencies of the missed entities due to maximum entity length out of \d+ total entities:"
+    )
+    assert any([train_pattern.search(record.msg) for record in caplog.records])
     assert any(["Detected the IOB or IOB2 labeling scheme." in record.msg for record in caplog.records])
     trainer.evaluate()
-    assert any(["model won't be able to predict" in record.msg for record in caplog.records])
+    eval_pattern = re.compile(
+        r"This SpanMarker model won't be able to predict [\d\.]+% of all annotated entities in the evaluation dataset\. "
+        r"This is caused by the SpanMarkerModel maximum entity length of 1 word\.\n"
+        r"These are the frequencies of the missed entities due to maximum entity length out of \d+ total entities:"
+    )
+    assert any([eval_pattern.search(record.msg) for record in caplog.records])
+
+
+def test_trainer_entity_tracker_warning_model_length(conll_dataset_dict: DatasetDict, caplog) -> None:
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, model_max_length=5)
+    trainer = Trainer(
+        model, args=DEFAULT_ARGS, train_dataset=conll_dataset_dict["train"], eval_dataset=conll_dataset_dict["train"]
+    )
+    trainer.train()
+    train_pattern = re.compile(
+        r"This SpanMarker model will ignore [\d\.]+% of all annotated entities in the train dataset\. "
+        r"This is caused by the SpanMarkerModel maximum model input length of 5 tokens\.\n"
+        r"A total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
+    )
+    assert any([train_pattern.match(record.msg) for record in caplog.records])
+    assert any(["Detected the IOB or IOB2 labeling scheme." in record.msg for record in caplog.records])
+    trainer.evaluate()
+    eval_pattern = re.compile(
+        r"This SpanMarker model won't be able to predict [\d\.]+% of all annotated entities in the evaluation dataset\. "
+        r"This is caused by the SpanMarkerModel maximum model input length of 5 tokens\.\n"
+        r"A total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
+    )
+    assert any([eval_pattern.match(record.msg) for record in caplog.records])
+
+
+def test_trainer_entity_tracker_warning_entity_and_model_length(conll_dataset_dict: DatasetDict, caplog) -> None:
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, model_max_length=5, entity_max_length=1)
+    trainer = Trainer(
+        model, args=DEFAULT_ARGS, train_dataset=conll_dataset_dict["train"], eval_dataset=conll_dataset_dict["train"]
+    )
+    trainer.train()
+    train_pattern = re.compile(
+        r"This SpanMarker model will ignore [\d\.]+% of all annotated entities in the train dataset\. "
+        r"This is caused by the SpanMarkerModel maximum entity length of 1 word and the maximum model "
+        r"input length of 5 tokens\.\n"
+        r"These are the frequencies of the missed entities due to maximum entity length out of \d+ total entities:\n"
+        r".*\nAdditionally, a total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
+    )
+    assert any([train_pattern.match(record.msg) for record in caplog.records])
+    assert any(["Detected the IOB or IOB2 labeling scheme." in record.msg for record in caplog.records])
+    trainer.evaluate()
+    eval_pattern = re.compile(
+        r"This SpanMarker model won't be able to predict [\d\.]+% of all annotated entities in the evaluation dataset\. "
+        r"This is caused by the SpanMarkerModel maximum entity length of 1 word and the maximum model "
+        r"input length of 5 tokens\.\n"
+        r"These are the frequencies of the missed entities due to maximum entity length out of \d+ total entities:\n"
+        r".*\nAdditionally, a total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
+    )
+    assert any([eval_pattern.match(record.msg) for record in caplog.records])
