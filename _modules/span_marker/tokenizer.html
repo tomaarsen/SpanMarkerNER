@@ -128,19 +128,18 @@
 
 <span class="sd">    Example::</span>
 
-<span class="sd">        This SpanMarker model will ignore 0.375176% of all annotated entities in the train dataset due to the SpanMarkerModel its maximum entity length of 8.</span>
-<span class="sd">        These are the frequencies of the missed entities out of 12794 total entities:</span>
-<span class="sd">        - entities with 9 words occurred 15 times (0.117242%)</span>
-<span class="sd">        - entities with 10 words occurred 10 times (0.078162%)</span>
-<span class="sd">        - entities with 11 words occurred 12 times (0.093794%)</span>
-<span class="sd">        - entities with 12 words occurred 5 times (0.039081%)</span>
-<span class="sd">        - entities with 13 words occurred 3 times (0.023448%)</span>
-<span class="sd">        - entities with 15 words occurred 1 time (0.007816%)</span>
-<span class="sd">        - entities with 17 words occurred 1 time (0.007816%)</span>
-<span class="sd">        - entities with 19 words occurred 1 time (0.007816%)</span>
+<span class="sd">        This SpanMarker model won&#39;t be able to predict 5.930931% of all annotated entities in the evaluation dataset.</span>
+<span class="sd">        This is caused by the SpanMarkerModel maximum entity length of 6 words and the maximum model input length of 64 tokens.</span>
+<span class="sd">        These are the frequencies of the missed entities due to maximum entity length out of 1332 total entities:</span>
+<span class="sd">        - 7 missed entities with 7 words (0.525526%)</span>
+<span class="sd">        - 2 missed entities with 8 words (0.150150%)</span>
+<span class="sd">        - 2 missed entities with 9 words (0.150150%)</span>
+<span class="sd">        - 2 missed entities with 13 words (0.150150%)</span>
+<span class="sd">        Additionally, a total of 66 (4.954955%) entities were missed due to the maximum input length.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span>
     <span class="n">split</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span>  <span class="c1"># or &quot;evaluation&quot; or &quot;test&quot;</span>
     <span class="n">total_num_entities</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">skipped_entities</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
@@ -174,25 +173,55 @@
 
     <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger the ignored entities warning on exit.&quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="p">:</span>
-            <span class="n">total_num_missed_entities</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model will ignore&quot;</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model won&#39;t be able to predict&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+        <span class="n">entity_max_length_missed_freq</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="p">[(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">],</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">model_max_length_missed_total</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span>
+            <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span>
+        <span class="p">)</span>
+        <span class="n">total_num_missed_entities</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model will ignore&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model won&#39;t be able to predict&quot;</span>
+        <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">total_num_missed_entities</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2"> of all annotated entities in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="s2">&quot; dataset. This is caused by the SpanMarkerModel &quot;</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">entity_max_length_missed_freq</span><span class="p">:</span>
             <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">total_num_missed_entities</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2"> of all annotated entities in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot; dataset due to the SpanMarkerModel maximum entity length of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span><span class="si">}</span><span class="s2"> words.&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">These are the frequencies of the missed entities out of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">}</span><span class="s2"> total entities:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;maximum entity length of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span><span class="si">}</span><span class="s2"> word</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">model_max_length_missed_total</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot; and the &quot;</span>
+        <span class="k">if</span> <span class="n">model_max_length_missed_total</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;maximum model input length of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span><span class="si">}</span><span class="s2"> token</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;.&quot;</span>
+        <span class="k">if</span> <span class="n">entity_max_length_missed_freq</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">These are the frequencies of the missed entities due to maximum entity length out of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">}</span><span class="s2"> total entities:</span><span class="se">\n</span><span class="s2">&quot;</span>
             <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                 <span class="p">[</span>
-                    <span class="sa">f</span><span class="s2">&quot;- entities with </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> word</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; occurred </span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2"> time</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">freq</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">freq</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2">)&quot;</span>
-                    <span class="k">for</span> <span class="n">length</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                    <span class="sa">f</span><span class="s2">&quot;- </span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2"> missed entities with </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> word</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; (</span><span class="si">{</span><span class="n">freq</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="k">for</span> <span class="n">length</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="n">entity_max_length_missed_freq</span>
                 <span class="p">]</span>
             <span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">model_max_length_missed_total</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">entity_max_length_missed_freq</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Additionally, a &quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">A &quot;</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;total of </span><span class="si">{</span><span class="n">model_max_length_missed_total</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">model_max_length_missed_total</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="s2">&quot; entities were missed due to the maximum input length.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
 <div class="viewcode-block" id="EntityTracker.add"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_entities</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -235,7 +264,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length_default</span>
         <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span> <span class="o">=</span> <span class="n">EntityTracker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span> <span class="o">=</span> <span class="n">EntityTracker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_words</span><span class="p">):</span>
