@@ -7,7 +7,7 @@ from transformers import EvalPrediction
 
 from span_marker.modeling import SpanMarkerModel
 from span_marker.trainer import Trainer
-from tests.constants import DEFAULT_ARGS
+from tests.constants import CONLL_LABELS, DEFAULT_ARGS, TINY_BERT
 
 
 @pytest.mark.parametrize(
@@ -99,3 +99,14 @@ def test_trainer_incorrect_columns(finetuned_conll_span_marker_model: SpanMarker
 
     with pytest.raises(ValueError, match="The evaluation dataset must contain a '.*?' column."):
         trainer.evaluate()
+
+
+def test_trainer_entity_tracker_warning(conll_dataset_dict: DatasetDict, caplog) -> None:
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, entity_max_length=1)
+    trainer = Trainer(
+        model, args=DEFAULT_ARGS, train_dataset=conll_dataset_dict["train"], eval_dataset=conll_dataset_dict["train"]
+    )
+    trainer.train()
+    assert any(["model will ignore" in record.msg for record in caplog.records])
+    trainer.evaluate()
+    assert any(["model won't be able to predict" in record.msg for record in caplog.records])

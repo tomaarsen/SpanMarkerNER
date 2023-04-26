@@ -1,11 +1,112 @@
 import itertools
+import logging
 import os
-import warnings
-from typing import Any, Dict, Iterator, List, Tuple, Union
+from collections import defaultdict
+from dataclasses import dataclass, field
+from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 from transformers import AutoTokenizer, PreTrainedTokenizer
 
 from span_marker.configuration import SpanMarkerConfig
+
+logger = logging.getLogger(__name__)
+
+
+@dataclass
+class EntityTracker:
+    """
+    For giving a warning about what percentage of entities are ignored/skipped.
+
+    Example::
+
+        This SpanMarker model will ignore 0.375176% of all annotated entities in the train dataset due to the SpanMarkerModel its maximum entity length of 8.
+        These are the frequencies of the missed entities out of 12794 total entities:
+        - entities with 9 words occurred 15 times (0.117242%)
+        - entities with 10 words occurred 10 times (0.078162%)
+        - entities with 11 words occurred 12 times (0.093794%)
+        - entities with 12 words occurred 5 times (0.039081%)
+        - entities with 13 words occurred 3 times (0.023448%)
+        - entities with 15 words occurred 1 time (0.007816%)
+        - entities with 17 words occurred 1 time (0.007816%)
+        - entities with 19 words occurred 1 time (0.007816%)
+    """
+
+    entity_max_length: int
+    split: str = "train"  # or "evaluation" or "test"
+    total_num_entities: int = 0
+    skipped_entities: Dict[int, int] = field(default_factory=lambda: defaultdict(int))
+    enabled: bool = False
+
+    def __call__(self, split: Optional[str] = None) -> None:
+        """Update the current split, which affects the warning message.
+
+        Example:
+
+            with tokenizer.entity_tracker(split=dataset_name):
+                dataset = dataset.map(
+                    lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"]),
+                    ...
+                )
+
+        Args:
+            split (Optional[str]): The new split string, either "train", "evaluation" or "test". Defaults to None.
+
+        Returns:
+            Self: The EntityTracker instance.
+        """
+        if split:
+            self.split = split
+        return self
+
+    def __enter__(self) -> None:
+        """Start tracking (ignored) entities on enter."""
+        self.enabled = True
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        """Trigger the ignored entities warning on exit."""
+        if self.skipped_entities:
+            total_num_missed_entities = sum(self.skipped_entities.values())
+            if self.split == "train":
+                message = "This SpanMarker model will ignore"
+            else:
+                message = "This SpanMarker model won't be able to predict"
+            message += (
+                f" {total_num_missed_entities/self.total_num_entities:%} of all annotated entities in the {self.split}"
+                f" dataset due to the SpanMarkerModel maximum entity length of {self.entity_max_length} words."
+                f"\nThese are the frequencies of the missed entities out of {self.total_num_entities} total entities:\n"
+            )
+            message += "\n".join(
+                [
+                    f"- entities with {length} word{'s' if length > 1 else ''}"
+                    f" occurred {freq} time{'s' if freq > 1 else ''} ({freq / self.total_num_entities:%})"
+                    for length, freq in sorted(self.skipped_entities.items(), key=lambda x: x[0])
+                ]
+            )
+            logger.warning(message)
+        self.reset()
+
+    def add(self, num_entities: int) -> None:
+        """Add to the counter of total number of entities.
+
+        Args:
+            num_entities (int): How many entities to increment by.
+        """
+        self.total_num_entities += num_entities
+
+    def missed(self, length: int) -> None:
+        """Add to the counter of missed/ignored/skipped entities.
+
+        Args:
+            length (int): How many entities were missed.
+        """
+        self.skipped_entities[length] += 1
+
+    def reset(self) -> None:
+        """Reset to defaults, stops tracking."""
+        self.total_num_entities = 0
+        self.skipped_entities = defaultdict(int)
+        self.enabled = False
 
 
 class SpanMarkerTokenizer:
@@ -17,13 +118,15 @@ class SpanMarkerTokenizer:
         self.start_marker_id, self.end_marker_id = self.tokenizer.convert_tokens_to_ids(["<start>", "<end>"])
 
         if self.tokenizer.model_max_length > 1e29 and self.config.model_max_length is None:
-            warnings.warn(
+            logger.warning(
                 f"The underlying {self.tokenizer.__class__.__name__!r} tokenizer nor {self.config.__class__.__name__!r}"
                 f" specify `model_max_length`: defaulting to {self.config.model_max_length_default} tokens."
             )
         self.model_max_length = min(
             self.tokenizer.model_max_length, self.config.model_max_length or self.config.model_max_length_default
         )
+
+        self.entity_tracker = EntityTracker(self.config.entity_max_length)
 
     def get_all_valid_spans(self, num_words: int, entity_max_length: int) -> Iterator[Tuple[int, int]]:
         for start_idx in range(num_words):
@@ -34,7 +137,7 @@ class SpanMarkerTokenizer:
         self, num_words: int, span_to_label: Dict[Tuple[int, int], int], entity_max_length: int, outside_id: int
     ) -> Iterator[Tuple[Tuple[int, int], int]]:
         for span in self.get_all_valid_spans(num_words, entity_max_length):
-            yield span, span_to_label.get(span, outside_id)
+            yield span, span_to_label.pop(span, outside_id)
 
     def __getattribute__(self, key: str) -> Any:
         try:
@@ -76,6 +179,8 @@ class SpanMarkerTokenizer:
                 num_tokens = len(input_ids)
             if labels:
                 span_to_label = {(start_idx, end_idx): label for label, start_idx, end_idx in labels[sample_idx]}
+                if self.entity_tracker.enabled:
+                    self.entity_tracker.add(len(span_to_label))
                 spans, span_labels = zip(
                     *list(
                         self.get_all_valid_spans_and_labels(
@@ -83,6 +188,11 @@ class SpanMarkerTokenizer:
                         )
                     )
                 )
+                # `self.get_all_valid_spans_and_labels` popped `span_to_label`, so if it's non-empty, then that
+                # entity was ignored, and we may want to track it for a useful warning
+                if self.entity_tracker.enabled:
+                    for start, end in span_to_label.keys():
+                        self.entity_tracker.missed(end - start)
             else:
                 spans = list(self.get_all_valid_spans(num_words, self.config.entity_max_length))
 

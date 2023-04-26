@@ -17,6 +17,10 @@ Types of changes
 
 ## [Unreleased]
 
+### Added
+
+- Added a warning for entities that are ignored/skipped due to the maximum entity length.
+
 ### Changed
 
 - Updated where in the input IDs the span markers are stored, results in 40% training and inferencing speed increase.

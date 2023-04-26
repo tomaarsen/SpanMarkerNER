@@ -1,6 +1,6 @@
+import logging
 import os
 import re
-import warnings
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
@@ -15,6 +15,8 @@ from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.model_card import MODEL_CARD_TEMPLATE
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
+
+logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound="SpanMarkerModel")
 
@@ -228,13 +230,11 @@ class SpanMarkerModel(PreTrainedModel):
         if isinstance(config, cls.config_class):
             model_span_marker_version = config.get("span_marker_version") or "0.1.0"
             if parse(model_span_marker_version) < Version("1.0.0.dev"):
-                warnings.warn(
+                logger.warning(
                     f"Loading a model trained using SpanMarker v{model_span_marker_version},"
                     f" while SpanMarker v{span_marker_version} is installed. Due to large changes"
                     " introduced in v1.0.0, this is not recommended. Either retrain your model for"
-                    f" v{span_marker_version}, or install `span_marker < 1.0.0`.",
-                    UserWarning,
-                    stacklevel=2,
+                    f" v{span_marker_version}, or install `span_marker < 1.0.0`."
                 )
             model = super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
 

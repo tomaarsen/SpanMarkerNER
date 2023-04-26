@@ -1,4 +1,4 @@
-import warnings
+import logging
 from typing import Callable, Dict, List, Optional, Tuple
 
 import torch
@@ -16,6 +16,8 @@ from span_marker.evaluation import compute_f1_via_seqeval
 from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
+
+logger = logging.getLogger(__name__)
 
 
 class Trainer(TransformersTrainer):
@@ -164,12 +166,13 @@ class Trainer(TransformersTrainer):
             desc=f"Label normalizing the {dataset_name} dataset",
         )
         # Tokenize and add start/end markers
-        dataset = dataset.map(
-            lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"], return_num_words=is_evaluate),
-            batched=True,
-            remove_columns=dataset.column_names,
-            desc=f"Tokenizing the {dataset_name} dataset",
-        )
+        with tokenizer.entity_tracker(split=dataset_name):
+            dataset = dataset.map(
+                lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"], return_num_words=is_evaluate),
+                batched=True,
+                remove_columns=dataset.column_names,
+                desc=f"Tokenizing the {dataset_name} dataset",
+            )
         return dataset
 
     def get_train_dataloader(self) -> DataLoader:
@@ -196,10 +199,8 @@ class Trainer(TransformersTrainer):
     def predict(
         self, test_dataset: Dataset, ignore_keys: Optional[List[str]] = None, metric_key_prefix: str = "test"
     ) -> PredictionOutput:
-        warnings.warn(
+        logger.warning(
             f"`Trainer.predict` is not recommended for a {self.model.__class__.__name__}. "
-            f"Consider using `{self.model.__class__.__name__}.predict` instead.",
-            UserWarning,
-            stacklevel=2,
+            f"Consider using `{self.model.__class__.__name__}.predict` instead."
         )
         return super().predict(test_dataset, ignore_keys, metric_key_prefix)

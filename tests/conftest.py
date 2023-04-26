@@ -1,3 +1,4 @@
+import datasets
 import pytest
 from datasets import DatasetDict
 
@@ -8,6 +9,11 @@ from tests.constants import (
     FEWNERD_COARSE_LABELS,
     TINY_BERT,
 )
+
+
+def pytest_sessionstart(session) -> None:
+    # Disable caching (for tests only) to ensure that we're actually recomputing things
+    datasets.disable_caching()
 
 
 # CoNLL03
