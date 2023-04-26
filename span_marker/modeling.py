@@ -1,6 +1,7 @@
 import logging
 import os
 import re
+import warnings
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
@@ -353,6 +354,15 @@ class SpanMarkerModel(PreTrainedModel):
 
                 If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.
         """
+        if torch.cuda.is_available() and self.device == torch.device("cpu"):
+            warnings.warn(
+                "SpanMarker model predictions are being computed on the CPU while CUDA is available."
+                " Moving the model to CUDA using `model.cuda()` before performing predictions is heavily"
+                " recommended to significantly boost prediction speeds.",
+                UserWarning,
+                stacklevel=2,
+            )
+
         if not inputs:
             return []
 

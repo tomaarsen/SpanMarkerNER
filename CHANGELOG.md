@@ -21,6 +21,7 @@ Types of changes
 
 - Added a warning for entities that are ignored/skipped due to the maximum entity length.
 - Added info-level logs displaying the detected labeling scheme (IOB/IOB2, BIOES, BILOU, none).
+- Added a warning suggesting to use `model.cuda()` when predictions are performed on a CPU while CUDA is available.
 
 ### Changed
 
