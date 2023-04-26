@@ -110,6 +110,101 @@
   <section id="module-span_marker.tokenizer">
 <span id="span-marker-tokenizer-module"></span><h1>span_marker.tokenizer module<a class="headerlink" href="#module-span_marker.tokenizer" title="Permalink to this heading">¶</a></h1>
 <dl class="py class">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.tokenizer.</span></span><span class="sig-name descname"><span class="pre">EntityTracker</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">entity_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split='train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">total_num_entities=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">skipped_entities=&lt;factory&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">enabled=False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/tokenizer.html#EntityTracker"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.tokenizer.EntityTracker" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>For giving a warning about what percentage of entities are ignored/skipped.</p>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">This</span> <span class="n">SpanMarker</span> <span class="n">model</span> <span class="n">will</span> <span class="n">ignore</span> <span class="mf">0.375176</span><span class="o">%</span> <span class="n">of</span> <span class="nb">all</span> <span class="n">annotated</span> <span class="n">entities</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">train</span> <span class="n">dataset</span> <span class="n">due</span> <span class="n">to</span> <span class="n">the</span> <span class="n">SpanMarkerModel</span> <span class="n">its</span> <span class="n">maximum</span> <span class="n">entity</span> <span class="n">length</span> <span class="n">of</span> <span class="mf">8.</span>
+<span class="n">These</span> <span class="n">are</span> <span class="n">the</span> <span class="n">frequencies</span> <span class="n">of</span> <span class="n">the</span> <span class="n">missed</span> <span class="n">entities</span> <span class="n">out</span> <span class="n">of</span> <span class="mi">12794</span> <span class="n">total</span> <span class="n">entities</span><span class="p">:</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">9</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">15</span> <span class="n">times</span> <span class="p">(</span><span class="mf">0.117242</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">10</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">10</span> <span class="n">times</span> <span class="p">(</span><span class="mf">0.078162</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">11</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">12</span> <span class="n">times</span> <span class="p">(</span><span class="mf">0.093794</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">12</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">5</span> <span class="n">times</span> <span class="p">(</span><span class="mf">0.039081</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">13</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">3</span> <span class="n">times</span> <span class="p">(</span><span class="mf">0.023448</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">15</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">1</span> <span class="n">time</span> <span class="p">(</span><span class="mf">0.007816</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">17</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">1</span> <span class="n">time</span> <span class="p">(</span><span class="mf">0.007816</span><span class="o">%</span><span class="p">)</span>
+<span class="o">-</span> <span class="n">entities</span> <span class="k">with</span> <span class="mi">19</span> <span class="n">words</span> <span class="n">occurred</span> <span class="mi">1</span> <span class="n">time</span> <span class="p">(</span><span class="mf">0.007816</span><span class="o">%</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>entity_max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>split</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a>) – </p></li>
+<li><p><strong>total_num_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>skipped_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a><em>]</em>) – </p></li>
+<li><p><strong>enabled</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a>) – </p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.entity_max_length">
+<span class="sig-name descname"><span class="pre">entity_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.entity_max_length" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.split">
+<span class="sig-name descname"><span class="pre">split</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'train'</span></em><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.split" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.total_num_entities">
+<span class="sig-name descname"><span class="pre">total_num_entities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">0</span></em><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.total_num_entities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.skipped_entities">
+<span class="sig-name descname"><span class="pre">skipped_entities</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.skipped_entities" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.enabled">
+<span class="sig-name descname"><span class="pre">enabled</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><span class="pre">bool</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">False</span></em><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.enabled" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.add">
+<span class="sig-name descname"><span class="pre">add</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">num_entities</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/tokenizer.html#EntityTracker.add"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.add" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add to the counter of total number of entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>num_entities</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – How many entities to increment by.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.missed">
+<span class="sig-name descname"><span class="pre">missed</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/tokenizer.html#EntityTracker.missed"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.missed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add to the counter of missed/ignored/skipped entities.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – How many entities were missed.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.tokenizer.EntityTracker.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/tokenizer.html#EntityTracker.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.tokenizer.EntityTracker.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset to defaults, stops tracking.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="span_marker.tokenizer.SpanMarkerTokenizer">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.tokenizer.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerTokenizer</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/tokenizer.html#SpanMarkerTokenizer"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.tokenizer.SpanMarkerTokenizer" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>

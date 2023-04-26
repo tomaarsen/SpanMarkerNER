@@ -124,6 +124,7 @@
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
+ | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  
@@ -139,10 +140,12 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.are_labels_schemed">are_labels_schemed() (span_marker.configuration.SpanMarkerConfig method)</a>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.add">add() (span_marker.tokenizer.EntityTracker method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.are_labels_schemed">are_labels_schemed() (span_marker.configuration.SpanMarkerConfig method)</a>
+</li>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer">AutoLabelNormalizer (class in span_marker.label_normalizer)</a>
 </li>
   </ul></td>
@@ -173,10 +176,16 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.enabled">enabled (span_marker.tokenizer.EntityTracker attribute)</a>
+</li>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.Entity">Entity (in module span_marker.label_normalizer)</a>
+</li>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.entity_max_length">entity_max_length (span_marker.tokenizer.EntityTracker attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker">EntityTracker (class in span_marker.tokenizer)</a>
+</li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.eval">eval() (span_marker.modeling.SpanMarkerModel method)</a>
 </li>
       <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer.evaluate">evaluate() (span_marker.trainer.Trainer method)</a>
@@ -261,6 +270,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length">marker_max_length (span_marker.data_collator.SpanMarkerDataCollator attribute)</a>
 </li>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.missed">missed() (span_marker.tokenizer.EntityTracker method)</a>
+</li>
       <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.model_type">model_type (span_marker.configuration.SpanMarkerConfig attribute)</a>
 </li>
       <li>
@@ -331,10 +342,20 @@
   </ul></td>
 </tr></table>
 
+<h2 id="R">R</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.reset">reset() (span_marker.tokenizer.EntityTracker method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.save_pretrained">save_pretrained() (span_marker.modeling.SpanMarkerModel method)</a>
+</li>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.skipped_entities">skipped_entities (span_marker.tokenizer.EntityTracker attribute)</a>
 </li>
       <li>
     span_marker
@@ -411,6 +432,8 @@
 </li>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer">SpanMarkerTokenizer (class in span_marker.tokenizer)</a>
 </li>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.split">split (span_marker.tokenizer.EntityTracker attribute)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -419,14 +442,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.tokenizer">tokenizer (span_marker.data_collator.SpanMarkerDataCollator attribute)</a>
 </li>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.total_num_entities">total_num_entities (span_marker.tokenizer.EntityTracker attribute)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.train">train() (span_marker.modeling.SpanMarkerModel method)</a>
 
       <ul>
         <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer.train">(span_marker.trainer.Trainer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer">Trainer (class in span_marker.trainer)</a>
 </li>
   </ul></td>

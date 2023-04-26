@@ -107,9 +107,9 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.modeling</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -124,6 +124,8 @@
 <span class="kn">from</span> <span class="nn">span_marker.model_card</span> <span class="kn">import</span> <span class="n">MODEL_CARD_TEMPLATE</span>
 <span class="kn">from</span> <span class="nn">span_marker.output</span> <span class="kn">import</span> <span class="n">SpanMarkerOutput</span>
 <span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span>
 
@@ -337,13 +339,11 @@
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">):</span>
             <span class="n">model_span_marker_version</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;span_marker_version&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;0.1.0&quot;</span>
             <span class="k">if</span> <span class="n">parse</span><span class="p">(</span><span class="n">model_span_marker_version</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">Version</span><span class="p">(</span><span class="s2">&quot;1.0.0.dev&quot;</span><span class="p">):</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Loading a model trained using SpanMarker v</span><span class="si">{</span><span class="n">model_span_marker_version</span><span class="si">}</span><span class="s2">,&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; while SpanMarker v</span><span class="si">{</span><span class="n">span_marker_version</span><span class="si">}</span><span class="s2"> is installed. Due to large changes&quot;</span>
                     <span class="s2">&quot; introduced in v1.0.0, this is not recommended. Either retrain your model for&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot; v</span><span class="si">{</span><span class="n">span_marker_version</span><span class="si">}</span><span class="s2">, or install `span_marker &lt; 1.0.0`.&quot;</span><span class="p">,</span>
-                    <span class="ne">UserWarning</span><span class="p">,</span>
-                    <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+                    <span class="sa">f</span><span class="s2">&quot; v</span><span class="si">{</span><span class="n">span_marker_version</span><span class="si">}</span><span class="s2">, or install `span_marker &lt; 1.0.0`.&quot;</span>
                 <span class="p">)</span>
             <span class="n">model</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

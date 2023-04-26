@@ -108,13 +108,114 @@
           
   <h1>Source code for span_marker.tokenizer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">itertools</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">warnings</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">PreTrainedTokenizer</span>
 
 <span class="kn">from</span> <span class="nn">span_marker.configuration</span> <span class="kn">import</span> <span class="n">SpanMarkerConfig</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="EntityTracker"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker">[docs]</a><span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">EntityTracker</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    For giving a warning about what percentage of entities are ignored/skipped.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        This SpanMarker model will ignore 0.375176% of all annotated entities in the train dataset due to the SpanMarkerModel its maximum entity length of 8.</span>
+<span class="sd">        These are the frequencies of the missed entities out of 12794 total entities:</span>
+<span class="sd">        - entities with 9 words occurred 15 times (0.117242%)</span>
+<span class="sd">        - entities with 10 words occurred 10 times (0.078162%)</span>
+<span class="sd">        - entities with 11 words occurred 12 times (0.093794%)</span>
+<span class="sd">        - entities with 12 words occurred 5 times (0.039081%)</span>
+<span class="sd">        - entities with 13 words occurred 3 times (0.023448%)</span>
+<span class="sd">        - entities with 15 words occurred 1 time (0.007816%)</span>
+<span class="sd">        - entities with 17 words occurred 1 time (0.007816%)</span>
+<span class="sd">        - entities with 19 words occurred 1 time (0.007816%)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span>
+    <span class="n">split</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;train&quot;</span>  <span class="c1"># or &quot;evaluation&quot; or &quot;test&quot;</span>
+    <span class="n">total_num_entities</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">skipped_entities</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">))</span>
+    <span class="n">enabled</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">split</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Update the current split, which affects the warning message.</span>
+
+<span class="sd">        Example:</span>
+
+<span class="sd">            with tokenizer.entity_tracker(split=dataset_name):</span>
+<span class="sd">                dataset = dataset.map(</span>
+<span class="sd">                    lambda batch: tokenizer(batch[&quot;tokens&quot;], labels=batch[&quot;ner_tags&quot;]),</span>
+<span class="sd">                    ...</span>
+<span class="sd">                )</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            split (Optional[str]): The new split string, either &quot;train&quot;, &quot;evaluation&quot; or &quot;test&quot;. Defaults to None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Self: The EntityTracker instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">split</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">=</span> <span class="n">split</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Start tracking (ignored) entities on enter.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">exc_type</span><span class="p">,</span> <span class="n">exc_val</span><span class="p">,</span> <span class="n">exc_tb</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Trigger the ignored entities warning on exit.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="p">:</span>
+            <span class="n">total_num_missed_entities</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">split</span> <span class="o">==</span> <span class="s2">&quot;train&quot;</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model will ignore&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;This SpanMarker model won&#39;t be able to predict&quot;</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">total_num_missed_entities</span><span class="o">/</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2"> of all annotated entities in the </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">split</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot; dataset due to the SpanMarkerModel maximum entity length of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span><span class="si">}</span><span class="s2"> words.&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">These are the frequencies of the missed entities out of </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">}</span><span class="s2"> total entities:</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+            <span class="n">message</span> <span class="o">+=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                <span class="p">[</span>
+                    <span class="sa">f</span><span class="s2">&quot;- entities with </span><span class="si">{</span><span class="n">length</span><span class="si">}</span><span class="s2"> word</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">length</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; occurred </span><span class="si">{</span><span class="n">freq</span><span class="si">}</span><span class="s2"> time</span><span class="si">{</span><span class="s1">&#39;s&#39;</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">freq</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="mi">1</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;&#39;</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">freq</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2">)&quot;</span>
+                    <span class="k">for</span> <span class="n">length</span><span class="p">,</span> <span class="n">freq</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="p">]</span>
+            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EntityTracker.add"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_entities</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add to the counter of total number of entities.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            num_entities (int): How many entities to increment by.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span> <span class="o">+=</span> <span class="n">num_entities</span></div>
+
+<div class="viewcode-block" id="EntityTracker.missed"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.missed">[docs]</a>    <span class="k">def</span> <span class="nf">missed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add to the counter of missed/ignored/skipped entities.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            length (int): How many entities were missed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="p">[</span><span class="n">length</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span></div>
+
+<div class="viewcode-block" id="EntityTracker.reset"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset to defaults, stops tracking.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span></div></div>
 
 
 <div class="viewcode-block" id="SpanMarkerTokenizer"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerTokenizer</span><span class="p">:</span>
@@ -126,13 +227,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">start_marker_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_marker_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">convert_tokens_to_ids</span><span class="p">([</span><span class="s2">&quot;&lt;start&gt;&quot;</span><span class="p">,</span> <span class="s2">&quot;&lt;end&gt;&quot;</span><span class="p">])</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">&gt;</span> <span class="mf">1e29</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;The underlying </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2"> tokenizer nor </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">!r}</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot; specify `model_max_length`: defaulting to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length_default</span><span class="si">}</span><span class="s2"> tokens.&quot;</span>
             <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">model_max_length_default</span>
         <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span> <span class="o">=</span> <span class="n">EntityTracker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">)</span>
 
 <div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_words</span><span class="p">):</span>
@@ -143,7 +246,7 @@
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">span_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">):</span>
-            <span class="k">yield</span> <span class="n">span</span><span class="p">,</span> <span class="n">span_to_label</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">)</span></div>
+            <span class="k">yield</span> <span class="n">span</span><span class="p">,</span> <span class="n">span_to_label</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -185,6 +288,8 @@
                 <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
                 <span class="n">span_to_label</span> <span class="o">=</span> <span class="p">{(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">):</span> <span class="n">label</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span> <span class="ow">in</span> <span class="n">labels</span><span class="p">[</span><span class="n">sample_idx</span><span class="p">]}</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">span_to_label</span><span class="p">))</span>
                 <span class="n">spans</span><span class="p">,</span> <span class="n">span_labels</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span>
                     <span class="o">*</span><span class="nb">list</span><span class="p">(</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans_and_labels</span><span class="p">(</span>
@@ -192,6 +297,11 @@
                         <span class="p">)</span>
                     <span class="p">)</span>
                 <span class="p">)</span>
+                <span class="c1"># `self.get_all_valid_spans_and_labels` popped `span_to_label`, so if it&#39;s non-empty, then that</span>
+                <span class="c1"># entity was ignored, and we may want to track it for a useful warning</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span><span class="o">.</span><span class="n">enabled</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">span_to_label</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span><span class="o">.</span><span class="n">missed</span><span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">))</span>
 
