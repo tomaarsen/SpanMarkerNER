@@ -20,6 +20,7 @@ Types of changes
 ### Added
 
 - Added a warning for entities that are ignored/skipped due to the maximum entity length.
+- Added info-level logs displaying the detected labeling scheme (IOB/IOB2, BIOES, BILOU, none).
 
 ### Changed
 

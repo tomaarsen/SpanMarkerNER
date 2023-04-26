@@ -1,7 +1,10 @@
+import logging
 from abc import ABC, abstractmethod
 from typing import Any, Dict, Iterator, List, Tuple
 
 from span_marker.configuration import SpanMarkerConfig
+
+logger = logging.getLogger(__name__)
 
 Entity = Tuple[int, int, int]
 """
@@ -62,6 +65,7 @@ class LabelNormalizerIOB(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
         # Support for IOB2 and IOB, respectively:
+        logger.info("Detected the IOB or IOB2 labeling scheme.")
         self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["I"]
         self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"]
 
@@ -69,6 +73,7 @@ class LabelNormalizerIOB(LabelNormalizerScheme):
 class LabelNormalizerBIOES(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
+        logger.info("Detected the BIOES labeling scheme.")
         self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["S"]
         self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["S"]
 
@@ -76,11 +81,16 @@ class LabelNormalizerBIOES(LabelNormalizerScheme):
 class LabelNormalizerBILOU(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
+        logger.info("Detected the BILOU labeling scheme.")
         self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["U"]
         self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["U"]
 
 
 class LabelNormalizerNoScheme(LabelNormalizer):
+    def __init__(self, config: SpanMarkerConfig) -> None:
+        super().__init__(config)
+        logger.info("No labeling scheme detected: all label IDs belong to individual entity classes.")
+
     def ner_tags_to_entities(self, ner_tags: List[int]) -> Iterator[Entity]:
         start_idx = None
         entity_label_id = None
@@ -119,5 +129,5 @@ class AutoLabelNormalizer:
             return LabelNormalizerBILOU(config)
         raise ValueError(
             "Data labeling scheme not recognized. Expected either IOB, IOB2, BIOES, BILOU "
-            "or no scheme (i.e. one label per class, no B-, I- scheme prefixes, etc.)"
+            "or no scheme (i.e. one label ID per class, no B-, I- label prefixes, etc.)"
         )
