@@ -80,3 +80,6 @@ Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf
 
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
+
+## License
+See [LICENSE] for the current license.
