@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
   
-  <title>SpanMarker :: SpanMarker for Named Entity Recognition</title>
+  <title>SpanMarker :: Loading &amp; Inferencing with SpanMarker</title>
   
   <link rel="index" title="Index" href="../genindex.html"/>
 
@@ -71,7 +71,9 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Notebooks</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_training.html">Initializing &amp; Training</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_configuration.html">Configurating</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
@@ -111,10 +113,10 @@
 <a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/model_loading.ipynb" target="_blank">
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
-</div><section id="SpanMarker-for-Named-Entity-Recognition">
-<h1>SpanMarker for Named Entity Recognition<a class="headerlink" href="#SpanMarker-for-Named-Entity-Recognition" title="Permalink to this heading">¶</a></h1>
+</div><section id="Loading-&amp;-Inferencing-with-SpanMarker">
+<h1>Loading &amp; Inferencing with SpanMarker<a class="headerlink" href="#Loading-&-Inferencing-with-SpanMarker" title="Permalink to this heading">¶</a></h1>
 <p><a class="reference external" href="github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
-<p>In this notebook, we’ll have a look at how to load a SpanMarker model from the hub for inference.</p>
+<p>In this short notebook, we’ll have a look at how to load a SpanMarker model from the hub for inference. For a larger and more general tutorial on how to use SpanMarker, please have a look at the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook.</p>
 <section id="Setup">
 <h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
 <p>First of all, the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module needs to be installed.</p>
@@ -129,7 +131,8 @@
 </section>
 <section id="Loading-the-Model">
 <h2>Loading the Model<a class="headerlink" href="#Loading-the-Model" title="Permalink to this heading">¶</a></h2>
-<p>We’re going to load the <a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super">tomaarsen/span-marker-bert-base-fewnerd-fine-super</a> model from the hub, which has previously been trained to 0.7020 Test F1 on the finegrained supervised FewNERD dataset. Note that we place it on the GPU with <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
+<p>We’re going to load the <a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super">tomaarsen/span-marker-bert-base-fewnerd-fine-super</a> model from the hub, which has previously been trained to 0.7020 Test F1 on the finegrained supervised <a class="reference external" href="https://huggingface.co/datasets/DFKI-SLT/few-nerd">FewNERD</a> dataset. We use <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a>
+for this. Note that we place it on the GPU with <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -141,7 +144,7 @@ model = SpanMarkerModel.from_pretrained(model_name).cuda()
 </pre></div>
 </div>
 </div>
-<p>Let’s try the model out with some predictions. For this we can use the <code class="docutils literal notranslate"><span class="pre">model.predict</span></code> method, which accepts either:</p>
+<p>Let’s try the model out with some predictions. For this we can use the <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict">model.predict</a> method, which accepts either:</p>
 <ul class="simple">
 <li><p>A sentence as a string.</p></li>
 <li><p>A tokenized sentence as a list of strings.</p></li>
@@ -210,7 +213,7 @@ Ann Arbor =&gt; location-GPE
 
 </pre></div></div>
 </div>
-<p>Feel free to compare this to the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook, which trains a simpler model using <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code> on coarse-grained FewNERD.</p>
+<p>Feel free to compare this to the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook, which trains a model using <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code> on the simpler coarse-grained FewNERD.</p>
 </section>
 </section>
 

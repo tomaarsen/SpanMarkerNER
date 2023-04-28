@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: Configuring SpanMarker</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_training.html">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Configurating</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <div class="open-in-colab__wrapper">
+<a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/model_configuration.ipynb" target="_blank">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
+</a>
+</div><section id="Configuring-SpanMarker">
+<h1>Configuring SpanMarker<a class="headerlink" href="#Configuring-SpanMarker" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
+<p>In this short notebook, we’ll have a look at how to configure a SpanMarker model for training. For a larger and more general tutorial on how to use SpanMarker, please have a look at the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook.</p>
+<section id="Configuring-SpanMarkerModel.from_pretrained">
+<h2>Configuring <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code><a class="headerlink" href="#Configuring-SpanMarkerModel.from_pretrained" title="Permalink to this heading">¶</a></h2>
+<p>The <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a> method is the go-to approach to initialize a new or pretrained SpanMarker model. We will consider these two cases separately here.</p>
+<section id="Initializing-a-new-model">
+<h3>Initializing a new model<a class="headerlink" href="#Initializing-a-new-model" title="Permalink to this heading">¶</a></h3>
+<p>A new model is initialized using a pretrained encoder, e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>. See <a class="reference internal" href="model_training.html#Initializing-a-SpanMarkerModel"><span class="std std-ref">Initializing &amp; Training</span></a> for details on valid encoders. Additionally, a new SpanMarker model <strong>must</strong> be initialized using a list of string labels. These labels can have the IOB, IOB2, BIOES or BILOU labeling scheme, or no scheme at all. For example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;B-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;B-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;I-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;B-LOC&quot;</span><span class="p">,</span> <span class="s2">&quot;I-LOC&quot;</span><span class="p">,</span> <span class="s2">&quot;B-MISC&quot;</span><span class="p">,</span> <span class="s2">&quot;I-MISC&quot;</span><span class="p">]</span>
+<span class="c1"># or depending on your dataset, you may have:</span>
+<span class="c1"># labels = [&quot;O&quot;, &quot;PER&quot;, &quot;ORG&quot;, &quot;LOC&quot;, &quot;MISC&quot;]</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Additionally, any keyword arguments passed to <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a> will be passed to:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig">SpanMarkerConfig</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/transformers/model_doc/auto#transformers.AutoConfig.from_pretrained">transformers.AutoConfig.from_pretrained</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/docs/transformers/model_doc/auto#transformers.AutoModel.from_pretrained">transformers.AutoModel.from_pretrained</a></p></li>
+<li><p><a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained">SpanMarkerTokenizer</a></p></li>
+</ul>
+<p>In particular, that first one is noteworthy. Its parameters (<code class="docutils literal notranslate"><span class="pre">model_max_length</span></code>, <code class="docutils literal notranslate"><span class="pre">marker_max_length</span></code> and <code class="docutils literal notranslate"><span class="pre">entity_max_length</span></code>) have large impacts on training &amp; inferencing speeds, as well as final performance.</p>
+</section>
+<section id="Initializing-a-pretrained-model">
+<h3>Initializing a pretrained model<a class="headerlink" href="#Initializing-a-pretrained-model" title="Permalink to this heading">¶</a></h3>
+<p>A pretrained model is initialized in the same way as a new model, but most of the valuable parameters will have already been set when the model was originally initialized, trained and saved. As a result, we do not need to specify the labels anymore. Beyond that, we need to be careful with providing configuration parameters that differ from the parameters used to train the model. We may degrade model performance otherwise.</p>
+<p>Loading a pretrained SpanMarker model usually looks like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="Configuring-🤗-TrainingArguments">
+<h2>Configuring 🤗 TrainingArguments<a class="headerlink" href="#Configuring-🤗-TrainingArguments" title="Permalink to this heading">¶</a></h2>
+<p>SpanMarker relies on the Hugging Face <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments">TrainingArguments</a>. As a result, online documentation or guides to optimize these training arguments for 🤗 Transformers tend to also apply for SpanMarker.</p>
+<p>The <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code> class is quite massive, and a bit overwhelming, so here are my recommendations of parameters to look at: * <code class="docutils literal notranslate"><span class="pre">learning_rate</span></code>: One of the most important parameters for training, values between 1e-5 and 5e-5 have performed well for me. * <code class="docutils literal notranslate"><span class="pre">per_device_train_batch_size</span></code> and <code class="docutils literal notranslate"><span class="pre">per_device_eval_batch_size</span></code>: Increasing them can boost training speed at the cost of memory. If you experience Out Of Memory exceptions, this is the first parameter to reduce. *
+<code class="docutils literal notranslate"><span class="pre">gradient_accumulation_steps</span></code>: Allows for reducing the batch size without changing the performance. * <code class="docutils literal notranslate"><span class="pre">bf16</span></code> or <code class="docutils literal notranslate"><span class="pre">fp16</span></code>: Mixed precision training - allows for notable speedups if your GPU supports it. * <code class="docutils literal notranslate"><span class="pre">dataloader_num_workers</span></code>: The default of 0 means that data will be loaded in the main process. Generally, this is notably slower (e.g. 30-40%) than using separate/multiple workers by increasing this number. Note, higher is not strictly better. Usually 2 or 4 is a nice common ground. *
+<code class="docutils literal notranslate"><span class="pre">evaluation_strategy</span></code> + <code class="docutils literal notranslate"><span class="pre">eval_steps</span></code>, <code class="docutils literal notranslate"><span class="pre">logging_strategy</span></code> + <code class="docutils literal notranslate"><span class="pre">logging_steps</span></code>, <code class="docutils literal notranslate"><span class="pre">save_strategy</span></code> + <code class="docutils literal notranslate"><span class="pre">save_steps</span></code>: Crucial for better tracking the model performance during training in exactly the way you want it. * <code class="docutils literal notranslate"><span class="pre">run_name</span></code>: Used in third party logging applications like (the recommended) <a class="reference external" href="https://wandb.ai">wandb</a>. This parameter allows for easier tracking which model is which.</p>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/notebooks/model_configuration.ipynb.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

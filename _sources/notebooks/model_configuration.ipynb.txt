@@ -1,0 +1,83 @@
+{
+ "cells": [
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "## Configuring SpanMarker\n",
+    "[SpanMarker](github.com/tomaarsen/SpanMarkerNER) is an accessible yet powerful Python module for training Named Entity Recognition models.\n",
+    "\n",
+    "In this short notebook, we'll have a look at how to configure a SpanMarker model for training. For a larger and more general tutorial on how to use SpanMarker, please have a look at the [Getting Started](getting_started.ipynb) notebook."
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Configuring `SpanMarkerModel.from_pretrained`\n",
+    "The [SpanMarkerModel.from_pretrained](https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained) method is the go-to approach to initialize a new or pretrained SpanMarker model. We will consider these two cases separately here.\n",
+    "\n",
+    "#### Initializing a new model\n",
+    "A new model is initialized using a pretrained encoder, e.g. `bert-base-cased`. See [Initializing & Training](model_training.ipynb#initializing-a-spanmarkermodel) for details on valid encoders. Additionally, a new SpanMarker model **must** be initialized using a list of string labels. These labels can have the IOB, IOB2, BIOES or BILOU labeling scheme, or no scheme at all. For example:\n",
+    "\n",
+    "```python\n",
+    "from span_marker import SpanMarkerModel\n",
+    "\n",
+    "model_name = \"bert-base-cased\"\n",
+    "labels = [\"O\", \"B-PER\", \"I-PER\", \"B-ORG\", \"I-ORG\", \"B-LOC\", \"I-LOC\", \"B-MISC\", \"I-MISC\"]\n",
+    "# or depending on your dataset, you may have:\n",
+    "# labels = [\"O\", \"PER\", \"ORG\", \"LOC\", \"MISC\"]\n",
+    "model = SpanMarkerModel.from_pretrained(model_name, labels=labels)\n",
+    "```\n",
+    "\n",
+    "Additionally, any keyword arguments passed to [SpanMarkerModel.from_pretrained](https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained) will be passed to:\n",
+    "\n",
+    "* [SpanMarkerConfig](https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig)\n",
+    "* [transformers.AutoConfig.from_pretrained](https://huggingface.co/docs/transformers/model_doc/auto#transformers.AutoConfig.from_pretrained)\n",
+    "* [transformers.AutoModel.from_pretrained](https://huggingface.co/docs/transformers/model_doc/auto#transformers.AutoModel.from_pretrained)\n",
+    "* [SpanMarkerTokenizer](https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained)\n",
+    "\n",
+    "In particular, that first one is noteworthy. Its parameters (`model_max_length`, `marker_max_length` and `entity_max_length`) have large impacts on training & inferencing speeds, as well as final performance.\n",
+    "\n",
+    "#### Initializing a pretrained model\n",
+    "A pretrained model is initialized in the same way as a new model, but most of the valuable parameters will have already been set when the model was originally initialized, trained and saved. As a result, we do not need to specify the labels anymore. Beyond that, we need to be careful with providing configuration parameters that differ from the parameters used to train the model. We may degrade model performance otherwise.\n",
+    "\n",
+    "Loading a pretrained SpanMarker model usually looks like this:\n",
+    "```python\n",
+    "from span_marker import SpanMarkerModel\n",
+    "\n",
+    "model_name = \"tomaarsen/span-marker-bert-base-fewnerd-fine-super\"\n",
+    "model = SpanMarkerModel.from_pretrained(model_name)\n",
+    "```"
+   ]
+  },
+  {
+   "attachments": {},
+   "cell_type": "markdown",
+   "metadata": {},
+   "source": [
+    "### Configuring 🤗 TrainingArguments\n",
+    "SpanMarker relies on the Hugging Face [TrainingArguments](https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments). As a result, online documentation or guides to optimize these training arguments for 🤗 Transformers tend to also apply for SpanMarker.\n",
+    "\n",
+    "The `TrainingArguments` class is quite massive, and a bit overwhelming, so here are my recommendations of parameters to look at:\n",
+    "* `learning_rate`: One of the most important parameters for training, values between 1e-5 and 5e-5 have performed well for me.\n",
+    "* `per_device_train_batch_size` and `per_device_eval_batch_size`: Increasing them can boost training speed at the cost of memory. If you experience Out Of Memory exceptions, this is the first parameter to reduce.\n",
+    "* `gradient_accumulation_steps`: Allows for reducing the batch size without changing the performance.\n",
+    "* `bf16` or `fp16`: Mixed precision training - allows for notable speedups if your GPU supports it.\n",
+    "* `dataloader_num_workers`: The default of 0 means that data will be loaded in the main process. Generally, this is notably slower (e.g. 30-40%) than using separate/multiple workers by increasing this number. Note, higher is not strictly better. Usually 2 or 4 is a nice common ground.\n",
+    "* `evaluation_strategy` + `eval_steps`, `logging_strategy` + `logging_steps`, `save_strategy` + `save_steps`: Crucial for better tracking the model performance during training in exactly the way you want it.\n",
+    "* `run_name`: Used in third party logging applications like (the recommended) [wandb](https://wandb.ai). This parameter allows for easier tracking which model is which."
+   ]
+  }
+ ],
+ "metadata": {
+  "language_info": {
+   "name": "python"
+  },
+  "orig_nbformat": 4
+ },
+ "nbformat": 4,
+ "nbformat_minor": 2
+}

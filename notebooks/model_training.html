@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: Initializing &amp; Training with SpanMarker</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_configuration.html">Configurating</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <div class="open-in-colab__wrapper">
+<a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/model_training.ipynb" target="_blank">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
+</a>
+</div><section id="Initializing-&amp;-Training-with-SpanMarker">
+<h1>Initializing &amp; Training with SpanMarker<a class="headerlink" href="#Initializing-&-Training-with-SpanMarker" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
+<p>In this short notebook, we’ll have a look at how to initialize and train an NER model using SpanMarker. For a larger and more general tutorial on how to use SpanMarker, please have a look at the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook.</p>
+<section id="Setup">
+<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
+<p>First of all, the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module needs to be installed. If we want to use <a class="reference external" href="https://wandb.ai/">Weights and Biases</a> for logging, we can install <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> using the <code class="docutils literal notranslate"><span class="pre">[wandb]</span></code> extra.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%pip install span_marker
+# %pip install span_marker[wandb]
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Loading-the-dataset">
+<h2>Loading the dataset<a class="headerlink" href="#Loading-the-dataset" title="Permalink to this heading">¶</a></h2>
+<p>For this example, we’ll load the commonly used <a class="reference external" href="https://huggingface.co/datasets/conll2003">CoNLL2003 dataset</a> from the Hugging Face hub using 🤗 Datasets.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from datasets import load_dataset
+
+dataset = load_dataset(&quot;conll2003&quot;)
+dataset
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+DatasetDict({
+    train: Dataset({
+        features: [&#39;id&#39;, &#39;tokens&#39;, &#39;pos_tags&#39;, &#39;chunk_tags&#39;, &#39;ner_tags&#39;],
+        num_rows: 14041
+    })
+    validation: Dataset({
+        features: [&#39;id&#39;, &#39;tokens&#39;, &#39;pos_tags&#39;, &#39;chunk_tags&#39;, &#39;ner_tags&#39;],
+        num_rows: 3250
+    })
+    test: Dataset({
+        features: [&#39;id&#39;, &#39;tokens&#39;, &#39;pos_tags&#39;, &#39;chunk_tags&#39;, &#39;ner_tags&#39;],
+        num_rows: 3453
+    })
+})
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>labels = dataset[&quot;train&quot;].features[&quot;ner_tags&quot;].feature.names
+labels
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;O&#39;, &#39;B-PER&#39;, &#39;I-PER&#39;, &#39;B-ORG&#39;, &#39;I-ORG&#39;, &#39;B-LOC&#39;, &#39;I-LOC&#39;, &#39;B-MISC&#39;, &#39;I-MISC&#39;]
+</pre></div></div>
+</div>
+<p>SpanMarker accepts any dataset as long as it has <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns. The <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> can be annotated using the IOB, IOB2, BIOES or BILOU labeling scheme, but also regular unschemed labels. This CoNLL dataset uses the common IOB or IOB2 labeling scheme, with PER, ORG, LOC and MISC labels.</p>
+</section>
+<section id="Initializing-a-SpanMarkerModel">
+<h2>Initializing a <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code><a class="headerlink" href="#Initializing-a-SpanMarkerModel" title="Permalink to this heading">¶</a></h2>
+<p>A SpanMarker model is initialized via <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a>. This method will be familiar to those who know 🤗 Transformers. It accepts either a path to a local model or the name of a model on the <a class="reference external" href="https://huggingface.co/models">Hugging Face Hub</a>.</p>
+<p>Importantly, the model can <em>either</em> be an encoder or an already trained and saved SpanMarker model. As we haven’t trained anything yet, we will use an encoder. To learn how to load and use a saved SpanMarker model, please have a look at the <a class="reference internal" href="model_loading.html"><span class="doc">Loading &amp; Inferencing</span></a> notebook.</p>
+<p>Reasonable options for encoders include BERT and RoBERTa, which means that the following are all good options:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://huggingface.co/prajjwal1/bert-tiny">prajjwal1/bert-tiny</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/prajjwal1/bert-mini">prajjwal1/bert-mini</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/prajjwal1/bert-small">prajjwal1/bert-small</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/prajjwal1/bert-medium">prajjwal1/bert-medium</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/bert-base-cased">bert-base-cased</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/bert-large-cased">bert-large-cased</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/roberta-base">roberta-base</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/roberta-large">roberta-large</a></p></li>
+</ul>
+<p>Not all encoders work though, they <strong>must</strong> allow for <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> as an input argument, which disqualifies DistilBERT, T5, DistilRoBERTa, ALBERT &amp; BART. Furthermore, using uncased models is generally not recommended, as the capitalisation can be very useful to find named entities.</p>
+<p>We’ll use <code class="docutils literal notranslate"><span class="pre">&quot;roberta-base&quot;</span></code> for this notebook. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import SpanMarkerModel
+
+model_name = &quot;roberta-base&quot;
+model = SpanMarkerModel.from_pretrained(
+    model_name,
+    labels=labels,
+    model_max_length=256,
+    entity_max_length=6,
+)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: [&#39;lm_head.dense.bias&#39;, &#39;lm_head.bias&#39;, &#39;lm_head.layer_norm.weight&#39;, &#39;lm_head.decoder.weight&#39;, &#39;lm_head.dense.weight&#39;, &#39;lm_head.layer_norm.bias&#39;]
+- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
+- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+</pre></div></div>
+</div>
+<p>For us, these warnings are expected, as we are initializing <code class="docutils literal notranslate"><span class="pre">BertModel</span></code> for a new task.</p>
+<p>Note that we provided <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a> with a list of our labels. This is required when training a new model. See <a class="reference internal" href="model_configuration.html"><span class="doc">Configuring</span></a> for more details and recommendations on configuration options.</p>
+</section>
+<section id="Training">
+<h2>Training<a class="headerlink" href="#Training" title="Permalink to this heading">¶</a></h2>
+<p>At this point, our model is already ready for training! We can import <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">TrainingArguments</a> directly from 🤗 Transformers as well as the SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. The <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> is a subclass of the 🤗 Transformers <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer">Trainer</a> that simplifies some tasks for you, but otherwise it works just like the regular <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>.</p>
+<p>This next snippet shows some reasonable defaults. Feel free to adjust the batch size to a lower value if you experience out of memory exceptions.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from transformers import TrainingArguments
+
+args = TrainingArguments(
+    output_dir=&quot;models/span-marker-roberta-base-conll03&quot;,
+    learning_rate=1e-5,
+    gradient_accumulation_steps=2,
+    per_device_train_batch_size=4,
+    per_device_eval_batch_size=4,
+    num_train_epochs=1,
+    evaluation_strategy=&quot;steps&quot;,
+    save_strategy=&quot;steps&quot;,
+    eval_steps=500,
+    push_to_hub=False,
+    logging_steps=50,
+    fp16=True,
+    warmup_ratio=0.1,
+)
+</pre></div>
+</div>
+</div>
+<p>Now we can create a SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> in the same way that you would initialize a 🤗 Transformers <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. We’ll train on a subsection of the data to save us some time. Amazingly, this <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> will automatically create logs using exactly the logging tools that you have installed. With other words, if you prefer logging with <a class="reference external" href="https://www.tensorflow.org/tensorboard">Tensorboard</a>, all that you have to do is install it.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import Trainer
+
+trainer = Trainer(
+    model=model,
+    args=args,
+    train_dataset=dataset[&quot;train&quot;],
+    eval_dataset=dataset[&quot;validation&quot;].select(range(2000)),
+)
+trainer.train()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+This SpanMarker model will ignore 0.097877% of all annotated entities in the train dataset. This is caused by the SpanMarkerModel maximum entity length of 6 words.
+These are the frequencies of the missed entities due to maximum entity length out of 23499 total entities:
+- 18 missed entities with 7 words (0.076599%)
+- 2 missed entities with 8 words (0.008511%)
+- 3 missed entities with 10 words (0.012767%)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+wandb version 0.15.0 is available!  To upgrade, please run:
+ $ pip install wandb --upgrade</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Tracking run with wandb version 0.14.0</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Run data is saved locally in <code>wandb\run-20230428_160736-klxbldeq</code></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+Syncing run <strong>woven-plasma-757</strong> to Weights & Biases (<a href='https://wandb.me/run' target="_blank">docs</a>)<br/></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<script type="application/vnd.jupyter.widget-view+json">{"model_id": "be3fbeb39544469eba6382d146d521fa", "version_major": 2, "version_minor": 0}</script></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;loss&#39;: 0.9477, &#39;learning_rate&#39;: 2.6519337016574586e-06, &#39;epoch&#39;: 0.03}
+{&#39;loss&#39;: 0.2025, &#39;learning_rate&#39;: 5.414364640883978e-06, &#39;epoch&#39;: 0.06}
+{&#39;loss&#39;: 0.1407, &#39;learning_rate&#39;: 8.176795580110498e-06, &#39;epoch&#39;: 0.08}
+{&#39;loss&#39;: 0.1291, &#39;learning_rate&#39;: 9.895126465144972e-06, &#39;epoch&#39;: 0.11}
+{&#39;loss&#39;: 0.0973, &#39;learning_rate&#39;: 9.58667489204195e-06, &#39;epoch&#39;: 0.14}
+{&#39;loss&#39;: 0.0737, &#39;learning_rate&#39;: 9.278223318938926e-06, &#39;epoch&#39;: 0.17}
+{&#39;loss&#39;: 0.0639, &#39;learning_rate&#39;: 8.969771745835904e-06, &#39;epoch&#39;: 0.19}
+{&#39;loss&#39;: 0.0539, &#39;learning_rate&#39;: 8.661320172732882e-06, &#39;epoch&#39;: 0.22}
+{&#39;loss&#39;: 0.0481, &#39;learning_rate&#39;: 8.352868599629858e-06, &#39;epoch&#39;: 0.25}
+{&#39;loss&#39;: 0.0489, &#39;learning_rate&#39;: 8.044417026526836e-06, &#39;epoch&#39;: 0.28}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+This SpanMarker model won&#39;t be able to predict 0.172563% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 6 words.
+These are the frequencies of the missed entities due to maximum entity length out of 3477 total entities:
+- 5 missed entities with 7 words (0.143802%)
+- 1 missed entities with 10 words (0.028760%)
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;eval_loss&#39;: 0.03809420391917229, &#39;eval_overall_precision&#39;: 0.8559068219633943, &#39;eval_overall_recall&#39;: 0.7527070529704419, &#39;eval_overall_f1&#39;: 0.8009965742759265, &#39;eval_overall_accuracy&#39;: 0.9548683524504692, &#39;eval_runtime&#39;: 13.4517, &#39;eval_samples_per_second&#39;: 153.661, &#39;eval_steps_per_second&#39;: 38.434, &#39;epoch&#39;: 0.28}
+{&#39;loss&#39;: 0.0379, &#39;learning_rate&#39;: 7.735965453423812e-06, &#39;epoch&#39;: 0.31}
+{&#39;loss&#39;: 0.039, &#39;learning_rate&#39;: 7.42751388032079e-06, &#39;epoch&#39;: 0.33}
+{&#39;loss&#39;: 0.0373, &#39;learning_rate&#39;: 7.119062307217768e-06, &#39;epoch&#39;: 0.36}
+{&#39;loss&#39;: 0.0362, &#39;learning_rate&#39;: 6.810610734114744e-06, &#39;epoch&#39;: 0.39}
+{&#39;loss&#39;: 0.0287, &#39;learning_rate&#39;: 6.502159161011722e-06, &#39;epoch&#39;: 0.42}
+{&#39;loss&#39;: 0.0283, &#39;learning_rate&#39;: 6.193707587908698e-06, &#39;epoch&#39;: 0.44}
+{&#39;loss&#39;: 0.0308, &#39;learning_rate&#39;: 5.885256014805676e-06, &#39;epoch&#39;: 0.47}
+{&#39;loss&#39;: 0.0266, &#39;learning_rate&#39;: 5.576804441702654e-06, &#39;epoch&#39;: 0.5}
+{&#39;loss&#39;: 0.0193, &#39;learning_rate&#39;: 5.26835286859963e-06, &#39;epoch&#39;: 0.53}
+{&#39;loss&#39;: 0.0163, &#39;learning_rate&#39;: 4.959901295496608e-06, &#39;epoch&#39;: 0.55}
+{&#39;eval_loss&#39;: 0.018327122554183006, &#39;eval_overall_precision&#39;: 0.9140995260663507, &#39;eval_overall_recall&#39;: 0.9031314018144572, &#39;eval_overall_f1&#39;: 0.9085823641984395, &#39;eval_overall_accuracy&#39;: 0.9804157977059437, &#39;eval_runtime&#39;: 13.537, &#39;eval_samples_per_second&#39;: 152.693, &#39;eval_steps_per_second&#39;: 38.192, &#39;epoch&#39;: 0.55}
+{&#39;loss&#39;: 0.0249, &#39;learning_rate&#39;: 4.651449722393585e-06, &#39;epoch&#39;: 0.58}
+{&#39;loss&#39;: 0.0225, &#39;learning_rate&#39;: 4.342998149290562e-06, &#39;epoch&#39;: 0.61}
+{&#39;loss&#39;: 0.0215, &#39;learning_rate&#39;: 4.0345465761875395e-06, &#39;epoch&#39;: 0.64}
+{&#39;loss&#39;: 0.0251, &#39;learning_rate&#39;: 3.726095003084516e-06, &#39;epoch&#39;: 0.67}
+{&#39;loss&#39;: 0.0186, &#39;learning_rate&#39;: 3.417643429981493e-06, &#39;epoch&#39;: 0.69}
+{&#39;loss&#39;: 0.0212, &#39;learning_rate&#39;: 3.10919185687847e-06, &#39;epoch&#39;: 0.72}
+{&#39;loss&#39;: 0.0166, &#39;learning_rate&#39;: 2.800740283775448e-06, &#39;epoch&#39;: 0.75}
+{&#39;loss&#39;: 0.0226, &#39;learning_rate&#39;: 2.492288710672425e-06, &#39;epoch&#39;: 0.78}
+{&#39;loss&#39;: 0.0162, &#39;learning_rate&#39;: 2.183837137569402e-06, &#39;epoch&#39;: 0.8}
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Loading cached processed dataset at ...
+Loading cached processed dataset at ...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;loss&#39;: 0.0178, &#39;learning_rate&#39;: 1.8753855644663791e-06, &#39;epoch&#39;: 0.83}
+{&#39;eval_loss&#39;: 0.013812492601573467, &#39;eval_overall_precision&#39;: 0.9375370041444642, &#39;eval_overall_recall&#39;: 0.9268364062042728, &#39;eval_overall_f1&#39;: 0.9321559970566594, &#39;eval_overall_accuracy&#39;: 0.9858902502606882, &#39;eval_runtime&#39;: 13.6173, &#39;eval_samples_per_second&#39;: 151.793, &#39;eval_steps_per_second&#39;: 37.967, &#39;epoch&#39;: 0.83}
+{&#39;loss&#39;: 0.017, &#39;learning_rate&#39;: 1.566933991363356e-06, &#39;epoch&#39;: 0.86}
+{&#39;loss&#39;: 0.0164, &#39;learning_rate&#39;: 1.2584824182603333e-06, &#39;epoch&#39;: 0.89}
+{&#39;loss&#39;: 0.0202, &#39;learning_rate&#39;: 9.500308451573104e-07, &#39;epoch&#39;: 0.92}
+{&#39;loss&#39;: 0.0203, &#39;learning_rate&#39;: 6.415792720542875e-07, &#39;epoch&#39;: 0.94}
+{&#39;loss&#39;: 0.0188, &#39;learning_rate&#39;: 3.3312769895126467e-07, &#39;epoch&#39;: 0.97}
+{&#39;loss&#39;: 0.0175, &#39;learning_rate&#39;: 2.4676125848241828e-08, &#39;epoch&#39;: 1.0}
+{&#39;train_runtime&#39;: 326.1576, &#39;train_samples_per_second&#39;: 44.193, &#39;train_steps_per_second&#39;: 5.525, &#39;train_loss&#39;: 0.06725485075976323, &#39;epoch&#39;: 1.0}
+</pre></div></div>
+</div>
+<p>And now the final step is to compute the model’s performance.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>metrics = trainer.evaluate()
+metrics
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+Loading cached processed dataset at ...
+Loading cached processed dataset at ...
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;eval_loss&#39;: 0.01344103179872036,
+ &#39;eval_overall_precision&#39;: 0.9364892678623934,
+ &#39;eval_overall_recall&#39;: 0.9321041849575651,
+ &#39;eval_overall_f1&#39;: 0.9342915811088296,
+ &#39;eval_overall_accuracy&#39;: 0.9861183524504692,
+ &#39;eval_runtime&#39;: 13.1532,
+ &#39;eval_samples_per_second&#39;: 157.148,
+ &#39;eval_steps_per_second&#39;: 39.306,
+ &#39;epoch&#39;: 1.0}
+</pre></div></div>
+</div>
+<p>Additionally, we should evaluate using the test set.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>trainer.evaluate(dataset[&quot;test&quot;], metric_key_prefix=&quot;test&quot;)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;test_loss&#39;: 0.027700792998075485,
+ &#39;test_overall_precision&#39;: 0.9039692701664532,
+ &#39;test_overall_recall&#39;: 0.9067889908256881,
+ &#39;test_overall_f1&#39;: 0.9053769350554182,
+ &#39;test_overall_accuracy&#39;: 0.9796867082332724,
+ &#39;test_runtime&#39;: 22.7367,
+ &#39;test_samples_per_second&#39;: 155.915,
+ &#39;test_steps_per_second&#39;: 39.012,
+ &#39;epoch&#39;: 1.0}
+</pre></div></div>
+</div>
+<p>Once trained, we can save our new model locally.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>trainer.save_model(&quot;models/span-marker-roberta-base-conll03/checkpoint-final&quot;)
+</pre></div>
+</div>
+</div>
+<p>Or we can push it to the 🤗 Hub like so. I’ve commented it away for now to prevent people from accidentally pushing models.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># trainer.push_to_hub()
+</pre></div>
+</div>
+</div>
+<p>If we want to use it again, we can just load it using the checkpoint or using the model name on the Hub. This is how it would be done using a local checkpoint. See the <a class="reference internal" href="model_loading.html"><span class="doc">Loading &amp; Inferencing</span></a> notebook for more details.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># model = SpanMarkerModel.from_pretrained(&quot;models/span-marker-roberta-base-conll03/checkpoint-final&quot;)
+</pre></div>
+</div>
+</div>
+<p>That was all! As simple as that. If we put it all together into a single script, it looks something like this:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
+
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;conll2003&quot;</span><span class="p">)</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">names</span>
+
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;roberta-base&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+
+<span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/span-marker-roberta-base-conll03&quot;</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">save_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+    <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8000</span><span class="p">)),</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span>
+<span class="p">)</span>
+
+<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;models/span-marker-roberta-base-conll03/checkpoint-final&quot;</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">()</span>
+
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>With <code class="docutils literal notranslate"><span class="pre">wandb</span></code> initialized, you can enjoy their very useful training graphs straight in your browser. It ends up looking something like this. <img alt="image" src="https://user-images.githubusercontent.com/37621491/235172501-a3cdae91-faf0-42b7-ac60-e6738b78e67e.png" /> <img alt="image1" src="https://user-images.githubusercontent.com/37621491/235172726-795ded55-4b1c-40fa-ab91-476762f7dd57.png" /></p>
+<p>Furthermore, you can use the <code class="docutils literal notranslate"><span class="pre">wandb</span></code> hyperparameter search functionality using the tutorial from the Hugging Face documentation <a class="reference external" href="https://huggingface.co/docs/transformers/hpo_train">here</a>. This transfers very well to the SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>.</p>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/notebooks/model_training.ipynb.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>
