@@ -26,6 +26,10 @@ pip install span_marker
 ## Quick Start
 Please have a look at our [Getting Started](notebooks/getting_started.ipynb) notebook for details on how SpanMarker is commonly used. It explains the following snippet in more detail.
 
+| Colab                                                                                                                                                                                                         | Kaggle                                                                                                                                                                                                             | Gradient                                                                                                                                                                                         | Studio Lab                                                                                                                                                                                                             |
+|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Gradient](https://assets.paperspace.io/img/gradient-badge.svg)](https://console.paperspace.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Open In SageMaker Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       |
+
 ```python
 from datasets import load_dataset
 from span_marker import SpanMarkerModel, Trainer
@@ -50,7 +54,7 @@ def main():
         logging_steps=50,
         fp16=True,
         warmup_ratio=0.1,
-        dataloader_num_workers=1,
+        dataloader_num_workers=2,
     )
 
     trainer = Trainer(

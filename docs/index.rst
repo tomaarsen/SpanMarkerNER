@@ -125,7 +125,6 @@ To the 🤗 Hub
 .. toctree::
    :maxdepth: 2
    :caption: Documentation
-   :hidden:
    :titlesonly:
 
    Notebooks <notebooks/index>

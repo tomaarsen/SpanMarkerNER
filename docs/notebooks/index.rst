@@ -6,4 +6,6 @@ Usage Notebooks
     :maxdepth: 1
 
     Getting Started <getting_started.ipynb>
+    Initializing & Training <model_training.ipynb>
     Loading & Inferencing <model_loading.ipynb>
+    Configurating <model_configuration.ipynb>
