@@ -246,7 +246,7 @@ print(fine_labels)
 <p>A SpanMarker model is initialized via <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a>. This method will be familiar to those who know 🤗 Transformers. It accepts either a path to a local model or the name of a model on the <a class="reference external" href="https://huggingface.co/models">Hugging Face Hub</a>.</p>
 <p>Importantly, the model can <em>either</em> be an encoder or an already trained and saved SpanMarker model. As we haven’t trained anything yet, we will use an encoder. To learn how to load and use a saved SpanMarker model, please have a look at the <a class="reference internal" href="model_loading.html"><span class="doc">Loading &amp; Inferencing</span></a> notebook.</p>
 <p>Reasonable options for encoders include BERT, RoBERTa, etc., which means that the following are all good options: <code class="docutils literal notranslate"><span class="pre">&quot;bert-base-cased&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;bert-large-cased&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;roberta-base&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;roberta-large&quot;</span></code>. Not all encoders work though, they <strong>must</strong> allow for <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> as an input argument, which disqualifies DistilBERT, T5, DistilRoBERTa, ALBERT &amp; BART. Furthermore, using uncased models is generally not recommended, as the capitalisation can be very useful to find named entities.</p>
-<p>We’ll use <code class="docutils literal notranslate"><span class="pre">&quot;bert-base-cased&quot;</span></code> for this notebook. Note that we ensure that the model is placed on the GPU with <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
+<p>We’ll use <code class="docutils literal notranslate"><span class="pre">&quot;bert-base-cased&quot;</span></code> for this notebook. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
@@ -254,7 +254,7 @@ print(fine_labels)
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import SpanMarkerModel
 
 model_name = &quot;bert-base-cased&quot;
-model = SpanMarkerModel.from_pretrained(model_name, labels=labels, model_max_length=256).cuda()
+model = SpanMarkerModel.from_pretrained(model_name, labels=labels, model_max_length=256)
 </pre></div>
 </div>
 </div>
