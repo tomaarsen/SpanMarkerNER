@@ -48,7 +48,8 @@ docs = [
     "better-apidoc",
     "nbsphinx",
     "nbconvert<7",
-    "pandoc<3"
+    "pandoc<3",
+    "ipython"
 ]
 wandb = [
     "wandb"
