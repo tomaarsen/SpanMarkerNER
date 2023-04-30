@@ -45,24 +45,24 @@
    "metadata": {},
    "outputs": [
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "100%|██████████| 3359329/3359329 [00:09<00:00, 342056.99it/s]\n"
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "100%|██████████| 482037/482037 [00:01<00:00, 346172.32it/s]\n"
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
-      "100%|██████████| 958765/958765 [00:02<00:00, 346564.24it/s]"
+      "100%|██████████| 958765/958765 [00:02<00:00, 346564.24it/s]\n"
      ]
     },
     {
@@ -73,8 +73,9 @@
      ]
     },
     {
-     "data": {
-      "text/plain": [
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
        "DatasetDict({\n",
        "    train: Dataset({\n",
        "        features: ['id', 'tokens', 'ner_tags', 'fine_ner_tags'],\n",
@@ -89,11 +90,7 @@
        "        num_rows: 37648\n",
        "    })\n",
        "})"
-      ]
-     },
-     "execution_count": 2,
-     "metadata": {},
-     "output_type": "execute_result"
+     ]
     }
    ],
    "source": [
@@ -204,7 +201,7 @@
    "metadata": {},
    "outputs": [
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Some weights of the model checkpoint at bert-base-cased were not used when initializing BertModel: ['cls.seq_relationship.bias', 'cls.predictions.transform.LayerNorm.weight', 'cls.predictions.decoder.weight', 'cls.predictions.transform.LayerNorm.bias', 'cls.predictions.bias', 'cls.seq_relationship.weight', 'cls.predictions.transform.dense.weight', 'cls.predictions.transform.dense.bias']\n",
@@ -307,7 +304,7 @@
    "metadata": {},
    "outputs": [
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "This SpanMarker model will ignore 0.339050% of all annotated entities in the train dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.\n",
@@ -319,44 +316,11 @@
       "- 5 missed entities with 13 words (0.024569%)\n",
       "- 2 missed entities with 15 words (0.009828%)\n",
       "- 1 missed entities with 17 words (0.004914%)\n",
-      "- 1 missed entities with 19 words (0.004914%)\n"
+      "- 1 missed entities with 19 words (0.004914%)\n",
+	  "Tracking run with wandb version 0.14.0\n",
+	  "Run data is saved locally in ...\n",
+	  "Syncing run colorful-leaf-761 to Weights & Biases\n"
      ]
-    },
-    {
-     "data": {
-      "text/html": [
-       "Tracking run with wandb version 0.14.0"
-      ],
-      "text/plain": [
-       "<IPython.core.display.HTML object>"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
-     "data": {
-      "text/html": [
-       "Run data is saved locally in <code>...</code>"
-      ],
-      "text/plain": [
-       "<IPython.core.display.HTML object>"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
-    },
-    {
-     "data": {
-      "text/html": [
-       "Syncing run <strong>colorful-leaf-761</strong> to Weights & Biases (<a href='https://wandb.me/run' target=\"_blank\">docs</a>)<br/>"
-      ],
-      "text/plain": [
-       "<IPython.core.display.HTML object>"
-      ]
-     },
-     "metadata": {},
-     "output_type": "display_data"
     },
     {
      "name": "stdout",
@@ -369,7 +333,7 @@
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "This SpanMarker model won't be able to predict 0.307515% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.\n",
@@ -392,7 +356,7 @@
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Loading cached processed dataset at ...\n",
@@ -428,7 +392,7 @@
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Loading cached processed dataset at ...\n",
@@ -453,7 +417,7 @@
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Loading cached processed dataset at ...\n",
@@ -478,7 +442,7 @@
      ]
     },
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Loading cached processed dataset at ...\n",
@@ -497,18 +461,9 @@
      "output_type": "stream",
      "text": [
       "{'eval_loss': 0.019159900024533272, 'eval_overall_precision': 0.7773279352226721, 'eval_overall_recall': 0.7774778249132279, 'eval_overall_f1': 0.7774028728429576, 'eval_overall_accuracy': 0.9399702095533473, 'eval_runtime': 28.0225, 'eval_samples_per_second': 87.394, 'eval_steps_per_second': 21.875, 'epoch': 0.98}\n",
-      "{'train_runtime': 453.1296, 'train_samples_per_second': 21.667, 'train_steps_per_second': 2.708, 'train_loss': 0.06319850289734186, 'epoch': 1.0}\n"
+      "{'train_runtime': 453.1296, 'train_samples_per_second': 21.667, 'train_steps_per_second': 2.708, 'train_loss': 0.06319850289734186, 'epoch': 1.0}\n",
+	  "TrainOutput(global_step=1227, training_loss=0.06319850289734186, metrics={'train_runtime': 453.1296, 'train_samples_per_second': 21.667, 'train_steps_per_second': 2.708, 'train_loss': 0.06319850289734186, 'epoch': 1.0})"
      ]
-    },
-    {
-     "data": {
-      "text/plain": [
-       "TrainOutput(global_step=1227, training_loss=0.06319850289734186, metrics={'train_runtime': 453.1296, 'train_samples_per_second': 21.667, 'train_steps_per_second': 2.708, 'train_loss': 0.06319850289734186, 'epoch': 1.0})"
-      ]
-     },
-     "execution_count": 9,
-     "metadata": {},
-     "output_type": "execute_result"
     }
    ],
    "source": [
@@ -529,16 +484,11 @@
    "metadata": {},
    "outputs": [
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "Loading cached processed dataset at ...\n",
-      "Loading cached processed dataset at ...\n"
-     ]
-    },
-    {
-     "data": {
-      "text/plain": [
+      "Loading cached processed dataset at ...\n",
        "{'eval_loss': 0.019206691533327103,\n",
        " 'eval_overall_precision': 0.7758985200845666,\n",
        " 'eval_overall_recall': 0.7784419591207096,\n",
@@ -548,11 +498,7 @@
        " 'eval_samples_per_second': 87.2,\n",
        " 'eval_steps_per_second': 21.827,\n",
        " 'epoch': 1.0}"
-      ]
-     },
-     "execution_count": 10,
-     "metadata": {},
-     "output_type": "execute_result"
+     ]
     }
    ],
    "source": [
@@ -574,7 +520,7 @@
    "metadata": {},
    "outputs": [
     {
-     "name": "stderr",
+     "name": "stdout",
      "output_type": "stream",
      "text": [
       "This SpanMarker model won't be able to predict 0.285605% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.\n",
@@ -586,12 +532,7 @@
       "- 1 missed entities with 13 words (0.019040%)\n",
       "- 1 missed entities with 17 words (0.019040%)\n",
       "- 1 missed entities with 19 words (0.019040%)\n",
-      "- 1 missed entities with 40 words (0.019040%)\n"
-     ]
-    },
-    {
-     "data": {
-      "text/plain": [
+      "- 1 missed entities with 40 words (0.019040%)\n",
        "{'test_loss': 0.019189156591892242,\n",
        " 'test_overall_precision': 0.769879287219774,\n",
        " 'test_overall_recall': 0.7679663608562691,\n",
@@ -601,11 +542,7 @@
        " 'test_samples_per_second': 86.854,\n",
        " 'test_steps_per_second': 21.713,\n",
        " 'epoch': 1.0}"
-      ]
-     },
-     "execution_count": 11,
-     "metadata": {},
-     "output_type": "execute_result"
+     ]
     }
    ],
    "source": [

@@ -124,8 +124,8 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%pip install span_marker
-# %pip install span_marker[wandb]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install span_marker
+<span class="c1"># %pip install span_marker[wandb]</span>
 </pre></div>
 </div>
 </div>
@@ -137,37 +137,22 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from datasets import load_dataset
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
-dataset = load_dataset(&quot;DFKI-SLT/few-nerd&quot;, &quot;supervised&quot;)
-dataset
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;DFKI-SLT/few-nerd&quot;</span><span class="p">,</span> <span class="s2">&quot;supervised&quot;</span><span class="p">)</span>
+<span class="n">dataset</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
 100%|██████████| 3359329/3359329 [00:09&lt;00:00, 342056.99it/s]
 100%|██████████| 482037/482037 [00:01&lt;00:00, 346172.32it/s]
 100%|██████████| 958765/958765 [00:02&lt;00:00, 346564.24it/s]
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 Dataset few-nerd downloaded and prepared to .... Subsequent calls will reuse this data.
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 DatasetDict({
     train: Dataset({
         features: [&#39;id&#39;, &#39;tokens&#39;, &#39;ner_tags&#39;, &#39;fine_ner_tags&#39;],
@@ -189,8 +174,8 @@ DatasetDict({
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>for sample in dataset[&quot;train&quot;].select(range(3)):
-    print(sample)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">sample</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -209,8 +194,8 @@ DatasetDict({
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>labels = dataset[&quot;train&quot;].features[&quot;ner_tags&quot;].feature.names
-print(labels)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">names</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -226,8 +211,8 @@ print(labels)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>fine_labels = dataset[&quot;train&quot;].features[&quot;fine_ner_tags&quot;].feature.names
-print(fine_labels)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">fine_labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">&quot;fine_ner_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">names</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">fine_labels</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -251,17 +236,17 @@ print(fine_labels)
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import SpanMarkerModel
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
-model_name = &quot;bert-base-cased&quot;
-model = SpanMarkerModel.from_pretrained(model_name, labels=labels, model_max_length=256)
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
 Some weights of the model checkpoint at bert-base-cased were not used when initializing BertModel: [&#39;cls.seq_relationship.bias&#39;, &#39;cls.predictions.transform.LayerNorm.weight&#39;, &#39;cls.predictions.decoder.weight&#39;, &#39;cls.predictions.transform.LayerNorm.bias&#39;, &#39;cls.predictions.bias&#39;, &#39;cls.seq_relationship.weight&#39;, &#39;cls.predictions.transform.dense.weight&#39;, &#39;cls.predictions.transform.dense.bias&#39;]
 - This IS expected if you are initializing BertModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
@@ -283,23 +268,23 @@ Some weights of the model checkpoint at bert-base-cased were not used when initi
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from transformers import TrainingArguments
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
 
-args = TrainingArguments(
-    output_dir=&quot;models/span-marker-bert-base-fewnerd-coarse-super&quot;,
-    learning_rate=5e-5,
-    gradient_accumulation_steps=2,
-    per_device_train_batch_size=4,
-    per_device_eval_batch_size=4,
-    num_train_epochs=1,
-    evaluation_strategy=&quot;steps&quot;,
-    save_strategy=&quot;steps&quot;,
-    eval_steps=200,
-    push_to_hub=False,
-    logging_steps=50,
-    warmup_ratio=0.1,
-    dataloader_num_workers=2,
-)
+<span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/span-marker-bert-base-fewnerd-coarse-super&quot;</span><span class="p">,</span>
+    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">5e-5</span><span class="p">,</span>
+    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">save_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+    <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="n">dataloader_num_workers</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -308,14 +293,14 @@ args = TrainingArguments(
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import Trainer
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">Trainer</span>
 
-trainer = Trainer(
-    model=model,
-    args=args,
-    train_dataset=dataset[&quot;train&quot;].select(range(8000)),
-    eval_dataset=dataset[&quot;validation&quot;].select(range(2000)),
-)
+<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8000</span><span class="p">)),</span>
+    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span>
+<span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -324,14 +309,14 @@ trainer = Trainer(
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>trainer.train()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
 This SpanMarker model will ignore 0.339050% of all annotated entities in the train dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.
 These are the frequencies of the missed entities due to maximum entity length out of 20351 total entities:
@@ -343,42 +328,13 @@ These are the frequencies of the missed entities due to maximum entity length ou
 - 2 missed entities with 15 words (0.009828%)
 - 1 missed entities with 17 words (0.004914%)
 - 1 missed entities with 19 words (0.004914%)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Tracking run with wandb version 0.14.0</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Run data is saved locally in <code>...</code></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Syncing run <strong>colorful-leaf-761</strong> to Weights & Biases (<a href='https://wandb.me/run' target="_blank">docs</a>)<br/></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
+Tracking run with wandb version 0.14.0
+Run data is saved locally in ...
+Syncing run colorful-leaf-761 to Weights &amp; Biases
 {&#39;loss&#39;: 0.9012, &#39;learning_rate&#39;: 2.032520325203252e-05, &#39;epoch&#39;: 0.04}
 {&#39;loss&#39;: 0.0813, &#39;learning_rate&#39;: 4.065040650406504e-05, &#39;epoch&#39;: 0.08}
 {&#39;loss&#39;: 0.0514, &#39;learning_rate&#39;: 4.8777173913043476e-05, &#39;epoch&#39;: 0.12}
 {&#39;loss&#39;: 0.0385, &#39;learning_rate&#39;: 4.651268115942029e-05, &#39;epoch&#39;: 0.16}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
 This SpanMarker model won&#39;t be able to predict 0.307515% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.
 These are the frequencies of the missed entities due to maximum entity length out of 5203 total entities:
 - 5 missed entities with 9 words (0.096098%)
@@ -386,33 +342,12 @@ These are the frequencies of the missed entities due to maximum entity length ou
 - 2 missed entities with 11 words (0.038439%)
 - 1 missed entities with 12 words (0.019220%)
 - 3 missed entities with 13 words (0.057659%)
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;eval_loss&#39;: 0.03596973791718483, &#39;eval_overall_precision&#39;: 0.6802749427202666, &#39;eval_overall_recall&#39;: 0.6297724643270344, &#39;eval_overall_f1&#39;: 0.6540502653449485, &#39;eval_overall_accuracy&#39;: 0.9053643208390295, &#39;eval_runtime&#39;: 28.0718, &#39;eval_samples_per_second&#39;: 87.241, &#39;eval_steps_per_second&#39;: 21.837, &#39;epoch&#39;: 0.16}
 {&#39;loss&#39;: 0.0334, &#39;learning_rate&#39;: 4.42481884057971e-05, &#39;epoch&#39;: 0.2}
 {&#39;loss&#39;: 0.0306, &#39;learning_rate&#39;: 4.1983695652173914e-05, &#39;epoch&#39;: 0.24}
 {&#39;loss&#39;: 0.0278, &#39;learning_rate&#39;: 3.971920289855073e-05, &#39;epoch&#39;: 0.29}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
 Loading cached processed dataset at ...
 Loading cached processed dataset at ...
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;loss&#39;: 0.0245, &#39;learning_rate&#39;: 3.745471014492754e-05, &#39;epoch&#39;: 0.33}
 {&#39;eval_loss&#39;: 0.023754317313432693, &#39;eval_overall_precision&#39;: 0.7612159329140461, &#39;eval_overall_recall&#39;: 0.700154261473197, &#39;eval_overall_f1&#39;: 0.7294094013660104, &#39;eval_overall_accuracy&#39;: 0.9214634046807729, &#39;eval_runtime&#39;: 28.2374, &#39;eval_samples_per_second&#39;: 86.729, &#39;eval_steps_per_second&#39;: 21.709, &#39;epoch&#39;: 0.33}
 {&#39;loss&#39;: 0.0257, &#39;learning_rate&#39;: 3.5190217391304346e-05, &#39;epoch&#39;: 0.37}
@@ -423,75 +358,25 @@ Loading cached processed dataset at ...
 {&#39;loss&#39;: 0.021, &#39;learning_rate&#39;: 2.6132246376811598e-05, &#39;epoch&#39;: 0.53}
 {&#39;loss&#39;: 0.02, &#39;learning_rate&#39;: 2.3867753623188408e-05, &#39;epoch&#39;: 0.57}
 {&#39;loss&#39;: 0.022, &#39;learning_rate&#39;: 2.1603260869565217e-05, &#39;epoch&#39;: 0.61}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
 Loading cached processed dataset at ...
 Loading cached processed dataset at ...
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;loss&#39;: 0.0237, &#39;learning_rate&#39;: 1.933876811594203e-05, &#39;epoch&#39;: 0.65}
 {&#39;eval_loss&#39;: 0.020754070952534676, &#39;eval_overall_precision&#39;: 0.7628806742003448, &#39;eval_overall_recall&#39;: 0.7680293096799075, &#39;eval_overall_f1&#39;: 0.7654463341981359, &#39;eval_overall_accuracy&#39;: 0.9358077087881818, &#39;eval_runtime&#39;: 28.0953, &#39;eval_samples_per_second&#39;: 87.168, &#39;eval_steps_per_second&#39;: 21.819, &#39;epoch&#39;: 0.65}
 {&#39;loss&#39;: 0.0226, &#39;learning_rate&#39;: 1.7074275362318843e-05, &#39;epoch&#39;: 0.69}
 {&#39;loss&#39;: 0.0218, &#39;learning_rate&#39;: 1.4809782608695653e-05, &#39;epoch&#39;: 0.73}
 {&#39;loss&#39;: 0.0242, &#39;learning_rate&#39;: 1.2545289855072464e-05, &#39;epoch&#39;: 0.77}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
 Loading cached processed dataset at ...
 Loading cached processed dataset at ...
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;loss&#39;: 0.0197, &#39;learning_rate&#39;: 1.0280797101449275e-05, &#39;epoch&#39;: 0.81}
 {&#39;eval_loss&#39;: 0.019617434591054916, &#39;eval_overall_precision&#39;: 0.7771473292897672, &#39;eval_overall_recall&#39;: 0.7659082144234477, &#39;eval_overall_f1&#39;: 0.7714868408274256, &#39;eval_overall_accuracy&#39;: 0.937746128262156, &#39;eval_runtime&#39;: 28.2921, &#39;eval_samples_per_second&#39;: 86.561, &#39;eval_steps_per_second&#39;: 21.667, &#39;epoch&#39;: 0.81}
 {&#39;loss&#39;: 0.0191, &#39;learning_rate&#39;: 8.016304347826086e-06, &#39;epoch&#39;: 0.86}
 {&#39;loss&#39;: 0.0187, &#39;learning_rate&#39;: 5.751811594202898e-06, &#39;epoch&#39;: 0.9}
 {&#39;loss&#39;: 0.0202, &#39;learning_rate&#39;: 3.4873188405797104e-06, &#39;epoch&#39;: 0.94}
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
 Loading cached processed dataset at ...
 Loading cached processed dataset at ...
-</pre></div></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;loss&#39;: 0.0221, &#39;learning_rate&#39;: 1.2228260869565218e-06, &#39;epoch&#39;: 0.98}
 {&#39;eval_loss&#39;: 0.019159900024533272, &#39;eval_overall_precision&#39;: 0.7773279352226721, &#39;eval_overall_recall&#39;: 0.7774778249132279, &#39;eval_overall_f1&#39;: 0.7774028728429576, &#39;eval_overall_accuracy&#39;: 0.9399702095533473, &#39;eval_runtime&#39;: 28.0225, &#39;eval_samples_per_second&#39;: 87.394, &#39;eval_steps_per_second&#39;: 21.875, &#39;epoch&#39;: 0.98}
 {&#39;train_runtime&#39;: 453.1296, &#39;train_samples_per_second&#39;: 21.667, &#39;train_steps_per_second&#39;: 2.708, &#39;train_loss&#39;: 0.06319850289734186, &#39;epoch&#39;: 1.0}
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 TrainOutput(global_step=1227, training_loss=0.06319850289734186, metrics={&#39;train_runtime&#39;: 453.1296, &#39;train_samples_per_second&#39;: 21.667, &#39;train_steps_per_second&#39;: 2.708, &#39;train_loss&#39;: 0.06319850289734186, &#39;epoch&#39;: 1.0})
 </pre></div></div>
 </div>
@@ -500,26 +385,18 @@ TrainOutput(global_step=1227, training_loss=0.06319850289734186, metrics={&#39;t
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>metrics = trainer.evaluate()
-metrics
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+<span class="n">metrics</span>
 </pre></div>
 </div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Loading cached processed dataset at ...
-Loading cached processed dataset at ...
-</pre></div></div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
-</pre></div>
+<div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
+Loading cached processed dataset at ...
+Loading cached processed dataset at ...
 {&#39;eval_loss&#39;: 0.019206691533327103,
  &#39;eval_overall_precision&#39;: 0.7758985200845666,
  &#39;eval_overall_recall&#39;: 0.7784419591207096,
@@ -536,14 +413,14 @@ Loading cached processed dataset at ...
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>trainer.evaluate(dataset[&quot;test&quot;].select(range(2000)), metric_key_prefix=&quot;test&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span> <span class="n">metric_key_prefix</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
+<div class="nboutput nblast docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area stderr docutils container">
+<div class="output_area docutils container">
 <div class="highlight"><pre>
 This SpanMarker model won&#39;t be able to predict 0.285605% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 8 words.
 These are the frequencies of the missed entities due to maximum entity length out of 5252 total entities:
@@ -555,14 +432,6 @@ These are the frequencies of the missed entities due to maximum entity length ou
 - 1 missed entities with 17 words (0.019040%)
 - 1 missed entities with 19 words (0.019040%)
 - 1 missed entities with 40 words (0.019040%)
-</pre></div></div>
-</div>
-<div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
-</pre></div>
-</div>
-<div class="output_area docutils container">
-<div class="highlight"><pre>
 {&#39;test_loss&#39;: 0.019189156591892242,
  &#39;test_overall_precision&#39;: 0.769879287219774,
  &#39;test_overall_recall&#39;: 0.7679663608562691,
@@ -593,19 +462,19 @@ These are the frequencies of the missed entities due to maximum entity length ou
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sentences = [
-    &quot;The Ninth suffered a serious defeat at the Battle of Camulodunum under Quintus Petillius Cerialis in the rebellion of Boudica (61), when most of the foot-soldiers were killed in a disastrous attempt to relieve the besieged city of Camulodunum (Colchester).&quot;,
-    &quot;He was born in Wellingborough, Northamptonshire, where he attended Victoria Junior School, Westfield Boys School and Sir Christopher Hatton School.&quot;,
-    &quot;Nintendo continued to sell the revised Wii model and the Wii Mini alongside the Wii U during the Wii U&#39;s first release year.&quot;,
-    &quot;Dorsa has a Bachelor of Music in Composition from California State University, Northridge in 2001, Master of Music in Harpsichord Performance at Cal State Northridge in 2004, and a Doctor of Musical Arts at the University of Michigan, Ann Arbor in 2008.&quot;
-]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;The Ninth suffered a serious defeat at the Battle of Camulodunum under Quintus Petillius Cerialis in the rebellion of Boudica (61), when most of the foot-soldiers were killed in a disastrous attempt to relieve the besieged city of Camulodunum (Colchester).&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;He was born in Wellingborough, Northamptonshire, where he attended Victoria Junior School, Westfield Boys School and Sir Christopher Hatton School.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Nintendo continued to sell the revised Wii model and the Wii Mini alongside the Wii U during the Wii U&#39;s first release year.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Dorsa has a Bachelor of Music in Composition from California State University, Northridge in 2001, Master of Music in Harpsichord Performance at Cal State Northridge in 2004, and a Doctor of Musical Arts at the University of Michigan, Ann Arbor in 2008.&quot;</span>
+<span class="p">]</span>
 
-entities_per_sentence = model.predict(sentences)
+<span class="n">entities_per_sentence</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
 
-for entities in entities_per_sentence:
-    for entity in entities:
-        print(entity[&quot;span&quot;], &quot;=&gt;&quot;, entity[&quot;label&quot;])
-    print()
+<span class="k">for</span> <span class="n">entities</span> <span class="ow">in</span> <span class="n">entities_per_sentence</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">entity</span><span class="p">[</span><span class="s2">&quot;span&quot;</span><span class="p">],</span> <span class="s2">&quot;=&gt;&quot;</span><span class="p">,</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -645,7 +514,7 @@ Ann Arbor =&gt; organization
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>trainer.save_model(&quot;models/span-marker-bert-base-fewnerd-coarse-super/checkpoint-final&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;models/span-marker-bert-base-fewnerd-coarse-super/checkpoint-final&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -654,7 +523,7 @@ Ann Arbor =&gt; organization
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># trainer.push_to_hub()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># trainer.push_to_hub()</span>
 </pre></div>
 </div>
 </div>
@@ -663,7 +532,7 @@ Ann Arbor =&gt; organization
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span># model = SpanMarkerModel.from_pretrained(&quot;models/span-marker-bert-base-fewnerd-coarse-super/checkpoint-final&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># model = SpanMarkerModel.from_pretrained(&quot;models/span-marker-bert-base-fewnerd-coarse-super/checkpoint-final&quot;)</span>
 </pre></div>
 </div>
 </div>

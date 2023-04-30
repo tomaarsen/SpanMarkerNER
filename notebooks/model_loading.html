@@ -124,7 +124,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>%pip install span_marker
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="o">%</span><span class="k">pip</span> install span_marker
 </pre></div>
 </div>
 </div>
@@ -137,10 +137,10 @@ for this. Note that we place it on the GPU with <code class="docutils literal no
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>from span_marker import SpanMarkerModel
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
-model_name = &quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;
-model = SpanMarkerModel.from_pretrained(model_name).cuda()
+<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -163,19 +163,19 @@ model = SpanMarkerModel.from_pretrained(model_name).cuda()
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>sentences = [
-    &quot;The Ninth suffered a serious defeat at the Battle of Camulodunum under Quintus Petillius Cerialis in the rebellion of Boudica (61), when most of the foot-soldiers were killed in a disastrous attempt to relieve the besieged city of Camulodunum (Colchester).&quot;,
-    &quot;He was born in Wellingborough, Northamptonshire, where he attended Victoria Junior School, Westfield Boys School and Sir Christopher Hatton School.&quot;,
-    &quot;Nintendo continued to sell the revised Wii model and the Wii Mini alongside the Wii U during the Wii U&#39;s first release year.&quot;,
-    &quot;Dorsa has a Bachelor of Music in Composition from California State University, Northridge in 2001, Master of Music in Harpsichord Performance at Cal State Northridge in 2004, and a Doctor of Musical Arts at the University of Michigan, Ann Arbor in 2008.&quot;
-]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sentences</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;The Ninth suffered a serious defeat at the Battle of Camulodunum under Quintus Petillius Cerialis in the rebellion of Boudica (61), when most of the foot-soldiers were killed in a disastrous attempt to relieve the besieged city of Camulodunum (Colchester).&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;He was born in Wellingborough, Northamptonshire, where he attended Victoria Junior School, Westfield Boys School and Sir Christopher Hatton School.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Nintendo continued to sell the revised Wii model and the Wii Mini alongside the Wii U during the Wii U&#39;s first release year.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Dorsa has a Bachelor of Music in Composition from California State University, Northridge in 2001, Master of Music in Harpsichord Performance at Cal State Northridge in 2004, and a Doctor of Musical Arts at the University of Michigan, Ann Arbor in 2008.&quot;</span>
+<span class="p">]</span>
 
-entities_per_sentence = model.predict(sentences)
+<span class="n">entities_per_sentence</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">sentences</span><span class="p">)</span>
 
-for entities in entities_per_sentence:
-    for entity in entities:
-        print(entity[&quot;span&quot;], &quot;=&gt;&quot;, entity[&quot;label&quot;])
-    print()
+<span class="k">for</span> <span class="n">entities</span> <span class="ow">in</span> <span class="n">entities_per_sentence</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">entity</span><span class="p">[</span><span class="s2">&quot;span&quot;</span><span class="p">],</span> <span class="s2">&quot;=&gt;&quot;</span><span class="p">,</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
