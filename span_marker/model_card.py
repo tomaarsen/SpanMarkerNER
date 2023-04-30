@@ -28,7 +28,7 @@ You can then run inference as follows:
 ```python
 from span_marker import SpanMarkerModel
 
-# Download from Hub and run inference
+# Download from the 🤗 Hub
 model = SpanMarkerModel.from_pretrained("span_marker_model_name")
 # Run inference
 entities = model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.")
