@@ -59,7 +59,6 @@ How to Train
        save_strategy="steps",
        eval_steps=200,
        logging_steps=50,
-       fp16=True,
        warmup_ratio=0.1,
    )
 
