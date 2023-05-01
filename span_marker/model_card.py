@@ -71,13 +71,7 @@ def generate_model_card(save_directory: Union[str, os.PathLike], config: SpanMar
     save_directory = Path(save_directory)
     context = {}
 
-    # If the save_directory is a folder that exists locally, i.e. when create_model_card is called
-    # via push_to_hub, and the path is in a temporary folder, then we only take the last two
-    # directories. This corresponds with the repo ID when using push_to_hub.
-    if save_directory.exists() and Path(tempfile.gettempdir()) in save_directory.resolve().parents:
-        context["model_name_or_path"] = "span_marker_model_name"
-    else:
-        context["model_name_or_path"] = save_directory.as_posix()
+    context["model_name_or_path"] = "span_marker_model_name"
 
     if "_name_or_path" in config.encoder:
         context["encoder_name_or_path"] = config.encoder["_name_or_path"]

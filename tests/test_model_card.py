@@ -27,6 +27,6 @@ def test_model_card(finetuned_fewnerd_span_marker_model: SpanMarkerModel, tmp_pa
     assert "\n\n## Usage" in model_card
 
     model_card = generate_model_card("tomaarsen/my_test_model", config)
-    assert f'SpanMarkerModel.from_pretrained("tomaarsen/my_test_model")' in model_card
+    assert f'SpanMarkerModel.from_pretrained("span_marker_model_name")' in model_card
     assert "\n\n\n" not in model_card
     assert "\n\n## Usage" in model_card
