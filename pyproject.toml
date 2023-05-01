@@ -29,7 +29,9 @@ dependencies = [
     "datasets>=2.0.0",
     "packaging>=20.0",
     "evaluate",
-    "seqeval"
+    "seqeval",
+    "jinja2",
+    "huggingface_hub"
 ]
 dynamic = ["version"]
 

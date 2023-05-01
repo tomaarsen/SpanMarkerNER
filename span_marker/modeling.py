@@ -13,7 +13,7 @@ from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedMode
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
-from span_marker.model_card import MODEL_CARD_TEMPLATE
+from span_marker.model_card import MODEL_CARD_TEMPLATE, generate_model_card
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -476,12 +476,5 @@ class SpanMarkerModel(PreTrainedModel):
             variant=variant,
             **kwargs,
         )
-        if "_name_or_path" in self.config.encoder:
-            encoder_name_or_path = repr(self.config.encoder["_name_or_path"])
-        else:
-            encoder_name_or_path = "an unknown model"
-        model_card_content = MODEL_CARD_TEMPLATE.format(
-            model_name=save_directory, encoder_name_or_path=encoder_name_or_path
-        )
         with open(os.path.join(save_directory, "README.md"), "w", encoding="utf-8") as f:
-            f.write(model_card_content)
+            f.write(generate_model_card(save_directory, self.config))
