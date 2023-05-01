@@ -9,3 +9,4 @@ Usage Notebooks
     Initializing & Training <model_training.ipynb>
     Loading & Inferencing <model_loading.ipynb>
     Configurating <model_configuration.ipynb>
+    How it works <how_it_works.ipynb>
