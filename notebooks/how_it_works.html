@@ -122,9 +122,9 @@
 <h2>Step by step example<a class="headerlink" href="#Step-by-step-example" title="Permalink to this heading">¶</a></h2>
 <p>Consider the following example input sentence: <code class="docutils literal notranslate"><span class="pre">&quot;Tom</span> <span class="pre">is</span> <span class="pre">my</span> <span class="pre">name.&quot;</span></code>, which tokenizes to this using the standard RoBERTa tokenizer:</p>
 <div class="math">
-<p><span class="math">\begin{matrix}
+<p><img src="../_images/math/001f8c13e0db99cb9c9dd8d250782ab60446aa4f.png" alt="\begin{matrix}
 [0 &amp; 1560 &amp; 16 &amp; 127 &amp; 766 &amp; 4 &amp; 2]
-\end{matrix}</span></p>
+\end{matrix}"/></p>
 </div><p>In addition to these tokens, we also have position IDs, which tells the RoBERTa encoder where in the text each of these tokens exist. In the above example, the position IDs are:</p>
 <p>For this example, we consider a maximum token length of 16 (note: this is unreasonably low, 256 or 512 would be more sensible in real scenarios). The SpanMarker codebase pads using 0’s, so then the padded tokens (<code class="docutils literal notranslate"><span class="pre">input_ids</span></code>) are:</p>
 <p>And the position IDs now become:</p>
