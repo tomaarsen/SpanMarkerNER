@@ -2,6 +2,7 @@ import re
 from typing import Dict, List, Optional, Union
 
 import pytest
+import torch
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
@@ -105,7 +106,14 @@ def test_correct_predictions(
         {"this_is_completely_unused_I_hope": True},
     ],
 )
-def test_load_with_kwargs(kwargs):
+def test_load_with_kwargs(kwargs) -> None:
     # We only test that the model can be loaded without issues
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, kwargs=kwargs)
     assert isinstance(model, SpanMarkerModel)
+
+
+def test_try_cuda(finetuned_conll_span_marker_model: SpanMarkerModel) -> None:
+    # This should not crash, regardless of whether Torch is compiled with CUDA or not
+    finetuned_conll_span_marker_model.try_cuda()
+    # The model is on CUDA if CUDA is available, and not on CUDA if CUDA is not available.
+    assert (finetuned_conll_span_marker_model.device.type == "cuda") == torch.cuda.is_available()

@@ -7,8 +7,9 @@ from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 import torch
 import torch.nn.functional as F
 from packaging.version import Version, parse
-from torch import nn
+from torch import device, nn
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
+from typing_extensions import Self
 
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
@@ -478,3 +479,21 @@ class SpanMarkerModel(PreTrainedModel):
         )
         with open(os.path.join(save_directory, "README.md"), "w", encoding="utf-8") as f:
             f.write(generate_model_card(save_directory, self.config))
+
+    def try_cuda(self, device: Optional[Union[int, device]] = None) -> Self:
+        """Try to moves all model parameters and buffers to the GPU, do nothing if failed.
+
+        .. note::
+            This method modifies the module in-place.
+
+        Args:
+            device (int, optional): if specified, all parameters will be
+                copied to that device
+
+        Returns:
+            Module: self
+        """
+        try:
+            return self.cuda(device)
+        except (AssertionError, RuntimeError):
+            return self
