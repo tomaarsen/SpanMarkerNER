@@ -131,18 +131,100 @@
 [2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8]
 \end{matrix}"/></p>
 </div><p>For this example, we consider a maximum token length of 16 (note: this is unreasonably low, 256 or 512 would be more sensible in real scenarios). The SpanMarker codebase pads using 0’s, so then the padded tokens (<code class="docutils literal notranslate"><span class="pre">input_ids</span></code>) are:</p>
-<div class="math">
-<p><img src="../_images/math/dc027d1a913dca8123e540ada59946fcce02c11d.png" alt="\begin{matrix}
-[0 &amp; 1560 &amp; 16 &amp; 127 &amp; 766 &amp; 4 &amp; 2 &amp; 0 \\
-0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0]
-\end{matrix}"/></p>
-</div><p>And the position IDs now become:</p>
-<div class="math">
-<p><img src="../_images/math/8ac13cbd9ec56bc0a085d01b76bbdea760837ef8.png" alt="\begin{matrix}
-[2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 \\
-10 &amp; 11 &amp; 12 &amp; 13 &amp; 14 &amp; 15 &amp; 16 &amp; 17]
-\end{matrix}"/></p>
-</div></section>
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">\begin{matrix}
+[0 &amp; 1560 &amp; 16 &amp; 127 &amp; 766 &amp; 4 &amp; 2 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0 &amp; 0]
+\end{matrix}</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2021-11-15&gt; patch level 1
+L3 programming layer &lt;2022-01-21&gt;
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Extra alignment tab has been changed to \cr.
+&lt;recently read&gt; \endtemplate 
+                             
+l.16 \end{matrix}\end{split}
+                            
+! Extra alignment tab has been changed to \cr.
+&lt;recently read&gt; \endtemplate 
+                             
+l.16 \end{matrix}\end{split}
+                            
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 412 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+<p>And the position IDs now become:</p>
+<aside class="system-message">
+<p class="system-message-title">System Message: WARNING/2 (<span class="docutils literal">\begin{matrix}
+[2 &amp; 3 &amp; 4 &amp; 5 &amp; 6 &amp; 7 &amp; 8 &amp; 9 &amp; 10 &amp; 11 &amp; 12 &amp; 13 &amp; 14 &amp; 15 &amp; 16 &amp; 17]
+\end{matrix}</span>)</p>
+<p>latex exited with error
+[stdout]
+This is pdfTeX, Version 3.141592653-2.6-1.40.22 (TeX Live 2022/dev/Debian) (preloaded format=latex)
+ restricted \write18 enabled.
+entering extended mode
+(./math.tex
+LaTeX2e &lt;2021-11-15&gt; patch level 1
+L3 programming layer &lt;2022-01-21&gt;
+(/usr/share/texlive/texmf-dist/tex/latex/base/article.cls
+Document Class: article 2021/10/04 v1.4n Standard LaTeX document class
+(/usr/share/texlive/texmf-dist/tex/latex/base/size12.clo))
+(/usr/share/texlive/texmf-dist/tex/latex/base/inputenc.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsmath.sty
+For additional information on amsmath, use the `?' option.
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amstext.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsgen.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsbsy.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsmath/amsopn.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/amscls/amsthm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amssymb.sty
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/amsfonts.sty))
+(/usr/share/texlive/texmf-dist/tex/latex/anyfontsize/anyfontsize.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/tools/bm.sty)
+(/usr/share/texlive/texmf-dist/tex/latex/l3backend/l3backend-dvips.def)
+(./math.aux) (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsa.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
+! Extra alignment tab has been changed to \cr.
+&lt;recently read&gt; \endtemplate 
+                             
+l.16 \end{matrix}\end{split}
+                            
+! Extra alignment tab has been changed to \cr.
+&lt;recently read&gt; \endtemplate 
+                             
+l.16 \end{matrix}\end{split}
+                            
+[1] (./math.aux) )
+(see the transcript file for additional information)
+Output written on math.dvi (1 page, 412 bytes).
+Transcript written on math.log.
+</p>
+</aside>
+</section>
 <section id="Markers">
 <h2>Markers<a class="headerlink" href="#Markers" title="Permalink to this heading">¶</a></h2>
 <p>Crucially, the model takes advantage of “markers”. These are special tokens that mark the start and the end of a span within the input sentence. Every single legal span within the input sentence corresponds with exactly one set of two markers.</p>

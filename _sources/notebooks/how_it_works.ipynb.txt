@@ -34,15 +34,13 @@
     "For this example, we consider a maximum token length of 16 (note: this is unreasonably low, 256 or 512 would be more sensible in real scenarios). The SpanMarker codebase pads using 0's, so then the padded tokens (`input_ids`) are:\n",
     "$$\n",
     "\\begin{matrix}\n",
-    "[0 & 1560 & 16 & 127 & 766 & 4 & 2 & 0 \\\\\n",
-    "0 & 0 & 0 & 0 & 0 & 0 & 0 & 0]\n",
+    "[0 & 1560 & 16 & 127 & 766 & 4 & 2 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0]\n",
     "\\end{matrix}\n",
     "$$\n",
     "And the position IDs now become:\n",
     "$$\n",
     "\\begin{matrix}\n",
-    "[2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 \\\\\n",
-    "10 & 11 & 12 & 13 & 14 & 15 & 16 & 17]\n",
+    "[2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10 & 11 & 12 & 13 & 14 & 15 & 16 & 17]\n",
     "\\end{matrix}\n",
     "$$"
    ]
