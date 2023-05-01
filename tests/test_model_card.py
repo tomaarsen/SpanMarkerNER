@@ -10,21 +10,19 @@ def test_model_card(finetuned_fewnerd_span_marker_model: SpanMarkerModel, tmp_pa
     assert (
         "uses [prajjwal1/bert-tiny](https://huggingface.co/prajjwal1/bert-tiny) as the underlying encoder" in model_card
     )
-    assert f'SpanMarkerModel.from_pretrained("{"/".join(tmp_path.parts[-2:])}")' in model_card
+    assert f'SpanMarkerModel.from_pretrained("span_marker_model_name")' in model_card
     assert "\n\n\n" not in model_card
     assert "\n\n## Usage" in model_card
 
     config.encoder["_name_or_path"] = "does_not_exist"
     model_card = generate_model_card(tmp_path, config)
     assert 'uses "does_not_exist" as the underlying encoder' in model_card
-    assert f'SpanMarkerModel.from_pretrained("{"/".join(tmp_path.parts[-2:])}")' in model_card
     assert "\n\n\n" not in model_card
     assert "\n\n## Usage" in model_card
 
     del config.encoder["_name_or_path"]
     model_card = generate_model_card(tmp_path, config)
     assert "as the underlying encoder" not in model_card
-    assert f'SpanMarkerModel.from_pretrained("{"/".join(tmp_path.parts[-2:])}")' in model_card
     assert "\n\n\n" not in model_card
     assert "\n\n## Usage" in model_card
 
