@@ -288,7 +288,11 @@
             <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">loss_func</span><span class="p">(</span><span class="n">logits</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">num_labels</span><span class="p">),</span> <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">))</span>
 
         <span class="k">return</span> <span class="n">SpanMarkerOutput</span><span class="p">(</span>
-            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span> <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span> <span class="o">*</span><span class="n">outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span> <span class="n">num_words</span><span class="o">=</span><span class="n">num_words</span>
+            <span class="n">loss</span><span class="o">=</span><span class="n">loss</span> <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
+            <span class="n">logits</span><span class="o">=</span><span class="n">logits</span><span class="p">,</span>
+            <span class="o">*</span><span class="n">outputs</span><span class="p">[</span><span class="mi">2</span><span class="p">:],</span>
+            <span class="n">num_marker_pairs</span><span class="o">=</span><span class="n">num_marker_pairs</span><span class="p">,</span>
+            <span class="n">num_words</span><span class="o">=</span><span class="n">num_words</span><span class="p">,</span>
         <span class="p">)</span></div>
 
 <div class="viewcode-block" id="SpanMarkerModel.from_pretrained"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">[docs]</a>    <span class="nd">@classmethod</span>
@@ -507,14 +511,17 @@
         <span class="c1"># Moving the inputs to the right device</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">device</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">collated</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
 
-        <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="o">**</span><span class="n">inputs</span><span class="p">)</span>
+        <span class="c1"># use `num_marker_pairs` to remove all padding</span>
+        <span class="n">logits</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">(</span>
+            <span class="p">[</span><span class="n">logits</span><span class="p">[:</span><span class="n">num_marker_pairs</span><span class="p">]</span> <span class="k">for</span> <span class="n">logits</span><span class="p">,</span> <span class="n">num_marker_pairs</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">output</span><span class="o">.</span><span class="n">logits</span><span class="p">,</span> <span class="n">output</span><span class="o">.</span><span class="n">num_marker_pairs</span><span class="p">)]</span>
+        <span class="p">)</span>
         <span class="c1"># Computing probabilities based on the logits</span>
         <span class="n">probs</span> <span class="o">=</span> <span class="n">logits</span><span class="o">.</span><span class="n">softmax</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
         <span class="c1"># Get the labels and the correponding probability scores</span>
         <span class="n">scores</span><span class="p">,</span> <span class="n">labels</span> <span class="o">=</span> <span class="n">probs</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
-        <span class="c1"># Reduce the dimensionality and convert to normal Python lists</span>
-        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">view</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">scores</span> <span class="o">=</span> <span class="n">scores</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">labels</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
         <span class="c1"># Get all of the valid spans to match with the score and labels</span>
         <span class="n">spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">))</span>
 
