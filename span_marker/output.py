@@ -32,4 +32,5 @@ class SpanMarkerOutput(TokenClassifierOutput):
             Required for evaluation purposes.
     """
 
+    num_marker_pairs: Optional[torch.Tensor] = None
     num_words: Optional[torch.Tensor] = None

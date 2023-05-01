@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- Fixed critical issue with incorrect predictions at inputs that require multiple samples.
+
 ## [1.0.0]
 
 ### Added

@@ -176,7 +176,11 @@ class SpanMarkerModel(PreTrainedModel):
             loss = self.loss_func(logits.view(-1, self.config.num_labels), labels.view(-1))
 
         return SpanMarkerOutput(
-            loss=loss if labels is not None else None, logits=logits, *outputs[2:], num_words=num_words
+            loss=loss if labels is not None else None,
+            logits=logits,
+            *outputs[2:],
+            num_marker_pairs=num_marker_pairs,
+            num_words=num_words,
         )
 
     @classmethod
@@ -395,14 +399,17 @@ class SpanMarkerModel(PreTrainedModel):
         # Moving the inputs to the right device
         inputs = {key: value.to(self.device) for key, value in collated.items()}
 
-        logits = self(**inputs)[0]
+        output = self(**inputs)
+        # use `num_marker_pairs` to remove all padding
+        logits = torch.cat(
+            [logits[:num_marker_pairs] for logits, num_marker_pairs in zip(output.logits, output.num_marker_pairs)]
+        )
         # Computing probabilities based on the logits
         probs = logits.softmax(-1)
         # Get the labels and the correponding probability scores
         scores, labels = probs.max(-1)
-        # Reduce the dimensionality and convert to normal Python lists
-        scores = scores.view(-1).tolist()
-        labels = labels.view(-1).tolist()
+        scores = scores.tolist()
+        labels = labels.tolist()
         # Get all of the valid spans to match with the score and labels
         spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
 
