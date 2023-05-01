@@ -130,6 +130,7 @@ Types of changes
 <li><p>Added a warning for entities that are ignored/skipped due to the maximum entity length or maximum model input length.</p></li>
 <li><p>Added info-level logs displaying the detected labeling scheme (IOB/IOB2, BIOES, BILOU, none).</p></li>
 <li><p>Added a warning suggesting to use <code class="docutils literal notranslate"><span class="pre">model.cuda()</span></code> when predictions are performed on a CPU while CUDA is available.</p></li>
+<li><p>Added <code class="docutils literal notranslate"><span class="pre">try_cuda</span></code> method to <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code> which tries to place the model on CUDA and does nothing if that fails.</p></li>
 </ul>
 </section>
 <section id="changed">
