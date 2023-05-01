@@ -24,6 +24,9 @@ jobs:
         with:
           pandoc-version: "2.17.1"
 
+      - name: Install LaTeX
+        run: apt install texlive-latex-extra -y
+
       - name: Try to load cached dependencies
         uses: actions/cache@v3
         id: restore-cache
