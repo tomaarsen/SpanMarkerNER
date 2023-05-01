@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: How SpanMarker works</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_training.html">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_configuration.html">Configurating</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.output.html">span_marker.output module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <div class="open-in-colab__wrapper">
+<a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/how_it_works.ipynb" target="_blank">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
+</a>
+</div><section id="How-SpanMarker-works">
+<h1>How SpanMarker works<a class="headerlink" href="#How-SpanMarker-works" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models. In this notebook, we’ll go over the specific model details that make SpanMarker so powerful.</p>
+<p>The SpanMarker model is quite simple at a glance: no contrastive learning, just passing single sentences through a pretrained (BERT, RoBERTa, etc.) encoder and using a simple cross entropy loss of embeddings against labels to finetune the encoder. However, there are some notable ideas that set it apart. First of all, I want to mention that these ideas are inspired by <a class="reference external" href="https://arxiv.org/pdf/2109.06067v5.pdf">PL-Marker</a>.</p>
+<section id="Step-by-step-example">
+<h2>Step by step example<a class="headerlink" href="#Step-by-step-example" title="Permalink to this heading">¶</a></h2>
+<p>Consider the following example input sentence: <code class="docutils literal notranslate"><span class="pre">&quot;Tom</span> <span class="pre">is</span> <span class="pre">my</span> <span class="pre">name.&quot;</span></code>, which tokenizes to this using the standard RoBERTa tokenizer:</p>
+<div class="math">
+<p><span class="math">\begin{matrix}
+[0 &amp; 1560 &amp; 16 &amp; 127 &amp; 766 &amp; 4 &amp; 2]
+\end{matrix}</span></p>
+</div><p>In addition to these tokens, we also have position IDs, which tells the RoBERTa encoder where in the text each of these tokens exist. In the above example, the position IDs are:</p>
+<p>For this example, we consider a maximum token length of 16 (note: this is unreasonably low, 256 or 512 would be more sensible in real scenarios). The SpanMarker codebase pads using 0’s, so then the padded tokens (<code class="docutils literal notranslate"><span class="pre">input_ids</span></code>) are:</p>
+<p>And the position IDs now become:</p>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/notebooks/how_it_works.ipynb.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>
