@@ -91,7 +91,7 @@ if __name__ == "__main__":
 </h1>
 
 I have developed this library as a part of my thesis work at [Argilla](https://github.com/argilla-io/argilla).
-Feel free to ⭐ star or watch this repository to get notified when my thesis is published.
+Feel free to ⭐ star or watch the SpanMarker repository to get notified when my thesis is published.
 
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
