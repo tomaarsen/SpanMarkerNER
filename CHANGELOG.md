@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Changed
+
+- Ensure models are in evaluation mode when using `SpanMarkerModel.predict`.
+
 ## [1.0.1]
 
 ### Fixed
