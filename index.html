@@ -124,10 +124,20 @@ or no label annotation scheme.</p>
    frameborder="0"
    width="850"
    height="650"
-></iframe><section id="quick-reference">
-<h2>Quick Reference<a class="headerlink" href="#quick-reference" title="Permalink to this heading">¶</a></h2>
+></iframe><section id="context">
+<h2>Context<a class="headerlink" href="#context" title="Permalink to this heading">¶</a></h2>
+<h1 align="center">
+   <a href="https://github.com/argilla-io/argilla">
+   <img src="https://github.com/dvsrepo/imgs/raw/main/rg.svg" alt="Argilla" width="150">
+   </a>
+</h1><p>I have developed this library as a part of my thesis work at <a class="reference external" href="https://github.com/argilla-io/argilla">Argilla</a>.
+Feel free to ⭐ star or watch the <a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker repository</a> to get notified when my thesis is published.</p>
+<section id="quick-reference">
+<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Permalink to this heading">¶</a></h3>
+</section>
+</section>
 <section id="how-to-train">
-<h3>How to Train<a class="headerlink" href="#how-to-train" title="Permalink to this heading">¶</a></h3>
+<h2>How to Train<a class="headerlink" href="#how-to-train" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
@@ -174,7 +184,7 @@ or no label annotation scheme.</p>
 </div>
 </section>
 <section id="how-to-predict">
-<h3>How to predict<a class="headerlink" href="#how-to-predict" title="Permalink to this heading">¶</a></h3>
+<h2>How to predict<a class="headerlink" href="#how-to-predict" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="c1"># Load a finetuned SpanMarkerModel from the 🤗 Hub</span>
@@ -196,15 +206,10 @@ much like in 🤗 Transformers.</p>
 </div>
 </section>
 <section id="how-to-save-a-model">
-<h3>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Permalink to this heading">¶</a></h3>
-<section id="locally">
-<h4>Locally<a class="headerlink" href="#locally" title="Permalink to this heading">¶</a></h4>
+<h2>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="s2">&quot;my_model_dir&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</section>
-<section id="to-the-hub">
-<h4>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Permalink to this heading">¶</a></h4>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
 <span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
 </pre></div>
@@ -237,8 +242,6 @@ much like in 🤗 Transformers.</p>
 </div>
 <div class="toctree-wrapper compound">
 </div>
-</section>
-</section>
 </section>
 </section>
 
