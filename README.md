@@ -83,6 +83,15 @@ if __name__ == "__main__":
 
 * [`tomaarsen/span-marker-roberta-large-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-roberta-large-fewnerd-fine-super) was trained in 6 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd) using `roberta-large`. It reached a 0.7103 Test F1, very competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup).
 
+## Context
+<h1 align="center">
+    <a href="https://github.com/argilla-io/argilla">
+    <img src="https://github.com/dvsrepo/imgs/raw/main/rg.svg" alt="Argilla" width="150">
+    </a>
+</h1>
+
+I will be formally introducing SpanMarker in my upcoming thesis under the supervision of [Argilla](https://github.com/argilla-io/argilla). Feel free to ⭐ star or watch this repository to get notified when my thesis is published!
+
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
 
