@@ -368,6 +368,9 @@ class SpanMarkerModel(PreTrainedModel):
                 stacklevel=2,
             )
 
+        # Disable dropout, etc.
+        self.eval()
+
         if not inputs:
             return []
 
