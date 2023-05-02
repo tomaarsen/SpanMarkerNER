@@ -25,6 +25,19 @@ or no label annotation scheme.
       height="650"
    ></iframe>
 
+Context
+=======
+
+.. raw:: html
+
+   <h1 align="center">
+      <a href="https://github.com/argilla-io/argilla">
+      <img src="https://github.com/dvsrepo/imgs/raw/main/rg.svg" alt="Argilla" width="150">
+      </a>
+   </h1>
+
+I have developed this library as a part of my thesis work at `Argilla <https://github.com/argilla-io/argilla>`_.
+Feel free to ⭐ star or watch the `SpanMarker repository <https://github.com/tomaarsen/SpanMarkerNER>`_ to get notified when my thesis is published.
 
 ***************
 Quick Reference
