@@ -22,6 +22,11 @@ def conll_dataset_dict() -> DatasetDict:
     return DatasetDict.load_from_disk("tests/data/tiny_conll2003")
 
 
+@pytest.fixture(scope="session")
+def document_context_conll_dataset_dict() -> DatasetDict:
+    return DatasetDict.load_from_disk("tests/data/tiny_conll2003_with_context")
+
+
 @pytest.fixture()
 def fresh_conll_span_marker_model() -> SpanMarkerModel:
     return SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)

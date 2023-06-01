@@ -27,7 +27,11 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     inputs = eval_prediction.inputs
     gold_labels = eval_prediction.label_ids
     logits = eval_prediction.predictions[0]
-    num_words = eval_prediction.predictions[-1]
+    num_words = eval_prediction.predictions[2]
+    has_document_context = len(eval_prediction.predictions) == 5
+    if has_document_context:
+        document_ids = eval_prediction.predictions[3]
+        sentence_ids = eval_prediction.predictions[4]
 
     # Compute probabilities via softmax and extract 'winning' scores/labels
     probs = torch.tensor(logits, dtype=torch.float32).softmax(dim=-1)
@@ -38,13 +42,11 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     for sample_idx in range(inputs.shape[0]):
         tokens = inputs[sample_idx]
         text = tokenizer.decode(tokens, skip_special_tokens=True)
-        token_hash = hash(text)
+        token_hash = hash(text) if not has_document_context else (document_ids[sample_idx], sentence_ids[sample_idx])
         if token_hash not in sample_dict:
-            spans = list(tokenizer.get_all_valid_spans(num_words[sample_idx], tokenizer.config.entity_max_length))
             mask = gold_labels[sample_idx] != -100
             sample_dict[token_hash] = {
                 "text": text,
-                "spans": spans,
                 "gold_labels": gold_labels[sample_idx][mask].tolist(),
                 "pred_labels": pred_labels[sample_idx][mask].tolist(),
                 "scores": scores[sample_idx].tolist(),
@@ -61,11 +63,12 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     # seqeval works wonders for NER evaluation
     seqeval = evaluate.load("seqeval")
     for sample in sample_dict.values():
-        spans = sample["spans"]
         scores = sample["scores"]
         num_words = sample["num_words"]
+        spans = list(tokenizer.get_all_valid_spans(num_words, tokenizer.config.entity_max_length))
         gold_labels = sample["gold_labels"]
         pred_labels = sample["pred_labels"]
+        assert len(gold_labels) == len(pred_labels) and len(spans) == len(pred_labels)
 
         # Construct IOB2 format for gold labels, useful for seqeval
         gold_labels_per_tokens = ["O"] * num_words
