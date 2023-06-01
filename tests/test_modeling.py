@@ -159,6 +159,14 @@ def test_correct_predictions_with_document_level_context(
         compare_entities(pred_entities, gold_entities)
 
 
+def test_incorrect_predict_inputs(finetuned_conll_span_marker_model: SpanMarkerModel):
+    model = finetuned_conll_span_marker_model.try_cuda()
+    with pytest.raises(ValueError, match="could not recognize your input"):
+        model.predict(12)
+    with pytest.raises(ValueError, match="could not recognize your input"):
+        model.predict(True)
+
+
 @pytest.mark.parametrize(
     "kwargs",
     [

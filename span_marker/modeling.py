@@ -347,7 +347,7 @@ class SpanMarkerModel(PreTrainedModel):
                 * List[str]: a pre-tokenized string sentence, i.e. a list of words.
                 * List[str]: a list of multiple string sentences.
                 * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.
-                * Dataset: A 🤗 :class:`~datasets.Dataset` with ``tokens`` column and optionally ``document_id`` and ``sentence_id`` columns.
+                * Dataset: A 🤗 :class:`~datasets.Dataset` with a ``tokens`` column and optionally ``document_id`` and ``sentence_id`` columns.
                     If the optional columns are provided, they will be used to provide document-level context.
 
         Returns:
@@ -401,8 +401,15 @@ class SpanMarkerModel(PreTrainedModel):
             dataset = inputs
 
         else:
-            # TODO:
-            raise ValueError()
+            raise ValueError(
+                "`SpanMarkerModel.predict` could not recognize your input. It accepts the following:\n"
+                "* str: a string sentence.\n"
+                "* List[str]: a pre-tokenized string sentence, i.e. a list of words.\n"
+                "* List[str]: a list of multiple string sentences.\n"
+                "* List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.\n"
+                "* Dataset: A 🤗 Dataset with `tokens` column and optionally `document_id` and `sentence_id` columns.\n"
+                "    If the optional columns are provided, they will be used to provide document-level context."
+            )
 
         dataset = dataset.remove_columns(set(dataset.column_names) - {"tokens", "document_id", "sentence_id"})
         num_inputs = len(dataset)
