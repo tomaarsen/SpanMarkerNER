@@ -426,6 +426,9 @@ class SpanMarkerModel(PreTrainedModel):
             dataset = dataset.add_column(key, value)
         # Add context if possible
         if {"document_id", "sentence_id"} <= set(dataset.column_names):
+            # Add column to be able to revert sorting later
+            dataset = dataset.add_column("__sort_id", range(len(dataset)))
+            # Sorting by doc ID and then sentence ID is required for add_context
             dataset = dataset.sort(column_names=["document_id", "sentence_id"])
             dataset = Trainer.add_context(
                 dataset,
@@ -433,6 +436,9 @@ class SpanMarkerModel(PreTrainedModel):
                 max_prev_context=self.config.max_prev_context,
                 max_next_context=self.config.max_next_context,
             )
+            dataset = dataset.sort(column_names=["__sort_id"])
+            dataset = dataset.remove_columns("__sort_id")
+
         dataset = dataset.map(
             lambda sample: Trainer.spread_sample(
                 self.tokenizer.model_max_length, self.config.marker_max_length, sample

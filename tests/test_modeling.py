@@ -122,6 +122,29 @@ def test_correct_predictions(
                 [],
             ],
         ),
+        (
+            Dataset.from_dict(
+                {
+                    "tokens": [
+                        "I'm living in the Netherlands, but I work in Spain.",
+                        "My name is Tom and this is a test.",
+                        "I hope it can detect Paris here.",
+                        "And nothing in this sentence.",
+                    ],
+                    "document_id": [0, 1, 0, 0],
+                    "sentence_id": [0, 0, 2, 1],
+                }
+            ),
+            [
+                [
+                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29},
+                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50},
+                ],
+                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14}],
+                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26}],
+                [],
+            ],
+        ),
     ],
 )
 def test_correct_predictions_with_document_level_context(
