@@ -38,31 +38,34 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     scores, pred_labels = probs.max(-1)
 
     # Collect all samples in one dict. We do this because some samples are spread between multiple inputs
-    sample_dict = {}
+    sample_list = []
     for sample_idx in range(inputs.shape[0]):
         tokens = inputs[sample_idx]
         text = tokenizer.decode(tokens, skip_special_tokens=True)
         token_hash = hash(text) if not has_document_context else (document_ids[sample_idx], sentence_ids[sample_idx])
-        if token_hash not in sample_dict:
+        if not sample_list or sample_list[-1]["hash"] != token_hash:
             mask = gold_labels[sample_idx] != -100
-            sample_dict[token_hash] = {
-                "text": text,
-                "gold_labels": gold_labels[sample_idx][mask].tolist(),
-                "pred_labels": pred_labels[sample_idx][mask].tolist(),
-                "scores": scores[sample_idx].tolist(),
-                "num_words": num_words[sample_idx],
-            }
+            sample_list.append(
+                {
+                    "text": text,
+                    "gold_labels": gold_labels[sample_idx][mask].tolist(),
+                    "pred_labels": pred_labels[sample_idx][mask].tolist(),
+                    "scores": scores[sample_idx].tolist(),
+                    "num_words": num_words[sample_idx],
+                    "hash": token_hash,
+                }
+            )
         else:
             mask = gold_labels[sample_idx] != -100
-            sample_dict[token_hash]["gold_labels"] += gold_labels[sample_idx][mask].tolist()
-            sample_dict[token_hash]["pred_labels"] += pred_labels[sample_idx][mask].tolist()
-            sample_dict[token_hash]["scores"] += scores[sample_idx].tolist()
+            sample_list[-1]["gold_labels"] += gold_labels[sample_idx][mask].tolist()
+            sample_list[-1]["pred_labels"] += pred_labels[sample_idx][mask].tolist()
+            sample_list[-1]["scores"] += scores[sample_idx].tolist()
 
     outside_id = tokenizer.config.outside_id
     id2label = tokenizer.config.id2label
     # seqeval works wonders for NER evaluation
     seqeval = evaluate.load("seqeval")
-    for sample in sample_dict.values():
+    for sample in sample_list:
         scores = sample["scores"]
         num_words = sample["num_words"]
         spans = list(tokenizer.get_all_valid_spans(num_words, tokenizer.config.entity_max_length))
