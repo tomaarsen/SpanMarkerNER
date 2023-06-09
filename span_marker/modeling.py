@@ -10,6 +10,7 @@ import torch.nn.functional as F
 from datasets import Dataset
 from packaging.version import Version, parse
 from torch import device, nn
+from tqdm.autonotebook import trange
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 from typing_extensions import Self
 
@@ -454,7 +455,7 @@ class SpanMarkerModel(PreTrainedModel):
             batch_size=1,
             desc="Spreading data between multiple samples",
         )
-        for batch_start_idx in range(0, len(dataset), batch_size):
+        for batch_start_idx in trange(0, len(dataset), batch_size):
             batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
             # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
             batch = self.data_collator(batch)

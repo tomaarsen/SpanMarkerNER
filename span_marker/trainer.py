@@ -239,7 +239,9 @@ class Trainer(TransformersTrainer):
         all_input_ids = []
         all_start_position_ids = []
         all_end_position_ids = []
-        for sample_idx, sample in tqdm(enumerate(dataset), desc="Adding document-level context", total=len(dataset)):
+        for sample_idx, sample in tqdm(
+            enumerate(dataset), desc="Adding document-level context", total=len(dataset), leave=False
+        ):
             # Sequentially add next context, previous context, next context, previous context, etc. until
             # max token length or max_prev/next_context
             tokens = sample["input_ids"][1:-1]
