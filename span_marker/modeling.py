@@ -2,7 +2,6 @@ import logging
 import os
 import re
 import warnings
-from collections import defaultdict
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
@@ -17,7 +16,7 @@ from typing_extensions import Self
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
-from span_marker.model_card import MODEL_CARD_TEMPLATE, generate_model_card
+from span_marker.model_card import generate_model_card
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 

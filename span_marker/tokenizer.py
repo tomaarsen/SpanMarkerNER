@@ -1,6 +1,4 @@
-import itertools
 import logging
-import math
 import os
 from collections import defaultdict
 from dataclasses import dataclass, field
