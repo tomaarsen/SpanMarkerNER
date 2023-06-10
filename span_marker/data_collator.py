@@ -113,12 +113,10 @@ class SpanMarkerDataCollator:
             if "sentence_id" in sample:
                 sentence_ids.append(sample["sentence_id"])
             if "labels" in sample:
-                batch["labels"].append(torch.tensor(sample["labels"]))
+                labels = torch.tensor(sample["labels"])
+                labels = F.pad(labels, (0, (total_size // 2) - len(labels)), value=-100)
+                batch["labels"].append(labels)
 
-        if "labels" in batch:
-            batch["labels"] = [
-                F.pad(labels, (0, max(num_marker_pairs) - len(labels)), value=-100) for labels in batch["labels"]
-            ]
         batch = {key: torch.stack(value) for key, value in batch.items()}
         # Used for evaluation, does not need to be padded/stacked
         if num_words:

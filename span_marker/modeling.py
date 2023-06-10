@@ -148,6 +148,7 @@ class SpanMarkerModel(PreTrainedModel):
         last_hidden_state = self.dropout(last_hidden_state)
 
         batch_size = last_hidden_state.size(0)
+        sequence_length = last_hidden_state.size(1)
 
         # Get the indices where the end markers start
         end_marker_indices = start_marker_indices + num_marker_pairs
@@ -168,7 +169,7 @@ class SpanMarkerModel(PreTrainedModel):
                 )
             )
         padded_embeddings = [
-            F.pad(embedding, (0, 0, 0, max(num_marker_pairs) - len(embedding))) for embedding in embeddings
+            F.pad(embedding, (0, 0, 0, sequence_length // 2 - len(embedding))) for embedding in embeddings
         ]
         feature_vector = torch.stack(padded_embeddings)
 
