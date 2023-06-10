@@ -22,7 +22,7 @@ pipeline_tag: token-classification
 
 # SpanMarker for Named Entity Recognition
 
-This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model that can be used\
+This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model that can be used \
 for Named Entity Recognition. {% if encoder_name_or_path %}In particular, this SpanMarker model uses \
 {% if is_public_model %}\
 [{{ encoder_name_or_path }}](https://huggingface.co/{{ encoder_name_or_path }})\
