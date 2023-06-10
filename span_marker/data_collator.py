@@ -52,6 +52,8 @@ class SpanMarkerDataCollator:
         total_size = self.tokenizer.model_max_length + 2 * self.marker_max_length
         batch = defaultdict(list)
         num_words = []
+        document_ids = []
+        sentence_ids = []
         start_marker_indices = []
         num_marker_pairs = []
         for sample in features:
@@ -74,13 +76,15 @@ class SpanMarkerDataCollator:
             batch["input_ids"].append(input_ids)
 
             # Prepare position IDs
-            position_ids = torch.arange(num_tokens, dtype=torch.int)
-            position_ids = F.pad(position_ids, (0, total_size - len(position_ids)), value=0)
-            position_ids[start_marker_idx : start_marker_idx + num_spans] = torch.tensor(sample["start_position_ids"])
-            position_ids[end_marker_idx : end_marker_idx + num_spans] = torch.tensor(sample["end_position_ids"])
+            position_ids = torch.arange(num_tokens, dtype=torch.int) + 2
+            position_ids = F.pad(position_ids, (0, total_size - len(position_ids)), value=1)
+            position_ids[start_marker_idx : start_marker_idx + num_spans] = (
+                torch.tensor(sample["start_position_ids"]) + 2
+            )
+            position_ids[end_marker_idx : end_marker_idx + num_spans] = torch.tensor(sample["end_position_ids"]) + 2
             # Increase the position_ids by 2, inspired by PL-Marker. The intuition is that these position IDs
             # better match the circumstances under which the underlying encoders are trained.
-            batch["position_ids"].append(position_ids + 2)
+            batch["position_ids"].append(position_ids)
 
             # Prepare attention mask matrix
             attention_mask = torch.zeros((total_size, total_size), dtype=torch.bool)
@@ -102,18 +106,25 @@ class SpanMarkerDataCollator:
             start_marker_indices.append(start_marker_idx)
             num_marker_pairs.append(end_marker_idx - start_marker_idx)
 
+            if "num_words" in sample:
+                num_words.append(sample["num_words"])
+            if "document_id" in sample:
+                document_ids.append(sample["document_id"])
+            if "sentence_id" in sample:
+                sentence_ids.append(sample["sentence_id"])
             if "labels" in sample:
                 labels = torch.tensor(sample["labels"])
                 labels = F.pad(labels, (0, (total_size // 2) - len(labels)), value=-100)
                 batch["labels"].append(labels)
 
-            if "num_words" in sample:
-                num_words.append(sample["num_words"])
-
         batch = {key: torch.stack(value) for key, value in batch.items()}
         # Used for evaluation, does not need to be padded/stacked
         if num_words:
             batch["num_words"] = torch.tensor(num_words)
+        if document_ids:
+            batch["document_ids"] = torch.tensor(document_ids)
+        if sentence_ids:
+            batch["sentence_ids"] = torch.tensor(sentence_ids)
         batch["start_marker_indices"] = torch.tensor(start_marker_indices)
         batch["num_marker_pairs"] = torch.tensor(num_marker_pairs)
         return batch

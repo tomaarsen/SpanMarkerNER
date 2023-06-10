@@ -30,7 +30,13 @@ class SpanMarkerOutput(TokenClassifierOutput):
         num_words (Optional[~torch.Tensor]):
             A vector with shape ``(batch_size,)`` that tracks how many words were in the input of each sample in the batch.
             Required for evaluation purposes.
+        document_ids (Optional[~torch.Tensor]):
+            A vector with shape ``(batch_size,)`` that tracks the document the input text belongs to.
+        sentence_ids (Optional[~torch.Tensor]):
+            A vector with shape ``(batch_size,)`` that tracks the sentence in the document that the input text belongs to.
     """
 
     num_marker_pairs: Optional[torch.Tensor] = None
     num_words: Optional[torch.Tensor] = None
+    document_ids: Optional[torch.Tensor] = None
+    sentence_ids: Optional[torch.Tensor] = None

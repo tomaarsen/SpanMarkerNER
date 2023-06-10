@@ -3,6 +3,7 @@ from typing import Dict, List, Optional, Union
 
 import pytest
 import torch
+from datasets import Dataset
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
@@ -25,7 +26,7 @@ from tests.helpers import compare_entities
 )
 def test_from_pretrained(model_name: str, labels: Optional[List[str]]) -> None:
     def load() -> SpanMarkerModel:
-        return SpanMarkerModel.from_pretrained(model_name, labels=labels)
+        return SpanMarkerModel.from_pretrained(model_name, labels=labels).try_cuda()
 
     # If labels have to be provided
     if model_name == TINY_BERT and labels is None:
@@ -79,7 +80,7 @@ def test_correct_predictions(
     inputs: Union[str, List[str]],
     gold_entities: List[Dict[str, Union[str, int]]],
 ) -> None:
-    model = finetuned_conll_span_marker_model
+    model = finetuned_conll_span_marker_model.try_cuda()
 
     # Single sentence
     pred_entities = model.predict(inputs)
@@ -89,6 +90,81 @@ def test_correct_predictions(
     pred_entity_list = model.predict([inputs] * 3)
     for pred_entities in pred_entity_list:
         compare_entities(pred_entities, gold_entities)
+
+    # As a Dataset
+    pred_entities = model.predict(Dataset.from_dict({"tokens": [inputs]}))
+    compare_entities(pred_entities, gold_entities)
+
+
+@pytest.mark.parametrize(
+    ("inputs", "gold_entity_list"),
+    [
+        (
+            Dataset.from_dict(
+                {
+                    "tokens": [
+                        "I'm living in the Netherlands, but I work in Spain.",
+                        "My name is Tom and this is a test.",
+                        "I hope it can detect Paris here.",
+                        "And nothing in this sentence.",
+                    ],
+                    "document_id": [0, 0, 0, 0],
+                    "sentence_id": [0, 1, 2, 3],
+                }
+            ),
+            [
+                [
+                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29},
+                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50},
+                ],
+                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14}],
+                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26}],
+                [],
+            ],
+        ),
+        (
+            Dataset.from_dict(
+                {
+                    "tokens": [
+                        "I'm living in the Netherlands, but I work in Spain.",
+                        "My name is Tom and this is a test.",
+                        "I hope it can detect Paris here.",
+                        "And nothing in this sentence.",
+                    ],
+                    "document_id": [0, 1, 0, 0],
+                    "sentence_id": [0, 0, 2, 1],
+                }
+            ),
+            [
+                [
+                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29},
+                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50},
+                ],
+                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14}],
+                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26}],
+                [],
+            ],
+        ),
+    ],
+)
+def test_correct_predictions_with_document_level_context(
+    finetuned_conll_span_marker_model: SpanMarkerModel,
+    inputs: Union[str, List[str]],
+    gold_entity_list: List[Dict[str, Union[str, int]]],
+) -> None:
+    model = finetuned_conll_span_marker_model.try_cuda()
+
+    pred_entity_list = model.predict(inputs)
+    for pred_entities, gold_entities in zip(pred_entity_list, gold_entity_list):
+        compare_entities(pred_entities, gold_entities)
+
+
+def test_incorrect_predict_inputs(finetuned_conll_span_marker_model: SpanMarkerModel):
+    model = finetuned_conll_span_marker_model.try_cuda()
+    with pytest.raises(ValueError, match="could not recognize your input"):
+        model.predict(12)
+    with pytest.raises(ValueError, match="could not recognize your input"):
+        model.predict(True)
 
 
 @pytest.mark.parametrize(

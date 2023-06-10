@@ -1,10 +1,10 @@
-import itertools
 import logging
 import os
 from collections import defaultdict
 from dataclasses import dataclass, field
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
+import numpy as np
 from transformers import AutoTokenizer, PreTrainedTokenizer
 
 from span_marker.configuration import SpanMarkerConfig
@@ -175,15 +175,17 @@ class SpanMarkerTokenizer:
             return super().__getattribute__("tokenizer").__getattribute__(key)
 
     def __call__(
-        self, inputs, labels=None, return_num_words: bool = False, return_batch_encoding=False, **kwargs
+        self, batch: Dict[str, List[Any]], return_num_words: bool = False, return_batch_encoding=False, **kwargs
     ) -> Dict[str, List]:
+        tokens = batch["tokens"]
+        labels = batch.get("ner_tags", None)
         # TODO: Increase robustness of this
         is_split_into_words = True
-        if isinstance(inputs, str) or (inputs and " " in inputs[0]):
+        if isinstance(tokens, str) or (tokens and " " in tokens[0]):
             is_split_into_words = False
 
         batch_encoding = self.tokenizer(
-            inputs,
+            tokens,
             **kwargs,
             is_split_into_words=is_split_into_words,
             padding="max_length",
@@ -198,10 +200,8 @@ class SpanMarkerTokenizer:
         all_end_position_ids = []
         all_labels = []
         all_num_words = []
-
         for sample_idx, input_ids in enumerate(batch_encoding["input_ids"]):
-            word_ids = itertools.takewhile(lambda word_id: word_id is not None, batch_encoding.word_ids(sample_idx)[1:])
-            num_words = max(word_ids) + 1
+            num_words = int(np.nanmax(np.array(batch_encoding.word_ids(sample_idx), dtype=float))) + 1
             if self.tokenizer.pad_token_id in input_ids:
                 num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
             else:
@@ -225,34 +225,25 @@ class SpanMarkerTokenizer:
             else:
                 spans = list(self.get_all_valid_spans(num_words, self.config.entity_max_length))
 
-            # Compute the total number of start and end marker pairs we can include in this sample
-            num_marker_pairs = (self.model_max_length + 2 * self.config.marker_max_length - num_tokens) // 2
+            start_position_ids, end_position_ids = [], []
+            for start_word_i, end_word_i in spans:
+                start_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=start_word_i)
+                # The if ... else 0 exists because of words like '\u2063'
+                start_position_ids.append(start_token_span.start if start_token_span else 0)
 
-            for group_start_idx in range(0, len(spans), num_marker_pairs):
-                group_end_idx = group_start_idx + num_marker_pairs
-                group_spans = spans[group_start_idx:group_end_idx]
-                group_num_spans = len(group_spans)
+                end_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=end_word_i - 1)
+                end_position_ids.append(end_token_span.end - 1 if end_token_span else 0)
 
-                start_position_ids, end_position_ids = [], []
-                for start_word_i, end_word_i in group_spans:
-                    start_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=start_word_i)
-                    # The if ... else 0 exists because of words like '\u2063'
-                    start_position_ids.append(start_token_span.start if start_token_span else 0)
+            all_input_ids.append(input_ids[:num_tokens].tolist())
+            all_num_spans.append(len(spans))
+            all_start_position_ids.append(start_position_ids)
+            all_end_position_ids.append(end_position_ids)
 
-                    end_token_span = batch_encoding.word_to_tokens(sample_idx, word_index=end_word_i - 1)
-                    end_position_ids.append(end_token_span.end - 1 if end_token_span else 0)
+            if labels:
+                all_labels.append(span_labels)
 
-                all_input_ids.append(input_ids[:num_tokens])
-                all_num_spans.append(group_num_spans)
-                all_start_position_ids.append(start_position_ids)
-                all_end_position_ids.append(end_position_ids)
-
-                if labels:
-                    group_labels = span_labels[group_start_idx:group_end_idx]
-                    all_labels.append(group_labels)
-
-                if return_num_words:
-                    all_num_words.append(num_words)
+            if return_num_words:
+                all_num_words.append(num_words)
 
         output = {
             "input_ids": all_input_ids,

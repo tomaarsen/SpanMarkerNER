@@ -6,15 +6,17 @@ from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 import torch.nn.functional as F
+from datasets import Dataset
 from packaging.version import Version, parse
 from torch import device, nn
+from tqdm.autonotebook import trange
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 from typing_extensions import Self
 
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
-from span_marker.model_card import MODEL_CARD_TEMPLATE, generate_model_card
+from span_marker.model_card import generate_model_card
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -118,6 +120,8 @@ class SpanMarkerModel(PreTrainedModel):
         num_marker_pairs: torch.Tensor,
         labels: Optional[torch.Tensor] = None,
         num_words: Optional[torch.Tensor] = None,
+        document_ids: Optional[torch.Tensor] = None,
+        sentence_ids: Optional[torch.Tensor] = None,
     ) -> SpanMarkerOutput:
         """Forward call of the SpanMarkerModel.
 
@@ -153,16 +157,17 @@ class SpanMarkerModel(PreTrainedModel):
         # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
         # the batch iteratively per sample, but every sample produces a different shape matrix
         # and this is the most convenient way to recombine them into a matrix.
-        embeddings = [
-            torch.cat(
-                (
-                    last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-                    last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-                ),
-                dim=-1,
+        embeddings = []
+        for i in range(batch_size):
+            embeddings.append(
+                torch.cat(
+                    (
+                        last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
+                        last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
+                    ),
+                    dim=-1,
+                )
             )
-            for i in range(batch_size)
-        ]
         padded_embeddings = [
             F.pad(embedding, (0, 0, 0, sequence_length // 2 - len(embedding))) for embedding in embeddings
         ]
@@ -181,6 +186,8 @@ class SpanMarkerModel(PreTrainedModel):
             *outputs[2:],
             num_marker_pairs=num_marker_pairs,
             num_words=num_words,
+            document_ids=document_ids,
+            sentence_ids=sentence_ids,
         )
 
     @classmethod
@@ -233,7 +240,8 @@ class SpanMarkerModel(PreTrainedModel):
         config: PretrainedConfig = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
-        if isinstance(config, cls.config_class):
+        loading_span_marker = isinstance(config, cls.config_class)
+        if loading_span_marker:
             model_span_marker_version = config.get("span_marker_version") or "0.1.0"
             if parse(model_span_marker_version) < Version("1.0.0.dev"):
                 logger.warning(
@@ -278,7 +286,6 @@ class SpanMarkerModel(PreTrainedModel):
         )
         model.set_tokenizer(tokenizer)
         model.resize_token_embeddings(len(tokenizer))
-
         return model
 
     @classmethod
@@ -315,7 +322,7 @@ class SpanMarkerModel(PreTrainedModel):
             raise exc
 
     def predict(
-        self, inputs: Union[str, List[str], List[List[str]]], allow_overlapping: bool = False
+        self, inputs: Union[str, List[str], List[List[str]], Dataset], batch_size: int = 4
     ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
         """Predict named entities from input texts.
 
@@ -334,15 +341,15 @@ class SpanMarkerModel(PreTrainedModel):
              {'span': ['Pompey'], 'label': 'person-politician', 'score': 0.9601260423660278, 'word_start_index': 14, 'word_end_index': 15}]
 
         Args:
-            inputs (Union[str, List[str], List[List[str]]]): Input sentences from which to extract entities.
+            inputs (Union[str, List[str], List[List[str]], Dataset]): Input sentences from which to extract entities.
                 Valid datastructures are:
 
                 * str: a string sentence.
                 * List[str]: a pre-tokenized string sentence, i.e. a list of words.
                 * List[str]: a list of multiple string sentences.
                 * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.
-            allow_overlapping (bool, optional): Whether to allow entity spans to overlap. The model does not
-                have good support for this, so False is recommended. Defaults to False.
+                * Dataset: A 🤗 :class:`~datasets.Dataset` with a ``tokens`` column and optionally ``document_id`` and ``sentence_id`` columns.
+                    If the optional columns are provided, they will be used to provide document-level context.
 
         Returns:
             Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
@@ -359,6 +366,8 @@ class SpanMarkerModel(PreTrainedModel):
 
                 If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.
         """
+        from span_marker.trainer import Trainer
+
         if torch.cuda.is_available() and self.device == torch.device("cpu"):
             warnings.warn(
                 "SpanMarker model predictions are being computed on the CPU while CUDA is available."
@@ -379,79 +388,139 @@ class SpanMarkerModel(PreTrainedModel):
         if isinstance(inputs, str) or (
             isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs)
         ):
-            return self._predict_one(inputs, allow_overlapping=allow_overlapping)
+            # return self._predict_one(inputs, allow_overlapping=allow_overlapping)
+            dataset = Dataset.from_dict({"tokens": [inputs]})
 
         # Otherwise, we likely have a list of strings, i.e. a list of string sentences,
         # or a list of lists of strings, i.e. a list of tokenized sentences
         # if isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs):
-        return [self._predict_one(sentence) for sentence in inputs]
+        # return [self._predict_one(sentence) for sentence in inputs]
+        elif isinstance(inputs, list):
+            dataset = Dataset.from_dict({"tokens": inputs})
 
-    def _predict_one(
-        self, sentence: Union[str, List[str]], allow_overlapping: bool = False
-    ) -> List[Dict[str, Union[str, int, float]]]:
-        # Tokenization, i.e. computing spans, adding span markers to position_ids
-        tokenized = self.tokenizer(sentence, return_num_words=True, return_batch_encoding=True)
-        num_words = tokenized.pop("num_words")[0]
-        batch_encoding = tokenized.pop("batch_encoding")
-        # Converting into a common batch format like the data collator wants
-        tokenized = [
-            {key: value[idx] for key, value in tokenized.items()} for idx in range(len(tokenized["input_ids"]))
+        elif isinstance(inputs, Dataset):
+            dataset = inputs
+
+        else:
+            raise ValueError(
+                "`SpanMarkerModel.predict` could not recognize your input. It accepts the following:\n"
+                "* str: a string sentence.\n"
+                "* List[str]: a pre-tokenized string sentence, i.e. a list of words.\n"
+                "* List[str]: a list of multiple string sentences.\n"
+                "* List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.\n"
+                "* Dataset: A 🤗 Dataset with `tokens` column and optionally `document_id` and `sentence_id` columns.\n"
+                "    If the optional columns are provided, they will be used to provide document-level context."
+            )
+
+        dataset = dataset.remove_columns(set(dataset.column_names) - {"tokens", "document_id", "sentence_id"})
+        num_inputs = len(dataset)
+        dataset: Dataset = dataset.add_column("id", range(num_inputs))
+        results = [
+            {
+                "tokens": tokens,
+                "scores": [],
+                "labels": [],
+                "num_words": None,
+            }
+            for tokens in dataset["tokens"]
         ]
-        # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
-        collated = self.data_collator(tokenized)
-        # Moving the inputs to the right device
-        inputs = {key: value.to(self.device) for key, value in collated.items()}
 
-        output = self(**inputs)
-        # use `num_marker_pairs` to remove all padding
-        logits = torch.cat(
-            [logits[:num_marker_pairs] for logits, num_marker_pairs in zip(output.logits, output.num_marker_pairs)]
+        # Tokenize & add start/end markers
+        tokenizer_dict = self.tokenizer(
+            {"tokens": dataset["tokens"]}, return_num_words=True, return_batch_encoding=True
         )
-        # Computing probabilities based on the logits
-        probs = logits.softmax(-1)
-        # Get the labels and the correponding probability scores
-        scores, labels = probs.max(-1)
-        scores = scores.tolist()
-        labels = labels.tolist()
-        # Get all of the valid spans to match with the score and labels
-        spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
+        batch_encoding = tokenizer_dict.pop("batch_encoding")
+        for key, value in tokenizer_dict.items():
+            dataset = dataset.add_column(key, value)
+        # Add context if possible
+        if {"document_id", "sentence_id"} <= set(dataset.column_names):
+            # Add column to be able to revert sorting later
+            dataset = dataset.add_column("__sort_id", range(len(dataset)))
+            # Sorting by doc ID and then sentence ID is required for add_context
+            dataset = dataset.sort(column_names=["document_id", "sentence_id"])
+            dataset = Trainer.add_context(
+                dataset,
+                self.tokenizer.model_max_length,
+                max_prev_context=self.config.max_prev_context,
+                max_next_context=self.config.max_next_context,
+            )
+            dataset = dataset.sort(column_names=["__sort_id"])
+            dataset = dataset.remove_columns("__sort_id")
 
-        output = []
+        dataset = dataset.map(
+            lambda sample: Trainer.spread_sample(
+                self.tokenizer.model_max_length, self.config.marker_max_length, sample
+            ),
+            batched=True,
+            batch_size=1,
+            desc="Spreading data between multiple samples",
+        )
+        for batch_start_idx in trange(0, len(dataset), batch_size):
+            batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
+            # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
+            batch = self.data_collator(batch)
+            # Moving the inputs to the right device
+            batch = {key: value.to(self.device) for key, value in batch.items()}
+            with torch.no_grad():
+                output = self(**batch)
+            # Computing probabilities based on the logits
+            probs = output.logits.softmax(-1)
+            # Get the labels and the correponding probability scores
+            scores, labels = probs.max(-1)
+            # TODO: Iterate over output.num_marker_pairs instead with enumerate
+            for iter_idx in range(output.num_marker_pairs.size(0)):
+                input_id = dataset["id"][batch_start_idx + iter_idx]
+                num_marker_pairs = output.num_marker_pairs[iter_idx]
+                results[input_id]["scores"].extend(scores[iter_idx, :num_marker_pairs].tolist())
+                results[input_id]["labels"].extend(labels[iter_idx, :num_marker_pairs].tolist())
+                results[input_id]["num_words"] = output.num_words[iter_idx]
+
+        all_entities = []
         id2label = self.config.id2label
-        # If we don't allow overlapping, then we keep track of a boolean for each word, indicating if it has been
-        # selected already by a previous, higher score entity span
-        if not allow_overlapping:
+        for sample_idx, sample in enumerate(results):
+            scores = sample["scores"]
+            labels = sample["labels"]
+            num_words = sample["num_words"]
+            sentence = sample["tokens"]
+            # Get all of the valid spans to match with the score and labels
+            spans = list(self.tokenizer.get_all_valid_spans(num_words, self.config.entity_max_length))
+
             word_selected = [False] * num_words
-        for (word_start_index, word_end_index), score, label_id in sorted(
-            zip(spans, scores, labels), key=lambda tup: tup[1], reverse=True
-        ):
-            if label_id != self.config.outside_id and (
-                allow_overlapping or not any(word_selected[word_start_index:word_end_index])
+            sentence_entities = []
+            assert len(spans) == len(scores) and len(spans) == len(labels)
+            for (word_start_index, word_end_index), score, label_id in sorted(
+                zip(spans, scores, labels), key=lambda tup: tup[1], reverse=True
             ):
-                char_start_index = batch_encoding.word_to_chars(0, word_start_index).start
-                char_end_index = batch_encoding.word_to_chars(0, word_end_index - 1).end
-                output.append(
-                    {
+                if label_id != self.config.outside_id and not any(word_selected[word_start_index:word_end_index]):
+                    char_start_index = batch_encoding.word_to_chars(sample_idx, word_start_index).start
+                    char_end_index = batch_encoding.word_to_chars(sample_idx, word_end_index - 1).end
+                    entity = {
                         "span": sentence[char_start_index:char_end_index]
                         if isinstance(sentence, str)
                         else sentence[word_start_index:word_end_index],
                         "label": id2label[label_id],
                         "score": score,
                     }
-                )
-                if isinstance(sentence, str):
-                    output[-1]["char_start_index"] = char_start_index
-                    output[-1]["char_end_index"] = char_end_index
-                else:
-                    output[-1]["word_start_index"] = word_start_index
-                    output[-1]["word_end_index"] = word_end_index
+                    if isinstance(sentence, str):
+                        entity["char_start_index"] = char_start_index
+                        entity["char_end_index"] = char_end_index
+                    else:
+                        entity["word_start_index"] = word_start_index
+                        entity["word_end_index"] = word_end_index
+                    sentence_entities.append(entity)
 
-                if not allow_overlapping:
                     word_selected[word_start_index:word_end_index] = [True] * (word_end_index - word_start_index)
-        return sorted(
-            output,
-            key=lambda entity: entity["char_start_index"] if isinstance(sentence, str) else entity["word_start_index"],
-        )
+            all_entities.append(
+                sorted(
+                    sentence_entities,
+                    key=lambda entity: entity["char_start_index"]
+                    if isinstance(sentence, str)
+                    else entity["word_start_index"],
+                )
+            )
+        if len(all_entities) == 1:
+            return all_entities[0]
+        return all_entities
 
     def save_pretrained(
         self,

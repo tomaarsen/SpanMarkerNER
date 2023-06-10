@@ -17,9 +17,20 @@ Types of changes
 
 ## [Unreleased]
 
+### Added
+
+- Added support for document-level context in training, evaluation and inference.
+  - Use it by supplying `document_id` and `sentence_id` columns to the Trainer datasets.
+  - Tune it by supplying `max_prev_context` and `max_next_context` to the `SpanMarkerConfig` via `SpanMarkerModel.from_pretrained(..., max_prev_context=3)`.
+- Added batch inference support via `SpanMarkerModel.predict(..., batch_size=4)`.
+
 ### Changed
 
 - Ensure models are in evaluation mode when using `SpanMarkerModel.predict`.
+
+### Deprecated
+
+- Removed the `allow_overlapping` optional keyword from `SpanMarkerModel.predict`
 
 ## [1.0.1]
 

@@ -18,6 +18,12 @@ class SpanMarkerConfig(PretrainedConfig):
             and 128 end markers, for a total of 256 markers per sample. Defaults to 128.
         entity_max_length (`int`): The maximum length of an entity span in terms of words.
             Defaults to 8.
+        max_prev_context (`Optional[int]`): The maximum number of previous sentences to include as
+            context. If `None`, the maximum amount that fits in `model_max_length` is chosen.
+            Defaults to `None`.
+        max_next_context (`Optional[int]`): The maximum number of next sentences to include as
+            context. If `None`, the maximum amount that fits in `model_max_length` is chosen.
+            Defaults to `None`.
 
     Example::
 
@@ -44,6 +50,8 @@ class SpanMarkerConfig(PretrainedConfig):
         model_max_length: Optional[int] = None,
         marker_max_length: int = 128,
         entity_max_length: int = 8,
+        max_prev_context: Optional[int] = None,
+        max_next_context: Optional[int] = None,
         **kwargs,
     ) -> None:
         self.encoder = encoder_config
@@ -51,6 +59,8 @@ class SpanMarkerConfig(PretrainedConfig):
         self.model_max_length_default = 512
         self.marker_max_length = marker_max_length
         self.entity_max_length = entity_max_length
+        self.max_prev_context = max_prev_context
+        self.max_next_context = max_next_context
         self.span_marker_version = kwargs.pop("span_marker_version", None)
         super().__init__(**kwargs)
 

@@ -47,18 +47,25 @@ def test_trainer_standard(
     # Try saving and loading the model
     model_path = tmp_path / model_fixture / dataset_fixture
     model.save_pretrained(model_path)
-    loaded_model = model.from_pretrained(model_path)
+    loaded_model = model.from_pretrained(model_path).try_cuda()
     output = loaded_model.predict(
         "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."
     )
     assert isinstance(output, list)
 
 
+@pytest.mark.parametrize(
+    "dataset_fixture",
+    [
+        "conll_dataset_dict",
+        "document_context_conll_dataset_dict",
+    ],
+)
 def test_trainer_model_init(
-    finetuned_conll_span_marker_model: SpanMarkerModel, conll_dataset_dict: DatasetDict
+    finetuned_conll_span_marker_model: SpanMarkerModel, dataset_fixture: str, request: pytest.FixtureRequest
 ) -> None:
     model = finetuned_conll_span_marker_model
-    dataset = conll_dataset_dict
+    dataset: DatasetDict = request.getfixturevalue(dataset_fixture)
 
     def model_init() -> SpanMarkerModel:
         return model
