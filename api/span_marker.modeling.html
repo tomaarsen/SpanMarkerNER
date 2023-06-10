@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
@@ -143,7 +143,7 @@ e.g. like so:</p>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.forward">
-<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_marker_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_marker_pairs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_words</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.forward" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">forward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">attention_mask</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">position_ids</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_marker_indices</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_marker_pairs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_words</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">document_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sentence_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.forward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.forward" title="Permalink to this definition">¶</a></dt>
 <dd><p>Forward call of the SpanMarkerModel.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -155,6 +155,8 @@ e.g. like so:</p>
 <li><p><strong>num_marker_pairs</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>Tensor</em></a>) – The number of start/end marker pairs per batch sample.</p></li>
 <li><p><strong>labels</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>Tensor</em></a><em>]</em>) – The labels for each span candidate. Defaults to None.</p></li>
 <li><p><strong>num_words</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>Tensor</em></a><em>]</em>) – The number of words for each batch sample. Defaults to None.</p></li>
+<li><p><strong>document_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>Tensor</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>sentence_ids</strong> (<a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>Tensor</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -227,7 +229,7 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_overlapping</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.predict" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">inputs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.predict" title="Permalink to this definition">¶</a></dt>
 <dd><p>Predict named entities from input texts.</p>
 <p>Example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
@@ -246,17 +248,21 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>]</em><em>]</em>) – <p>Input sentences from which to extract entities.
+<li><p><strong>inputs</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>Dataset</em><em>]</em>) – <p>Input sentences from which to extract entities.
 Valid datastructures are:</p>
 <ul>
 <li><p>str: a string sentence.</p></li>
 <li><p>List[str]: a pre-tokenized string sentence, i.e. a list of words.</p></li>
 <li><p>List[str]: a list of multiple string sentences.</p></li>
 <li><p>List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.</p></li>
+<li><dl class="simple">
+<dt>Dataset: A 🤗 <a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> with a <code class="docutils literal notranslate"><span class="pre">tokens</span></code> column and optionally <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns.</dt><dd><p>If the optional columns are provided, they will be used to provide document-level context.</p>
+</dd>
+</dl>
+</li>
 </ul>
 </p></li>
-<li><p><strong>allow_overlapping</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to allow entity spans to overlap. The model does not
-have good support for this, so False is recommended. Defaults to False.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -328,7 +334,7 @@ copied to that device</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.push_to_hub">
-<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">push_to_hub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_auth_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10GB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_pr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.push_to_hub" title="Permalink to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">push_to_hub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_auth_token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10GB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_pr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe_serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.push_to_hub" title="Permalink to this definition">¶</a></dt>
 <dd><p>Upload the model file to the 🤗 Model Hub while synchronizing a local clone of the repo in
 <cite>repo_path_or_name</cite>.</p>
 <dl class="field-list simple">
@@ -347,6 +353,7 @@ is not specified.</p></li>
 will then be each of size lower than this size. If expressed as a string, needs to be digits followed
 by a unit (like <cite>“5MB”</cite>).</p></li>
 <li><p><strong>create_pr</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>False</cite>) – Whether or not to create a PR with the uploaded files or directly commit.</p></li>
+<li><p><strong>safe_serialization</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>False</cite>) – Whether or not to convert the model weights in safetensors format for safer serialization.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>

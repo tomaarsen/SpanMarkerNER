@@ -130,6 +130,12 @@
 <span class="sd">            and 128 end markers, for a total of 256 markers per sample. Defaults to 128.</span>
 <span class="sd">        entity_max_length (`int`): The maximum length of an entity span in terms of words.</span>
 <span class="sd">            Defaults to 8.</span>
+<span class="sd">        max_prev_context (`Optional[int]`): The maximum number of previous sentences to include as</span>
+<span class="sd">            context. If `None`, the maximum amount that fits in `model_max_length` is chosen.</span>
+<span class="sd">            Defaults to `None`.</span>
+<span class="sd">        max_next_context (`Optional[int]`): The maximum number of next sentences to include as</span>
+<span class="sd">            context. If `None`, the maximum amount that fits in `model_max_length` is chosen.</span>
+<span class="sd">            Defaults to `None`.</span>
 
 <span class="sd">    Example::</span>
 
@@ -156,6 +162,8 @@
         <span class="n">model_max_length</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">128</span><span class="p">,</span>
         <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">8</span><span class="p">,</span>
+        <span class="n">max_prev_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_next_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">encoder_config</span>
@@ -163,6 +171,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length_default</span> <span class="o">=</span> <span class="mi">512</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">marker_max_length</span> <span class="o">=</span> <span class="n">marker_max_length</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">entity_max_length</span> <span class="o">=</span> <span class="n">entity_max_length</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_prev_context</span> <span class="o">=</span> <span class="n">max_prev_context</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_next_context</span> <span class="o">=</span> <span class="n">max_next_context</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">span_marker_version</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;span_marker_version&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 

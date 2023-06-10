@@ -110,13 +110,13 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.tokenizer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">itertools</span>
-<span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterator</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">AutoTokenizer</span><span class="p">,</span> <span class="n">PreTrainedTokenizer</span>
 
 <span class="kn">from</span> <span class="nn">span_marker.configuration</span> <span class="kn">import</span> <span class="n">SpanMarkerConfig</span>
@@ -287,15 +287,17 @@
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="s2">&quot;tokenizer&quot;</span><span class="p">)</span><span class="o">.</span><span class="fm">__getattribute__</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">return_num_words</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">return_num_words</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
+        <span class="n">tokens</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="c1"># TODO: Increase robustness of this</span>
         <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">inputs</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">inputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tokens</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
             <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="n">batch_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
-            <span class="n">inputs</span><span class="p">,</span>
+            <span class="n">tokens</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
             <span class="n">is_split_into_words</span><span class="o">=</span><span class="n">is_split_into_words</span><span class="p">,</span>
             <span class="n">padding</span><span class="o">=</span><span class="s2">&quot;max_length&quot;</span><span class="p">,</span>
@@ -310,10 +312,8 @@
         <span class="n">all_end_position_ids</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">all_labels</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">all_num_words</span> <span class="o">=</span> <span class="p">[]</span>
-
         <span class="k">for</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">input_ids</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch_encoding</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]):</span>
-            <span class="n">word_ids</span> <span class="o">=</span> <span class="n">itertools</span><span class="o">.</span><span class="n">takewhile</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word_id</span><span class="p">:</span> <span class="n">word_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_ids</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">)[</span><span class="mi">1</span><span class="p">:])</span>
-            <span class="n">num_words</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">word_ids</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="n">num_words</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">nanmax</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_ids</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)))</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span> <span class="ow">in</span> <span class="n">input_ids</span><span class="p">:</span>
                 <span class="n">num_tokens</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">input_ids</span><span class="p">)</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">pad_token_id</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
@@ -337,34 +337,25 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">spans</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">))</span>
 
-            <span class="c1"># Compute the total number of start and end marker pairs we can include in this sample</span>
-            <span class="n">num_marker_pairs</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span> <span class="o">-</span> <span class="n">num_tokens</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">start_position_ids</span><span class="p">,</span> <span class="n">end_position_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">start_word_i</span><span class="p">,</span> <span class="n">end_word_i</span> <span class="ow">in</span> <span class="n">spans</span><span class="p">:</span>
+                <span class="n">start_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">start_word_i</span><span class="p">)</span>
+                <span class="c1"># The if ... else 0 exists because of words like &#39;\u2063&#39;</span>
+                <span class="n">start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_token_span</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="n">start_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
-            <span class="k">for</span> <span class="n">group_start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">spans</span><span class="p">),</span> <span class="n">num_marker_pairs</span><span class="p">):</span>
-                <span class="n">group_end_idx</span> <span class="o">=</span> <span class="n">group_start_idx</span> <span class="o">+</span> <span class="n">num_marker_pairs</span>
-                <span class="n">group_spans</span> <span class="o">=</span> <span class="n">spans</span><span class="p">[</span><span class="n">group_start_idx</span><span class="p">:</span><span class="n">group_end_idx</span><span class="p">]</span>
-                <span class="n">group_num_spans</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">group_spans</span><span class="p">)</span>
+                <span class="n">end_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">end_word_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_token_span</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">end_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
 
-                <span class="n">start_position_ids</span><span class="p">,</span> <span class="n">end_position_ids</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-                <span class="k">for</span> <span class="n">start_word_i</span><span class="p">,</span> <span class="n">end_word_i</span> <span class="ow">in</span> <span class="n">group_spans</span><span class="p">:</span>
-                    <span class="n">start_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">start_word_i</span><span class="p">)</span>
-                    <span class="c1"># The if ... else 0 exists because of words like &#39;\u2063&#39;</span>
-                    <span class="n">start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_token_span</span><span class="o">.</span><span class="n">start</span> <span class="k">if</span> <span class="n">start_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="n">all_input_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_ids</span><span class="p">[:</span><span class="n">num_tokens</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+            <span class="n">all_num_spans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">spans</span><span class="p">))</span>
+            <span class="n">all_start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_position_ids</span><span class="p">)</span>
+            <span class="n">all_end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_position_ids</span><span class="p">)</span>
 
-                    <span class="n">end_token_span</span> <span class="o">=</span> <span class="n">batch_encoding</span><span class="o">.</span><span class="n">word_to_tokens</span><span class="p">(</span><span class="n">sample_idx</span><span class="p">,</span> <span class="n">word_index</span><span class="o">=</span><span class="n">end_word_i</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
-                    <span class="n">end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_token_span</span><span class="o">.</span><span class="n">end</span> <span class="o">-</span> <span class="mi">1</span> <span class="k">if</span> <span class="n">end_token_span</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
+                <span class="n">all_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span_labels</span><span class="p">)</span>
 
-                <span class="n">all_input_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">input_ids</span><span class="p">[:</span><span class="n">num_tokens</span><span class="p">])</span>
-                <span class="n">all_num_spans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_num_spans</span><span class="p">)</span>
-                <span class="n">all_start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_position_ids</span><span class="p">)</span>
-                <span class="n">all_end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_position_ids</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">labels</span><span class="p">:</span>
-                    <span class="n">group_labels</span> <span class="o">=</span> <span class="n">span_labels</span><span class="p">[</span><span class="n">group_start_idx</span><span class="p">:</span><span class="n">group_end_idx</span><span class="p">]</span>
-                    <span class="n">all_labels</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group_labels</span><span class="p">)</span>
-
-                <span class="k">if</span> <span class="n">return_num_words</span><span class="p">:</span>
-                    <span class="n">all_num_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num_words</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">return_num_words</span><span class="p">:</span>
+                <span class="n">all_num_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">num_words</span><span class="p">)</span>
 
         <span class="n">output</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;input_ids&quot;</span><span class="p">:</span> <span class="n">all_input_ids</span><span class="p">,</span>

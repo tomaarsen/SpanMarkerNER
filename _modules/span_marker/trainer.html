@@ -111,11 +111,13 @@
           
   <h1>Source code for span_marker.trainer</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span> <span class="nn">tqdm.autonotebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EvalPrediction</span><span class="p">,</span>
     <span class="n">TrainerCallback</span><span class="p">,</span>
@@ -144,9 +146,11 @@
 <span class="sd">            The arguments to tweak for training. Will default to a basic instance of :class:`~transformers.TrainingArguments` with the</span>
 <span class="sd">            ``output_dir`` set to a directory named *models/my_span_marker_model* in the current directory if not provided.</span>
 <span class="sd">        train_dataset (Optional[~datasets.Dataset]):</span>
-<span class="sd">            The dataset to use for training.</span>
+<span class="sd">            The dataset to use for training. Must contain ``tokens`` and ``ner_tags`` columns, and may contain</span>
+<span class="sd">            ``document_id`` and ``sentence_id`` columns for document-level context during training.</span>
 <span class="sd">        eval_dataset (Optional[~datasets.Dataset]):</span>
-<span class="sd">             The dataset to use for evaluation.</span>
+<span class="sd">            The dataset to use for evaluation. Must contain ``tokens`` and ``ner_tags`` columns, and may contain</span>
+<span class="sd">            ``document_id`` and ``sentence_id`` columns for document-level context during evaluation.</span>
 <span class="sd">        model_init (Optional[Callable[[], SpanMarkerModel]]):</span>
 <span class="sd">            A function that instantiates the model to be used. If provided, each call to :meth:`Trainer.train` will start</span>
 <span class="sd">            from a new instance of the model as given by this function.</span>
@@ -187,6 +191,9 @@
 <span class="sd">        - **is_in_train** -- Whether or not a model is currently running :meth:`~Trainer.train` (e.g. when ``evaluate`` is called while</span>
 <span class="sd">          in ``train``)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">REQUIRED_COLUMNS</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">)</span>
+    <span class="n">OPTIONAL_COLUMNS</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -267,10 +274,14 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            Dataset: The normalized and tokenized version of the input dataset.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">column</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">REQUIRED_COLUMNS</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">column</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;The </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset must contain a </span><span class="si">{</span><span class="n">column</span><span class="si">!r}</span><span class="s2"> column.&quot;</span><span class="p">)</span>
 
+        <span class="c1"># Drop all unused columns, only keep &quot;tokens&quot;, &quot;ner_tags&quot;, &quot;document_id&quot;, &quot;sentence_id&quot;</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPTIONAL_COLUMNS</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">REQUIRED_COLUMNS</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="c1"># Normalize the labels to a common format (list of label-start-end tuples)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="n">label_normalizer</span><span class="p">,</span>
@@ -280,12 +291,159 @@
         <span class="c1"># Tokenize and add start/end markers</span>
         <span class="k">with</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">entity_tracker</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">batch</span><span class="p">:</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">],</span> <span class="n">labels</span><span class="o">=</span><span class="n">batch</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">],</span> <span class="n">return_num_words</span><span class="o">=</span><span class="n">is_evaluate</span><span class="p">),</span>
+                <span class="k">lambda</span> <span class="n">batch</span><span class="p">:</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">return_num_words</span><span class="o">=</span><span class="n">is_evaluate</span><span class="p">),</span>
                 <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                <span class="n">remove_columns</span><span class="o">=</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">,</span>
+                <span class="n">remove_columns</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPTIONAL_COLUMNS</span><span class="p">),</span>
                 <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tokenizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="c1"># If &quot;document_id&quot; AND &quot;sentence_id&quot; exist in the training dataset</span>
+        <span class="k">if</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">):</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">column_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">])</span>
+            <span class="c1"># TODO: Sort the dataset</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_context</span><span class="p">(</span>
+                <span class="n">dataset</span><span class="p">,</span>
+                <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
+                <span class="n">max_prev_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_prev_context</span><span class="p">,</span>
+                <span class="n">max_next_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_next_context</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="c1"># Spread between multiple samples where needed</span>
+        <span class="n">original_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+            <span class="k">lambda</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">(</span>
+                <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span> <span class="n">sample</span>
+            <span class="p">),</span>
+            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Spreading data between multiple samples&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">new_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Spread </span><span class="si">{</span><span class="n">original_length</span><span class="si">}</span><span class="s2"> sentences across </span><span class="si">{</span><span class="n">new_length</span><span class="si">}</span><span class="s2"> samples, &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;a </span><span class="si">{</span><span class="p">(</span><span class="n">new_length</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">original_length</span><span class="p">)</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="mi">1</span><span class="si">:</span><span class="s2">%</span><span class="si">}</span><span class="s2"> increase. You can increase &quot;</span>
+            <span class="s2">&quot;`model_max_length` or `marker_max_length` to decrease the number of samples, &quot;</span>
+            <span class="s2">&quot;but recognize that longer samples are slower.&quot;</span>
+        <span class="p">)</span>
         <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="Trainer.add_context"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.add_context">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">add_context</span><span class="p">(</span>
+        <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
+        <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">max_prev_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_next_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Add document-level context from previous and next sentences in the same document.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            dataset (`Dataset`): The partially processed dataset, containing `&quot;input_ids&quot;`, `&quot;start_position_ids&quot;`,</span>
+<span class="sd">                `&quot;end_position_ids&quot;`, `&quot;document_id&quot;` and `&quot;sentence_id&quot;` columns.</span>
+<span class="sd">            model_max_length (`int`): The total number of tokens that can be processed before</span>
+<span class="sd">                truncation.</span>
+<span class="sd">            max_prev_context (`Optional[int]`): The maximum number of previous sentences to include. Defaults to None,</span>
+<span class="sd">                representing as many previous sentences as fits.</span>
+<span class="sd">            max_next_context (`Optional[int]`): The maximum number of next sentences to include. Defaults to None,</span>
+<span class="sd">                representing as many previous sentences as fits.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dataset: A copy of the Dataset with additional previous and next sentences added to input_ids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">all_input_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_start_position_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">all_end_position_ids</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">sample_idx</span><span class="p">,</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span>
+            <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Adding document-level context&quot;</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">leave</span><span class="o">=</span><span class="kc">False</span>
+        <span class="p">):</span>
+            <span class="c1"># Sequentially add next context, previous context, next context, previous context, etc. until</span>
+            <span class="c1"># max token length or max_prev/next_context</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="n">start_position_ids</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">]</span>
+            <span class="n">end_position_ids</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">]</span>
+
+            <span class="n">next_context_added</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">prev_context_added</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="n">remaining_space</span> <span class="o">=</span> <span class="n">model_max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+            <span class="k">while</span> <span class="n">remaining_space</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">next_context_index</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">+</span> <span class="n">next_context_added</span> <span class="o">+</span> <span class="mi">1</span>
+                <span class="n">should_add_next</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">max_next_context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">next_context_added</span> <span class="o">&lt;</span> <span class="n">max_next_context</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">next_context_index</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">dataset</span><span class="p">[</span><span class="n">next_context_index</span><span class="p">][</span><span class="s2">&quot;document_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;document_id&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">should_add_next</span><span class="p">:</span>
+                    <span class="c1"># TODO: [1:-1][:remaining_space] is not efficient</span>
+                    <span class="n">tokens</span> <span class="o">+=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">next_context_index</span><span class="p">][</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">][:</span><span class="n">remaining_space</span><span class="p">]</span>
+                    <span class="n">next_context_added</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="n">remaining_space</span> <span class="o">=</span> <span class="n">model_max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+                <span class="k">if</span> <span class="n">remaining_space</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">prev_context_index</span> <span class="o">=</span> <span class="n">sample_idx</span> <span class="o">-</span> <span class="n">prev_context_added</span> <span class="o">-</span> <span class="mi">1</span>
+                <span class="n">should_add_prev</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="p">(</span><span class="n">max_prev_context</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">prev_context_added</span> <span class="o">&lt;</span> <span class="n">max_prev_context</span><span class="p">)</span>
+                    <span class="ow">and</span> <span class="n">prev_context_index</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+                    <span class="ow">and</span> <span class="n">dataset</span><span class="p">[</span><span class="n">prev_context_index</span><span class="p">][</span><span class="s2">&quot;document_id&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;document_id&quot;</span><span class="p">]</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">should_add_prev</span><span class="p">:</span>
+                    <span class="c1"># TODO: [1:-1][remaining_space:] is not efficient</span>
+                    <span class="n">prepended_tokens</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="n">prev_context_index</span><span class="p">][</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">1</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">][</span><span class="o">-</span><span class="n">remaining_space</span><span class="p">:]</span>
+                    <span class="n">tokens</span> <span class="o">=</span> <span class="n">prepended_tokens</span> <span class="o">+</span> <span class="n">tokens</span>
+                    <span class="c1"># TODO: Use numpy? np.array(sample[&quot;start_position_ids&quot;]) + len(prepended_tokens)</span>
+                    <span class="n">start_position_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">prepended_tokens</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">start_position_ids</span><span class="p">]</span>
+                    <span class="n">end_position_ids</span> <span class="o">=</span> <span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">prepended_tokens</span><span class="p">)</span> <span class="k">for</span> <span class="n">index</span> <span class="ow">in</span> <span class="n">end_position_ids</span><span class="p">]</span>
+                    <span class="n">prev_context_added</span> <span class="o">+=</span> <span class="mi">1</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">should_add_next</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">should_add_prev</span><span class="p">:</span>
+                    <span class="k">break</span>
+
+                <span class="n">remaining_space</span> <span class="o">=</span> <span class="n">model_max_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-</span> <span class="mi">2</span>
+
+            <span class="n">all_input_ids</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">]]</span> <span class="o">+</span> <span class="n">tokens</span> <span class="o">+</span> <span class="p">[</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">][</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span>
+            <span class="n">all_start_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">start_position_ids</span><span class="p">)</span>
+            <span class="n">all_end_position_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">end_position_ids</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">((</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;start_position_ids&quot;</span><span class="p">,</span> <span class="s2">&quot;end_position_ids&quot;</span><span class="p">))</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;input_ids&quot;</span><span class="p">,</span> <span class="n">all_input_ids</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">,</span> <span class="n">all_start_position_ids</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">,</span> <span class="n">all_end_position_ids</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">dataset</span></div>
+
+<div class="viewcode-block" id="Trainer.spread_sample"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.spread_sample">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">spread_sample</span><span class="p">(</span>
+        <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Spread sentences between multiple samples if lack of space per sample requires it.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            model_max_length (`int`): The total number of tokens that can be processed before</span>
+<span class="sd">                truncation.</span>
+<span class="sd">            marker_max_length (`int`): The maximum length for each of the span markers. A value of 128</span>
+<span class="sd">                means that each training and inferencing sample contains a maximum of 128 start markers</span>
+<span class="sd">                and 128 end markers, for a total of 256 markers per sample.</span>
+<span class="sd">            sample (`Dict[str, List[Any]]`): A dictionary of dataset keys to singleton lists</span>
+<span class="sd">                of values.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, List[Any]]: A dictionary of dataset keys to not strictly singleton lists</span>
+<span class="sd">                of values.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sample</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">total_sample_length</span> <span class="o">=</span> <span class="n">model_max_length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_max_length</span>
+        <span class="n">sample_marker_space</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_sample_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]))</span> <span class="o">//</span> <span class="mi">2</span>
+        <span class="n">spread_between_n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">sample_marker_space</span><span class="p">)</span>
+        <span class="n">spread_samples</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spread_between_n</span><span class="p">):</span>
+            <span class="n">sample_copy</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
+            <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
+            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="k">if</span> <span class="s2">&quot;labels&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+                <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;num_spans&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span>
+            <span class="n">spread_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_copy</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">one_sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">one_sample</span> <span class="ow">in</span> <span class="n">spread_samples</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span></div>
 
     <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed training DataLoader.&quot;&quot;&quot;</span>

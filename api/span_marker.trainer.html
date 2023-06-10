@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
@@ -124,8 +124,10 @@ built tightly on top of the 🤗 Transformers <a class="reference external" href
 <li><p><strong>model</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><em>SpanMarkerModel</em></a><em>]</em>) – The model to train, evaluate or use for predictions. If not provided, a <code class="docutils literal notranslate"><span class="pre">model_init</span></code> must be passed.</p></li>
 <li><p><strong>args</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments" title="(in transformers vmain)"><em>TrainingArguments</em></a><em>]</em>) – The arguments to tweak for training. Will default to a basic instance of <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments" title="(in transformers vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingArguments</span></code></a> with the
 <code class="docutils literal notranslate"><span class="pre">output_dir</span></code> set to a directory named <em>models/my_span_marker_model</em> in the current directory if not provided.</p></li>
-<li><p><strong>train_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>Dataset</em></a><em>]</em>) – The dataset to use for training.</p></li>
-<li><p><strong>eval_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>Dataset</em></a><em>]</em>) – The dataset to use for evaluation.</p></li>
+<li><p><strong>train_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>Dataset</em></a><em>]</em>) – The dataset to use for training. Must contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns, and may contain
+<code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns for document-level context during training.</p></li>
+<li><p><strong>eval_dataset</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/main_classes#datasets.Dataset" title="(in datasets vmain)"><em>Dataset</em></a><em>]</em>) – The dataset to use for evaluation. Must contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns, and may contain
+<code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns for document-level context during evaluation.</p></li>
 <li><p><strong>model_init</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>]</em><em>, </em><a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><em>SpanMarkerModel</em></a><em>]</em><em>]</em>) – <p>A function that instantiates the model to be used. If provided, each call to <a class="reference internal" href="#span_marker.trainer.Trainer.train" title="span_marker.trainer.Trainer.train"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Trainer.train()</span></code></a> will start
 from a new instance of the model as given by this function.</p>
 <p>The function may have zero argument, or a single one containing the optuna/Ray Tune/SigOpt trial object, to
@@ -166,6 +168,16 @@ to <code class="docutils literal notranslate"><span class="pre">False</span></co
 in <code class="docutils literal notranslate"><span class="pre">train</span></code>)</p></li>
 </ul>
 </div></blockquote>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.REQUIRED_COLUMNS">
+<span class="sig-name descname"><span class="pre">REQUIRED_COLUMNS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('tokens',</span> <span class="pre">'ner_tags')</span></em><a class="headerlink" href="#span_marker.trainer.Trainer.REQUIRED_COLUMNS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.OPTIONAL_COLUMNS">
+<span class="sig-name descname"><span class="pre">OPTIONAL_COLUMNS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('document_id',</span> <span class="pre">'sentence_id')</span></em><a class="headerlink" href="#span_marker.trainer.Trainer.OPTIONAL_COLUMNS" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.trainer.Trainer.preprocess_dataset">
 <span class="sig-name descname"><span class="pre">preprocess_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_normalizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.preprocess_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.preprocess_dataset" title="Permalink to this definition">¶</a></dt>
@@ -190,6 +202,61 @@ Required for evaluation. Defaults to False.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.add_context">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_prev_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_next_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.add_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.add_context" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add document-level context from previous and next sentences in the same document.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dataset</strong> (<cite>Dataset</cite>) – The partially processed dataset, containing <cite>“input_ids”</cite>, <cite>“start_position_ids”</cite>,
+<cite>“end_position_ids”</cite>, <cite>“document_id”</cite> and <cite>“sentence_id”</cite> columns.</p></li>
+<li><p><strong>model_max_length</strong> (<cite>int</cite>) – The total number of tokens that can be processed before
+truncation.</p></li>
+<li><p><strong>max_prev_context</strong> (<cite>Optional[int]</cite>) – The maximum number of previous sentences to include. Defaults to None,
+representing as many previous sentences as fits.</p></li>
+<li><p><strong>max_next_context</strong> (<cite>Optional[int]</cite>) – The maximum number of next sentences to include. Defaults to None,
+representing as many previous sentences as fits.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A copy of the Dataset with additional previous and next sentences added to input_ids.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dataset</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.trainer.Trainer.spread_sample">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spread_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.spread_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.spread_sample" title="Permalink to this definition">¶</a></dt>
+<dd><p>Spread sentences between multiple samples if lack of space per sample requires it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_max_length</strong> (<cite>int</cite>) – The total number of tokens that can be processed before
+truncation.</p></li>
+<li><p><strong>marker_max_length</strong> (<cite>int</cite>) – The maximum length for each of the span markers. A value of 128
+means that each training and inferencing sample contains a maximum of 128 start markers
+and 128 end markers, for a total of 256 markers per sample.</p></li>
+<li><p><strong>sample</strong> (<cite>Dict[str, List[Any]]</cite>) – A dictionary of dataset keys to singleton lists
+of values.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A dictionary of dataset keys to not strictly singleton lists</dt><dd><p>of values.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, List[Any]]</p>
 </dd>
 </dl>
 </dd></dl>
