@@ -124,7 +124,17 @@ Types of changes
 * "Fixed" for any bug fixes.
 * "Security" in case of vulnerabilities.
 --><section id="id1">
-<h2>[1.1.0]<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<h2>[1.1.1]<a class="headerlink" href="#id1" title="Permalink to this heading">¶</a></h2>
+<section id="fixed">
+<h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this heading">¶</a></h3>
+<ul class="simple">
+<li><p>Add missing space in model card template.</p></li>
+<li><p>Return nested list if input is a singular list of sentences or a dataset with one sample.</p></li>
+</ul>
+</section>
+</section>
+<section id="id2">
+<h2>[1.1.0]<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
 <section id="added">
 <h3>Added<a class="headerlink" href="#added" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
@@ -150,19 +160,19 @@ Types of changes
 </ul>
 </section>
 </section>
-<section id="id2">
-<h2>[1.0.1]<a class="headerlink" href="#id2" title="Permalink to this heading">¶</a></h2>
-<section id="fixed">
-<h3>Fixed<a class="headerlink" href="#fixed" title="Permalink to this heading">¶</a></h3>
+<section id="id3">
+<h2>[1.0.1]<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
+<section id="id4">
+<h3>Fixed<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed critical issue with incorrect predictions at inputs that require multiple samples.</p></li>
 </ul>
 </section>
 </section>
-<section id="id3">
-<h2>[1.0.0]<a class="headerlink" href="#id3" title="Permalink to this heading">¶</a></h2>
-<section id="id4">
-<h3>Added<a class="headerlink" href="#id4" title="Permalink to this heading">¶</a></h3>
+<section id="id5">
+<h2>[1.0.0]<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h2>
+<section id="id6">
+<h3>Added<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Added a warning for entities that are ignored/skipped due to the maximum entity length or maximum model input length.</p></li>
 <li><p>Added info-level logs displaying the detected labeling scheme (IOB/IOB2, BIOES, BILOU, none).</p></li>
@@ -170,8 +180,8 @@ Types of changes
 <li><p>Added <code class="docutils literal notranslate"><span class="pre">try_cuda</span></code> method to <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code> which tries to place the model on CUDA and does nothing if that fails.</p></li>
 </ul>
 </section>
-<section id="id5">
-<h3>Changed<a class="headerlink" href="#id5" title="Permalink to this heading">¶</a></h3>
+<section id="id7">
+<h3>Changed<a class="headerlink" href="#id7" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Updated where in the input IDs the span markers are stored, results in 40% training and inferencing speed increase.</p></li>
 <li><p>Updated default <code class="docutils literal notranslate"><span class="pre">marker_max_length</span></code> in SpanMarkerConfig from 256 to 128.</p></li>
@@ -183,54 +193,54 @@ Types of changes
 <li><p>Improved model card generation.</p></li>
 </ul>
 </section>
-<section id="id6">
-<h3>Fixed<a class="headerlink" href="#id6" title="Permalink to this heading">¶</a></h3>
+<section id="id8">
+<h3>Fixed<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Resolved tricky issue causing models to learn to never predict the last token as an entity (Closes <a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/pull/1">#1</a>).</p></li>
 <li><p>Fixed label normalization for BILOU datasets.</p></li>
 </ul>
 </section>
 </section>
-<section id="id8">
-<h2>[0.2.2] - 2023-04-13<a class="headerlink" href="#id8" title="Permalink to this heading">¶</a></h2>
-<section id="id9">
-<h3>Fixed<a class="headerlink" href="#id9" title="Permalink to this heading">¶</a></h3>
+<section id="id10">
+<h2>[0.2.2] - 2023-04-13<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
+<section id="id11">
+<h3>Fixed<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Correctly propagate <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code> kwargs to the config initialisation.</p></li>
 </ul>
 </section>
 </section>
-<section id="id10">
-<h2>[0.2.1] - 2023-04-07<a class="headerlink" href="#id10" title="Permalink to this heading">¶</a></h2>
-<section id="id11">
-<h3>Added<a class="headerlink" href="#id11" title="Permalink to this heading">¶</a></h3>
+<section id="id12">
+<h2>[0.2.1] - 2023-04-07<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h2>
+<section id="id13">
+<h3>Added<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Save <code class="docutils literal notranslate"><span class="pre">span_marker_version</span></code> in config files from now on.</p></li>
 </ul>
 </section>
-<section id="id12">
-<h3>Changed<a class="headerlink" href="#id12" title="Permalink to this heading">¶</a></h3>
+<section id="id14">
+<h3>Changed<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.save_pretrained</span></code> and <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.push_to_hub</span></code> now also pushes the tokenizer and a simple model card.</p></li>
 </ul>
 </section>
 </section>
-<section id="id13">
-<h2>[0.2.0] - 2023-04-06<a class="headerlink" href="#id13" title="Permalink to this heading">¶</a></h2>
-<section id="id14">
-<h3>Added<a class="headerlink" href="#id14" title="Permalink to this heading">¶</a></h3>
+<section id="id15">
+<h2>[0.2.0] - 2023-04-06<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h2>
+<section id="id16">
+<h3>Added<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Added missing docstrings.</p></li>
 </ul>
 </section>
-<section id="id15">
-<h3>Changed<a class="headerlink" href="#id15" title="Permalink to this heading">¶</a></h3>
+<section id="id17">
+<h3>Changed<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Updated how entity span indices are returned for <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.predict</span></code>.</p></li>
 </ul>
 </section>
-<section id="id16">
-<h3>Fixed<a class="headerlink" href="#id16" title="Permalink to this heading">¶</a></h3>
+<section id="id18">
+<h3>Fixed<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Prevent incorrect labels when loading a model trained with a schemed (e.g. IOB, BIOES) dataset.</p></li>
 <li><p>Fix several bugs with loading finetuned SpanMarker models.</p></li>
@@ -239,20 +249,20 @@ Types of changes
 </ul>
 </section>
 </section>
-<section id="id17">
-<h2>[0.1.1] - 2023-03-31<a class="headerlink" href="#id17" title="Permalink to this heading">¶</a></h2>
-<section id="id18">
-<h3>Fixed<a class="headerlink" href="#id18" title="Permalink to this heading">¶</a></h3>
+<section id="id19">
+<h2>[0.1.1] - 2023-03-31<a class="headerlink" href="#id19" title="Permalink to this heading">¶</a></h2>
+<section id="id20">
+<h3>Fixed<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Prevent crash when <code class="docutils literal notranslate"><span class="pre">args</span></code> not supplied to Trainer.</p></li>
 <li><p>Prevent crash on evaluation when using <code class="docutils literal notranslate"><span class="pre">fp16=True</span></code> as a Training Argument.</p></li>
 </ul>
 </section>
 </section>
-<section id="id19">
-<h2>[0.1.0] - 2023-03-30<a class="headerlink" href="#id19" title="Permalink to this heading">¶</a></h2>
-<section id="id20">
-<h3>Added<a class="headerlink" href="#id20" title="Permalink to this heading">¶</a></h3>
+<section id="id21">
+<h2>[0.1.0] - 2023-03-30<a class="headerlink" href="#id21" title="Permalink to this heading">¶</a></h2>
+<section id="id22">
+<h3>Added<a class="headerlink" href="#id22" title="Permalink to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>Implement initial working version.</p></li>
 </ul>
