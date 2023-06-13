@@ -15,6 +15,13 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- Add missing space in model card template.
+- Return nested list if input is a singular list of sentences or a dataset with one sample.
+
 ## [1.1.0]
 
 ### Added
