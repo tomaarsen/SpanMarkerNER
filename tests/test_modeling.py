@@ -86,14 +86,25 @@ def test_correct_predictions(
     pred_entities = model.predict(inputs)
     compare_entities(pred_entities, gold_entities)
 
+    # Single sentence, but nested
+    pred_entity_list = model.predict([inputs])
+    for pred_entities in pred_entity_list:
+        compare_entities(pred_entities, gold_entities)
+
     # Multiple sentences
     pred_entity_list = model.predict([inputs] * 3)
     for pred_entities in pred_entity_list:
         compare_entities(pred_entities, gold_entities)
 
     # As a Dataset
-    pred_entities = model.predict(Dataset.from_dict({"tokens": [inputs]}))
-    compare_entities(pred_entities, gold_entities)
+    pred_entity_list = model.predict(Dataset.from_dict({"tokens": [inputs]}))
+    for pred_entities in pred_entity_list:
+        compare_entities(pred_entities, gold_entities)
+
+    # As a non-singular Dataset
+    pred_entity_list = model.predict(Dataset.from_dict({"tokens": [inputs] * 2}))
+    for pred_entities in pred_entity_list:
+        compare_entities(pred_entities, gold_entities)
 
 
 @pytest.mark.parametrize(

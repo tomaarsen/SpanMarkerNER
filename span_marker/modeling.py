@@ -383,12 +383,14 @@ class SpanMarkerModel(PreTrainedModel):
         if not inputs:
             return []
 
+        # Track whether the input was a string sentence or a list of tokens
+        single_input = False
         # Check if inputs is a string, i.e. a string sentence, or
         # if it is a list of strings without spaces, i.e. if it's 1 tokenized sentence
         if isinstance(inputs, str) or (
             isinstance(inputs, list) and all(isinstance(element, str) and " " not in element for element in inputs)
         ):
-            # return self._predict_one(inputs, allow_overlapping=allow_overlapping)
+            single_input = True
             dataset = Dataset.from_dict({"tokens": [inputs]})
 
         # Otherwise, we likely have a list of strings, i.e. a list of string sentences,
@@ -518,7 +520,8 @@ class SpanMarkerModel(PreTrainedModel):
                     else entity["word_start_index"],
                 )
             )
-        if len(all_entities) == 1:
+        # if the input was a string or a list of tokens, return a list of dictionaries
+        if single_input and len(all_entities) == 1:
             return all_entities[0]
         return all_entities
 
