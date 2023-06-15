@@ -1,3 +1,4 @@
+import logging
 import re
 from pathlib import Path
 from typing import Dict, List
@@ -16,13 +17,19 @@ from tests.constants import CONLL_LABELS, DEFAULT_ARGS, TINY_BERT
     [
         ("fresh_conll_span_marker_model", "conll_dataset_dict"),  # IOB2
         ("finetuned_conll_span_marker_model", "conll_dataset_dict"),  # IOB2
+        ("fresh_conll_span_marker_model", "document_context_conll_dataset_dict"),  # IOB2, doc-context
+        ("finetuned_conll_span_marker_model", "document_context_conll_dataset_dict"),  # IOB2, doc-context
         ("fresh_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),  # no scheme
         ("finetuned_fewnerd_span_marker_model", "fewnwerd_coarse_dataset_dict"),  # no scheme
         ("fresh_fabner_span_marker_model", "fabner_dataset_dict"),  # BIOES
     ],
 )
 def test_trainer_standard(
-    model_fixture: str, dataset_fixture: str, request: pytest.FixtureRequest, tmp_path: Path
+    model_fixture: str,
+    dataset_fixture: str,
+    request: pytest.FixtureRequest,
+    tmp_path: Path,
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     model: SpanMarkerModel = request.getfixturevalue(model_fixture)
     dataset: DatasetDict = request.getfixturevalue(dataset_fixture)
@@ -30,6 +37,8 @@ def test_trainer_standard(
     # Perform training and evaluation
     trainer = Trainer(model, args=DEFAULT_ARGS, train_dataset=dataset["train"], eval_dataset=dataset["test"])
     trainer.train()
+    if "document_context" in dataset_fixture:
+        assert model.config.trained_with_document_context
     metrics = trainer.evaluate()
     assert isinstance(metrics, dict)
     assert set(metrics.keys()) == {
@@ -52,6 +61,33 @@ def test_trainer_standard(
         "This might just output confusing things like M.C. Escher, but it should at least not crash in Germany."
     )
     assert isinstance(output, list)
+
+    if "document_context" in dataset_fixture:
+        # If there's document context, let's evaluate the doc-context model again, but with just tokens
+        caplog.clear()
+        trainer.evaluate(dataset["test"].remove_columns(("document_id", "sentence_id")))
+        print(caplog.record_tuples)
+        assert any(
+            [
+                level == logging.WARNING
+                and text == "This model was trained with document-level context: "
+                "evaluation without document-level context may cause decreased performance."
+                for (_, level, text) in caplog.record_tuples
+            ]
+        )
+        # Alternatively, let's pretend the model is not trained with doc-level context,
+        # and use the doc-level dataset for evaluation
+        caplog.clear()
+        model.config.trained_with_document_context = False
+        trainer.evaluate()
+        assert any(
+            [
+                level == logging.WARNING
+                and text == "This model was trained without document-level context: "
+                "evaluation with document-level context may cause decreased performance."
+                for (_, level, text) in caplog.record_tuples
+            ]
+        )
 
 
 @pytest.mark.parametrize(
