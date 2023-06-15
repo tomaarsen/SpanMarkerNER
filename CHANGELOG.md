@@ -21,6 +21,7 @@ Types of changes
 
 - Added `trained_with_document_context` to the SpanMarkerConfig
   - Added warnings if a model is trained with document-context and evaluated/inferenced without, or vice versa.
+- Added `spaCy` integration via `nlp.add_pipe("span_marker")`. See the [SpanMarker with spaCy documentation](https://tomaarsen.github.io/SpanMarkerNER/notebooks/spacy_integration.html) for information.
 
 ### Changed
 
