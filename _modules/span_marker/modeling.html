@@ -117,7 +117,7 @@
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">F</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">disable_progress_bar</span><span class="p">,</span> <span class="n">enable_progress_bar</span>
 <span class="kn">from</span> <span class="nn">packaging.version</span> <span class="kn">import</span> <span class="n">Version</span><span class="p">,</span> <span class="n">parse</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">device</span><span class="p">,</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">tqdm.autonotebook</span> <span class="kn">import</span> <span class="n">trange</span>
@@ -433,7 +433,10 @@
             <span class="k">raise</span> <span class="n">exc</span>
 
 <div class="viewcode-block" id="SpanMarkerModel.predict"><a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict">[docs]</a>    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">Dataset</span><span class="p">],</span> <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">Dataset</span><span class="p">],</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">show_progress_bar</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]],</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Predict named entities from input texts.</span>
 
@@ -461,6 +464,10 @@
 <span class="sd">                * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.</span>
 <span class="sd">                * Dataset: A 🤗 :class:`~datasets.Dataset` with a ``tokens`` column and optionally ``document_id`` and ``sentence_id`` columns.</span>
 <span class="sd">                    If the optional columns are provided, they will be used to provide document-level context.</span>
+
+<span class="sd">            batch_size (int): The number of samples to include in a batch, a higher batch size is faster,</span>
+<span class="sd">                but requires more memory. Defaults to 4</span>
+<span class="sd">            show_progress_bar (bool): Whether to show a progress bar, useful for longer inputs. Defaults to `False`.</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:</span>
@@ -560,6 +567,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
                 <span class="n">max_prev_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_prev_context</span><span class="p">,</span>
                 <span class="n">max_next_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_next_context</span><span class="p">,</span>
+                <span class="n">show_progress_bar</span><span class="o">=</span><span class="n">show_progress_bar</span><span class="p">,</span>
             <span class="p">)</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">column_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;__sort_id&quot;</span><span class="p">])</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;__sort_id&quot;</span><span class="p">)</span>
@@ -569,6 +577,8 @@
                 <span class="s2">&quot;inference without document-level context may cause decreased performance.&quot;</span>
             <span class="p">)</span>
 
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_progress_bar</span><span class="p">:</span>
+            <span class="n">disable_progress_bar</span><span class="p">()</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">,</span>
             <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -578,7 +588,9 @@
                 <span class="s2">&quot;marker_max_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span>
             <span class="p">},</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch_start_idx</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">show_progress_bar</span><span class="p">:</span>
+            <span class="n">enable_progress_bar</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">batch_start_idx</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">disable</span><span class="o">=</span><span class="ow">not</span> <span class="n">show_progress_bar</span><span class="p">):</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_start_idx</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_start_idx</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">)))</span>
             <span class="c1"># Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>

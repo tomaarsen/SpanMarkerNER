@@ -208,7 +208,7 @@ Required for evaluation. Defaults to False.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.trainer.Trainer.add_context">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_prev_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_next_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.add_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.add_context" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">add_context</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_prev_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_next_context</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_progress_bar</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.add_context"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.add_context" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add document-level context from previous and next sentences in the same document.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -221,6 +221,7 @@ truncation.</p></li>
 representing as many previous sentences as fits.</p></li>
 <li><p><strong>max_next_context</strong> (<cite>Optional[int]</cite>) – The maximum number of next sentences to include. Defaults to None,
 representing as many previous sentences as fits.</p></li>
+<li><p><strong>show_progress_bar</strong> (<cite>bool</cite>) – Whether to show a progress bar. Defaults to <cite>True</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
