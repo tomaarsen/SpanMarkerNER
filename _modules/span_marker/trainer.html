@@ -249,6 +249,9 @@
         <span class="c1"># in its __init__.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model_init</span> <span class="o">=</span> <span class="n">model_init</span>
 
+        <span class="c1"># Override the type hint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="n">SpanMarkerModel</span>
+
 <div class="viewcode-block" id="Trainer.preprocess_dataset"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
@@ -299,14 +302,28 @@
             <span class="p">)</span>
         <span class="c1"># If &quot;document_id&quot; AND &quot;sentence_id&quot; exist in the training dataset</span>
         <span class="k">if</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">):</span>
+            <span class="c1"># If training, set the config flag that this model is trained with document context</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">is_evaluate</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span> <span class="o">=</span> <span class="kc">True</span>
+            <span class="c1"># If evaluating and the model was not trained with document context, warn</span>
+            <span class="k">elif</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;This model was trained without document-level context: &quot;</span>
+                    <span class="s2">&quot;evaluation with document-level context may cause decreased performance.&quot;</span>
+                <span class="p">)</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">column_names</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">])</span>
-            <span class="c1"># TODO: Sort the dataset</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">add_context</span><span class="p">(</span>
                 <span class="n">dataset</span><span class="p">,</span>
                 <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
                 <span class="n">max_prev_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_prev_context</span><span class="p">,</span>
                 <span class="n">max_next_context</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">max_next_context</span><span class="p">,</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">is_evaluate</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;This model was trained with document-level context: &quot;</span>
+                <span class="s2">&quot;evaluation without document-level context may cause decreased performance.&quot;</span>
+            <span class="p">)</span>
+
         <span class="c1"># Spread between multiple samples where needed</span>
         <span class="n">original_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
