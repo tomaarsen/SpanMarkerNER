@@ -1,3 +1,4 @@
+import logging
 import re
 from typing import Dict, List, Optional, Union
 
@@ -79,6 +80,7 @@ def test_correct_predictions(
     finetuned_conll_span_marker_model: SpanMarkerModel,
     inputs: Union[str, List[str]],
     gold_entities: List[Dict[str, Union[str, int]]],
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     model = finetuned_conll_span_marker_model.try_cuda()
 
@@ -105,6 +107,19 @@ def test_correct_predictions(
     pred_entity_list = model.predict(Dataset.from_dict({"tokens": [inputs] * 2}))
     for pred_entities in pred_entity_list:
         compare_entities(pred_entities, gold_entities)
+
+    # Check for warning if the model is trained with document-level context
+    caplog.clear()
+    model.config.trained_with_document_context = True
+    model.predict(inputs)
+    assert any(
+        [
+            level == logging.WARNING
+            and text == "This model was trained with document-level context: "
+            "inference without document-level context may cause decreased performance."
+            for (_, level, text) in caplog.record_tuples
+        ]
+    )
 
 
 @pytest.mark.parametrize(
@@ -162,12 +177,22 @@ def test_correct_predictions_with_document_level_context(
     finetuned_conll_span_marker_model: SpanMarkerModel,
     inputs: Union[str, List[str]],
     gold_entity_list: List[Dict[str, Union[str, int]]],
+    caplog: pytest.LogCaptureFixture,
 ) -> None:
     model = finetuned_conll_span_marker_model.try_cuda()
 
     pred_entity_list = model.predict(inputs)
     for pred_entities, gold_entities in zip(pred_entity_list, gold_entity_list):
         compare_entities(pred_entities, gold_entities)
+
+    assert any(
+        [
+            level == logging.WARNING
+            and text == "This model was trained without document-level context: "
+            "inference with document-level context may cause decreased performance."
+            for (_, level, text) in caplog.record_tuples
+        ]
+    )
 
 
 def test_incorrect_predict_inputs(finetuned_conll_span_marker_model: SpanMarkerModel):

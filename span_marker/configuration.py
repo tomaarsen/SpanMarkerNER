@@ -61,6 +61,7 @@ class SpanMarkerConfig(PretrainedConfig):
         self.entity_max_length = entity_max_length
         self.max_prev_context = max_prev_context
         self.max_next_context = max_next_context
+        self.trained_with_document_context = False
         self.span_marker_version = kwargs.pop("span_marker_version", None)
         super().__init__(**kwargs)
 

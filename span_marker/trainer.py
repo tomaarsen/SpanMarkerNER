@@ -137,6 +137,9 @@ class Trainer(TransformersTrainer):
         # in its __init__.
         self.model_init = model_init
 
+        # Override the type hint
+        self.model: SpanMarkerModel
+
     def preprocess_dataset(
         self,
         dataset: Dataset,
@@ -187,14 +190,28 @@ class Trainer(TransformersTrainer):
             )
         # If "document_id" AND "sentence_id" exist in the training dataset
         if {"document_id", "sentence_id"} <= set(dataset.column_names):
+            # If training, set the config flag that this model is trained with document context
+            if not is_evaluate:
+                self.model.config.trained_with_document_context = True
+            # If evaluating and the model was not trained with document context, warn
+            elif not self.model.config.trained_with_document_context:
+                logger.warning(
+                    "This model was trained without document-level context: "
+                    "evaluation with document-level context may cause decreased performance."
+                )
             dataset = dataset.sort(column_names=["document_id", "sentence_id"])
-            # TODO: Sort the dataset
             dataset = self.add_context(
                 dataset,
                 tokenizer.model_max_length,
                 max_prev_context=self.model.config.max_prev_context,
                 max_next_context=self.model.config.max_next_context,
             )
+        elif is_evaluate and self.model.config.trained_with_document_context:
+            logger.warning(
+                "This model was trained with document-level context: "
+                "evaluation without document-level context may cause decreased performance."
+            )
+
         # Spread between multiple samples where needed
         original_length = len(dataset)
         dataset = dataset.map(

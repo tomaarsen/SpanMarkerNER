@@ -17,6 +17,11 @@ Types of changes
 
 ## [Unreleased]
 
+### Added
+
+- Added `trained_with_document_context` to the SpanMarkerConfig
+  - Added warnings if a model is trained with document-context and evaluated/inferenced without, or vice versa.
+
 ### Changed
 
 - Heavily improved computational efficiency of sample spreading, resulting in notably faster inference speeds.

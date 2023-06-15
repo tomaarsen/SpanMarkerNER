@@ -1,7 +1,6 @@
 import logging
 import os
 import re
-import warnings
 from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
@@ -369,12 +368,10 @@ class SpanMarkerModel(PreTrainedModel):
         from span_marker.trainer import Trainer
 
         if torch.cuda.is_available() and self.device == torch.device("cpu"):
-            warnings.warn(
+            logger.warn(
                 "SpanMarker model predictions are being computed on the CPU while CUDA is available."
                 " Moving the model to CUDA using `model.cuda()` before performing predictions is heavily"
                 " recommended to significantly boost prediction speeds.",
-                UserWarning,
-                stacklevel=2,
             )
 
         # Disable dropout, etc.
@@ -437,6 +434,11 @@ class SpanMarkerModel(PreTrainedModel):
             dataset = dataset.add_column(key, value)
         # Add context if possible
         if {"document_id", "sentence_id"} <= set(dataset.column_names):
+            if not self.config.trained_with_document_context:
+                logger.warning(
+                    "This model was trained without document-level context: "
+                    "inference with document-level context may cause decreased performance."
+                )
             # Add column to be able to revert sorting later
             dataset = dataset.add_column("__sort_id", range(len(dataset)))
             # Sorting by doc ID and then sentence ID is required for add_context
@@ -449,6 +451,11 @@ class SpanMarkerModel(PreTrainedModel):
             )
             dataset = dataset.sort(column_names=["__sort_id"])
             dataset = dataset.remove_columns("__sort_id")
+        elif self.config.trained_with_document_context:
+            logger.warning(
+                "This model was trained with document-level context: "
+                "inference without document-level context may cause decreased performance."
+            )
 
         dataset = dataset.map(
             Trainer.spread_sample,
