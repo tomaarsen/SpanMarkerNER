@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "span_marker"
-description = "Few-Shot Named Entity Recognition using Span Markers"
+description = "Named Entity Recognition using Span Markers"
 readme = "README.md"
 requires-python = ">=3.7"
 license = {file = "LICENSE.txt"}
