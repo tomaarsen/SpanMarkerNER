@@ -27,6 +27,10 @@ Types of changes
 - Heavily improved computational efficiency of sample spreading, resulting in notably faster inference speeds.
 - Disable progress bar for inference by default, and add `show_progress_bar` parameter to `SpanMarkerModel.predict`.
 
+### Fixed
+
+- Fixed evaluation method failing when the testing dataset contains two adjacent and identical sentences.
+
 ## [1.1.1]
 
 ### Fixed

@@ -43,8 +43,13 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
         tokens = inputs[sample_idx]
         text = tokenizer.decode(tokens, skip_special_tokens=True)
         token_hash = hash(text) if not has_document_context else (document_ids[sample_idx], sentence_ids[sample_idx])
-        if not sample_list or sample_list[-1]["hash"] != token_hash:
+        if (
+            not sample_list
+            or sample_list[-1]["hash"] != token_hash
+            or len(sample_list[-1]["spans"]) == len(sample_list[-1]["gold_labels"])
+        ):
             mask = gold_labels[sample_idx] != -100
+            spans = list(tokenizer.get_all_valid_spans(num_words[sample_idx], tokenizer.config.entity_max_length))
             sample_list.append(
                 {
                     "text": text,
@@ -53,6 +58,7 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
                     "scores": scores[sample_idx].tolist(),
                     "num_words": num_words[sample_idx],
                     "hash": token_hash,
+                    "spans": spans,
                 }
             )
         else:
@@ -68,7 +74,7 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     for sample in sample_list:
         scores = sample["scores"]
         num_words = sample["num_words"]
-        spans = list(tokenizer.get_all_valid_spans(num_words, tokenizer.config.entity_max_length))
+        spans = sample["spans"]
         gold_labels = sample["gold_labels"]
         pred_labels = sample["pred_labels"]
         assert len(gold_labels) == len(pred_labels) and len(spans) == len(pred_labels)
