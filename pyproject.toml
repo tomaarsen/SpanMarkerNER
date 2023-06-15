@@ -53,7 +53,8 @@ docs = [
     "nbsphinx",
     "nbconvert<7",
     "pandoc<3",
-    "ipython"
+    "ipython",
+    "spacy" # Required to build the spaCy integration docs
 ]
 wandb = [
     "wandb"
