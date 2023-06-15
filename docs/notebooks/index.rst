@@ -10,4 +10,5 @@ Usage Notebooks
     Loading & Inferencing <model_loading.ipynb>
     Configuring <model_configuration.ipynb>
     SpanMarker with spaCy <spacy_integration.ipynb>
+    Document-level context <document_level_context.ipynb>
     How it works <how_it_works.ipynb>
