@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Changed
+
+- Heavily improved computational efficiency of sample spreading, resulting in notably faster inference speeds.
+
 ## [1.1.1]
 
 ### Fixed
