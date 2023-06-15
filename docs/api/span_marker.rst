@@ -24,3 +24,4 @@ span_marker package
        span_marker.evaluation
        span_marker.label_normalizer
        span_marker.output
+       span_marker.spacy_integration

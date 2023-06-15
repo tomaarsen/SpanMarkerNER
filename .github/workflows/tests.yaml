@@ -39,6 +39,7 @@ jobs:
         run: |
           python -m pip install --no-cache-dir --upgrade pip
           python -m pip install --no-cache-dir ".[dev]"
+          python -m spacy download en_core_web_sm
         if: steps.restore-cache.outputs.cache-hit != 'true'
 
       - name: Install the checked-out span_marker

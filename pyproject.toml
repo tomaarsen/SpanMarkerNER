@@ -42,7 +42,8 @@ dev = [
     "ruff",
     "black",
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "spacy"
 ]
 docs = [
     "nltk_theme",
