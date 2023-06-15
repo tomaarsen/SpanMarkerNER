@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: Document-level context</title>
+  
+  <link rel="index" title="Index" href="../genindex.html"/>
+
+  <link rel="stylesheet" href="../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../_static/doctools.js"></script>
+      <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_training.html">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_configuration.html">Configuring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="spacy_integration.html">SpanMarker with spaCy</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Document-level context</a></li>
+<li class="toctree-l2"><a class="reference internal" href="how_it_works.html">How it works</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.output.html">span_marker.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.spacy_integration.html">span_marker.spacy_integration module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <div class="open-in-colab__wrapper">
+<a href="https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/document_level_context.ipynb" target="_blank">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
+</a>
+</div><section id="Document-level-context">
+<h1>Document-level context<a class="headerlink" href="#Document-level-context" title="Permalink to this heading">¶</a></h1>
+<p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
+<p>In this tutorial, I’ll show you how to perform training and inference of SpanMarker models using document-level context to improve performance.</p>
+<p>Many approaches to NER process individual sentences completely independently of another, even if the sentences originate from the same document. Although this works fine, research has shown that including additional contextual information (i.e. the previous and next sentence(s)) improves the performance of the model. In my own experiments of SpanMarker with CoNLL03, including this document-level contextual information improves the model from a mean F1 of 92.9±0.0 to a mean F1 of 94.1±0.1.</p>
+<section id="Document-level-context-in-SpanMarker">
+<h2>Document-level context in SpanMarker<a class="headerlink" href="#Document-level-context-in-SpanMarker" title="Permalink to this heading">¶</a></h2>
+<p>SpanMarker is designed to require only slight changes in the input data to allow for document-level context during training, evaluating and inference. In particular, the only required change is that the input must now be a <a class="reference external" href="https://huggingface.co/docs/datasets/package_reference/main_classes#datasets.Dataset">Dataset</a> with <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns.</p>
+<section id="Training-and-evaluating">
+<h3>Training and evaluating<a class="headerlink" href="#Training-and-evaluating" title="Permalink to this heading">¶</a></h3>
+<p>For training and evaluation, the dataset must now contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code>, <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns. I’ve prepared two datasets (<a class="reference external" href="https://huggingface.co/datasets/tomaarsen/conll2003">tomaarsen/conll2003</a>, <a class="reference external" href="https://huggingface.co/datasets/tomaarsen/conllpp">tomaarsen/conllpp</a>) that I’ve used to train some models. We will have a look at the former to get a feel for how these values are used.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span><span class="p">,</span> <span class="n">Dataset</span>
+
+<span class="c1"># Load the dataset from the Hub and throw away the non-NER columns</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;tomaarsen/conll2003&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">((</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;chunk_tags&quot;</span><span class="p">,</span> <span class="s2">&quot;pos_tags&quot;</span><span class="p">))</span>
+<span class="n">dataset</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Dataset({
+    features: [&#39;document_id&#39;, &#39;sentence_id&#39;, &#39;tokens&#39;, &#39;ner_tags&#39;],
+    num_rows: 14041
+})
+</pre></div></div>
+</div>
+<p>Let’s have a quick look at the data itself.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">30</span><span class="p">))</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>document_id</th>
+      <th>sentence_id</th>
+      <th>tokens</th>
+      <th>ner_tags</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>1</td>
+      <td>0</td>
+      <td>[EU, rejects, German, call, to, boycott, Briti...</td>
+      <td>[3, 0, 7, 0, 0, 0, 7, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>1</td>
+      <td>1</td>
+      <td>[Peter, Blackburn]</td>
+      <td>[1, 2]</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>1</td>
+      <td>2</td>
+      <td>[BRUSSELS, 1996-08-22]</td>
+      <td>[5, 0]</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>1</td>
+      <td>3</td>
+      <td>[The, European, Commission, said, on, Thursday...</td>
+      <td>[0, 3, 4, 0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>1</td>
+      <td>4</td>
+      <td>[Germany, 's, representative, to, the, Europea...</td>
+      <td>[5, 0, 0, 0, 0, 3, 4, 0, 0, 0, 1, 2, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>1</td>
+      <td>5</td>
+      <td>[", We, do, n't, support, any, such, recommend...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>1</td>
+      <td>6</td>
+      <td>[He, said, further, scientific, study, was, re...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>1</td>
+      <td>7</td>
+      <td>[He, said, a, proposal, last, month, by, EU, F...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 1, 2, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>1</td>
+      <td>8</td>
+      <td>[Fischler, proposed, EU-wide, measures, after,...</td>
+      <td>[1, 0, 7, 0, 0, 0, 0, 5, 0, 5, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>1</td>
+      <td>9</td>
+      <td>[But, Fischler, agreed, to, review, his, propo...</td>
+      <td>[0, 1, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>1</td>
+      <td>10</td>
+      <td>[Spanish, Farm, Minister, Loyola, de, Palacio,...</td>
+      <td>[7, 0, 0, 1, 2, 2, 0, 0, 0, 1, 0, 0, 3, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>11</th>
+      <td>1</td>
+      <td>11</td>
+      <td>[.]</td>
+      <td>[0]</td>
+    </tr>
+    <tr>
+      <th>12</th>
+      <td>1</td>
+      <td>12</td>
+      <td>[Only, France, and, Britain, backed, Fischler,...</td>
+      <td>[0, 5, 0, 5, 0, 1, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>13</th>
+      <td>1</td>
+      <td>13</td>
+      <td>[The, EU, 's, scientific, veterinary, and, mul...</td>
+      <td>[0, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>14</th>
+      <td>1</td>
+      <td>14</td>
+      <td>[Sheep, have, long, been, known, to, contract,...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, ...</td>
+    </tr>
+    <tr>
+      <th>15</th>
+      <td>1</td>
+      <td>15</td>
+      <td>[British, farmers, denied, on, Thursday, there...</td>
+      <td>[7, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>16</th>
+      <td>1</td>
+      <td>16</td>
+      <td>[", What, we, have, to, be, extremely, careful...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>17</th>
+      <td>1</td>
+      <td>17</td>
+      <td>[Bonn, has, led, efforts, to, protect, public,...</td>
+      <td>[5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>18</th>
+      <td>1</td>
+      <td>18</td>
+      <td>[Germany, imported, 47,600, sheep, from, Brita...</td>
+      <td>[5, 0, 0, 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>19</th>
+      <td>1</td>
+      <td>19</td>
+      <td>[It, brought, in, 4,275, tonnes, of, British, ...</td>
+      <td>[0, 0, 0, 0, 0, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>20</th>
+      <td>2</td>
+      <td>0</td>
+      <td>[Rare, Hendrix, song, draft, sells, for, almos...</td>
+      <td>[0, 1, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>21</th>
+      <td>2</td>
+      <td>1</td>
+      <td>[LONDON, 1996-08-22]</td>
+      <td>[5, 0]</td>
+    </tr>
+    <tr>
+      <th>22</th>
+      <td>2</td>
+      <td>2</td>
+      <td>[A, rare, early, handwritten, draft, of, a, so...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 5, 0, 0, 1, 2, 0, ...</td>
+    </tr>
+    <tr>
+      <th>23</th>
+      <td>2</td>
+      <td>3</td>
+      <td>[A, Florida, restaurant, paid, 10,925, pounds,...</td>
+      <td>[0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ...</td>
+    </tr>
+    <tr>
+      <th>24</th>
+      <td>2</td>
+      <td>4</td>
+      <td>[At, the, end, of, a, January, 1967, concert, ...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 7, 0, 0, 5, 0, ...</td>
+    </tr>
+    <tr>
+      <th>25</th>
+      <td>2</td>
+      <td>5</td>
+      <td>[Buyers, also, snapped, up, 16, other, items, ...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, ...</td>
+    </tr>
+    <tr>
+      <th>26</th>
+      <td>2</td>
+      <td>6</td>
+      <td>[They, included, a, black, lacquer, and, mothe...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, ...</td>
+    </tr>
+    <tr>
+      <th>27</th>
+      <td>2</td>
+      <td>7</td>
+      <td>[The, guitarist, died, of, a, drugs, overdose,...</td>
+      <td>[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>28</th>
+      <td>3</td>
+      <td>0</td>
+      <td>[China, says, Taiwan, spoils, atmosphere, for,...</td>
+      <td>[5, 0, 5, 0, 0, 0, 0, 0]</td>
+    </tr>
+    <tr>
+      <th>29</th>
+      <td>3</td>
+      <td>1</td>
+      <td>[BEIJING, 1996-08-22]</td>
+      <td>[5, 0]</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>As you can see, the <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns contain integers. The former serves to identify which document the sentence belongs to, while the latter indicates the position of the sentence in the document. Internally, SpanMarker will include adjacent sentences originating from the same document as contextual information. In the SpanMarker configuration, you can set <code class="docutils literal notranslate"><span class="pre">max_prev_context</span></code> and <code class="docutils literal notranslate"><span class="pre">max_next_context</span></code> to limit on the number of previous or next sentences to be included
+as context. By default, these are set to <code class="docutils literal notranslate"><span class="pre">None</span></code>, allowing the inclusion of as much context as is available until the maximum token length is reached. In practice, these settings are defined like so:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+<span class="c1"># An example encoder and example labels</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+    <span class="s2">&quot;prajjwal1/bert-tiny&quot;</span><span class="p">,</span>  <span class="c1"># Example encoder</span>
+    <span class="n">labels</span><span class="o">=</span><span class="p">[</span>  <span class="c1"># Example labels</span>
+        <span class="s2">&quot;O&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;PER&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;LOC&quot;</span><span class="p">,</span>
+    <span class="p">],</span>
+    <span class="n">max_prev_context</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="n">max_next_context</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+<span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<p>Training using this dataset works equivalently as if the <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns did not exist. See the <a class="reference internal" href="model_training.html"><span class="doc">Model Training</span></a> tutorial for more information on how to do that. See also the <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.trainer.html">Trainer</a> documentation.</p>
+</section>
+<section id="Inference">
+<h3>Inference<a class="headerlink" href="#Inference" title="Permalink to this heading">¶</a></h3>
+<p>For inference, the inputs to <code class="docutils literal notranslate"><span class="pre">model.predict</span></code> must also contain <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns, alongside a <code class="docutils literal notranslate"><span class="pre">tokens</span></code> column that includes either string sentences or lists of tokens. Let’s consider some sample data:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># For simplicity, this data is already split into sentences.</span>
+<span class="c1"># You can use various tools to do this, e.g. spaCy senter or NLTK sent_tokenize</span>
+<span class="n">document_one</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Cleopatra VII (70/69 BC - 10 August 30 BC) was Queen of the Ptolemaic Kingdom of Egypt from 51 to 30 BC, and its last active ruler.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;A member of the Ptolemaic dynasty, she was a descendant of its founder Ptolemy I Soter, a Macedonian Greek general and companion of Alexander the Great.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;After the death of Cleopatra, Egypt became a province of the Roman Empire, marking the end of the last Hellenistic state in the Mediterranean and of the age that had lasted since the reign of Alexander (336-323 BC).&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">document_two</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;The 35-year-old led his country to the 2022 World Cup title in Qatar last year, arguably the crowning triumph in one of the greatest football careers.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;And on Thursday, Messi enjoyed another landmark moment by scoring his fastest ever goal.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Messi curled home an exquisite left-footed strike from the edge of the box just 79 seconds into Argentina&#39;s friendly against Australia in Beijing - the quickest of his professional career, per South American football&#39;s governing body, CONMEBOL.&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+<span class="n">document_three</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;UK firms could gain access to US green funding as part of plans to boost UK and US ties announced by Rishi Sunak and Joe Biden.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The pair unveiled the Atlantic Declaration, to strengthen economic ties between the two countries, at a White House press conference.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The PM said the agreement, which falls short of a full trade deal would bring benefits </span><span class="se">\&quot;</span><span class="s2">as quickly as possible</span><span class="se">\&quot;</span><span class="s2">.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;UK electric car firms may get access to US green tax credits and subsidies.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;As the pair unveiled their partnership to bolster economic security, Mr Sunak said the UK-US relationship was an </span><span class="se">\&quot;</span><span class="s2">indispensable alliance</span><span class="se">\&quot;</span><span class="s2">.&quot;</span>
+<span class="p">]</span>
+
+<span class="n">documents</span> <span class="o">=</span> <span class="p">[</span><span class="n">document_one</span><span class="p">,</span> <span class="n">document_two</span><span class="p">,</span> <span class="n">document_three</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<p>Now we have to preprocess this dataset to generate the <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">data_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;document_id&quot;</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s2">&quot;sentence_id&quot;</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">}</span>
+<span class="k">for</span> <span class="n">document_id</span><span class="p">,</span> <span class="n">document</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">documents</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">sentence_id</span><span class="p">,</span> <span class="n">sentence</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">document</span><span class="p">):</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;document_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">document_id</span><span class="p">)</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;sentence_id&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence_id</span><span class="p">)</span>
+        <span class="n">data_dict</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sentence</span><span class="p">)</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">data_dict</span><span class="p">)</span>
+<span class="n">dataset</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Dataset({
+    features: [&#39;tokens&#39;, &#39;document_id&#39;, &#39;sentence_id&#39;],
+    num_rows: 11
+})
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dataset</span><span class="o">.</span><span class="n">to_pandas</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>tokens</th>
+      <th>document_id</th>
+      <th>sentence_id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>Cleopatra VII (70/69 BC - 10 August 30 BC) was...</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>A member of the Ptolemaic dynasty, she was a d...</td>
+      <td>0</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>After the death of Cleopatra, Egypt became a p...</td>
+      <td>0</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>The 35-year-old led his country to the 2022 Wo...</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>4</th>
+      <td>And on Thursday, Messi enjoyed another landmar...</td>
+      <td>1</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>5</th>
+      <td>Messi curled home an exquisite left-footed str...</td>
+      <td>1</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>6</th>
+      <td>UK firms could gain access to US green funding...</td>
+      <td>2</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <th>7</th>
+      <td>The pair unveiled the Atlantic Declaration, to...</td>
+      <td>2</td>
+      <td>1</td>
+    </tr>
+    <tr>
+      <th>8</th>
+      <td>The PM said the agreement, which falls short o...</td>
+      <td>2</td>
+      <td>2</td>
+    </tr>
+    <tr>
+      <th>9</th>
+      <td>UK electric car firms may get access to US gre...</td>
+      <td>2</td>
+      <td>3</td>
+    </tr>
+    <tr>
+      <th>10</th>
+      <td>As the pair unveiled their partnership to bols...</td>
+      <td>2</td>
+      <td>4</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We can immediately pass this dataset to <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.predict</span></code>, and SpanMarker will under the hood add the document-level context for you. Note that the dataset does not need to be sorted. See also the <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict">SpanMarkerModel.predict</a> documentation.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">try_cuda</span><span class="p">()</span>
+<span class="n">entities</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+<span class="nb">len</span><span class="p">(</span><span class="n">entities</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+11
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">entities</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[{&#39;span&#39;: &#39;Cleopatra VII&#39;,
+  &#39;label&#39;: &#39;PER&#39;,
+  &#39;score&#39;: 0.7116236686706543,
+  &#39;char_start_index&#39;: 0,
+  &#39;char_end_index&#39;: 13},
+ {&#39;span&#39;: &#39;BC&#39;,
+  &#39;label&#39;: &#39;MISC&#39;,
+  &#39;score&#39;: 0.9982840418815613,
+  &#39;char_start_index&#39;: 21,
+  &#39;char_end_index&#39;: 23},
+ {&#39;span&#39;: &#39;Ptolemaic Kingdom of Egypt&#39;,
+  &#39;label&#39;: &#39;LOC&#39;,
+  &#39;score&#39;: 0.6176416873931885,
+  &#39;char_start_index&#39;: 60,
+  &#39;char_end_index&#39;: 86}]
+</pre></div></div>
+</div>
+<p>As you can see, the SpanMarker model returns a list of entity dictionaries for each sentence in the input dataset.</p>
+</section>
+</section>
+</section>
+
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+                <li class="footer-element">
+                    
+                        <a href="../_sources/notebooks/document_level_context.ipynb.txt" rel="nofollow"> source</a>
+                    
+                </li>
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>
