@@ -9,4 +9,5 @@ Usage Notebooks
     Initializing & Training <model_training.ipynb>
     Loading & Inferencing <model_loading.ipynb>
     Configuring <model_configuration.ipynb>
+    SpanMarker with spaCy <spacy_integration.ipynb>
     How it works <how_it_works.ipynb>
