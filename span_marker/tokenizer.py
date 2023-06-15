@@ -43,7 +43,7 @@ class EntityTracker:
 
             with tokenizer.entity_tracker(split=dataset_name):
                 dataset = dataset.map(
-                    lambda batch: tokenizer(batch["tokens"], labels=batch["ner_tags"]),
+                    tokenizer,
                     ...
                 )
 

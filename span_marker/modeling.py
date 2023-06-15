@@ -432,6 +432,7 @@ class SpanMarkerModel(PreTrainedModel):
             {"tokens": dataset["tokens"]}, return_num_words=True, return_batch_encoding=True
         )
         batch_encoding = tokenizer_dict.pop("batch_encoding")
+        dataset = dataset.remove_columns("tokens")
         for key, value in tokenizer_dict.items():
             dataset = dataset.add_column(key, value)
         # Add context if possible
@@ -450,14 +451,15 @@ class SpanMarkerModel(PreTrainedModel):
             dataset = dataset.remove_columns("__sort_id")
 
         dataset = dataset.map(
-            lambda sample: Trainer.spread_sample(
-                self.tokenizer.model_max_length, self.config.marker_max_length, sample
-            ),
+            Trainer.spread_sample,
             batched=True,
-            batch_size=1,
             desc="Spreading data between multiple samples",
+            fn_kwargs={
+                "model_max_length": self.tokenizer.model_max_length,
+                "marker_max_length": self.config.marker_max_length,
+            },
         )
-        for batch_start_idx in trange(0, len(dataset), batch_size):
+        for batch_start_idx in trange(0, len(dataset), batch_size, leave=True):
             batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
             # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
             batch = self.data_collator(batch)
