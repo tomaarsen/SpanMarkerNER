@@ -117,14 +117,14 @@ These trained models have Hosted Inference API widgets that you can use to exper
 * [`tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super) is a multilingual model that I have trained in 1.5 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.686 Test F1 on English, and works well on other languages like Spanish, French, German, Russian, Dutch, Polish, Icelandic, Greek and many more.
 
 ### OntoNotes v5.0
-* [tomaarsen/span-marker-roberta-large-ontonotes5](https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5) was trained in 3 hours on the OntoNotes v5.0 dataset, reaching a performance of 0.9154 F1. For reference, the current strongest spaCy model (`en_core_web_trf`) reaches 0.898. This SpanMarker model uses a `roberta-large` encoder under the hood.
+* [`tomaarsen/span-marker-roberta-large-ontonotes5`](https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5) was trained in 3 hours on the OntoNotes v5.0 dataset, reaching a performance of 0.9154 F1. For reference, the current strongest spaCy model (`en_core_web_trf`) reaches 0.898. This SpanMarker model uses a `roberta-large` encoder under the hood.
 
 ### CoNLL03
-* [tomaarsen/span-marker-xlm-roberta-large-conll03](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conll03) is a SpanMarker model using `xlm-roberta-large` that was trained in 45 minutes. It reaches a state of the art 0.931 F1 on CoNLL03 without using document-level context. For reference, the current strongest spaCy model (`en_core_web_trf`) reaches 91.6.
-* [tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context) is another SpanMarker model using the `xlm-roberta-large` encoder. It uses [document-level context](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html) to reach a state of the art 0.944 F1. For the best performance, inference should be performed using document-level context ([docs](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html#Inference)). This model was trained in 1 hour.
+* [`tomaarsen/span-marker-xlm-roberta-large-conll03`](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conll03) is a SpanMarker model using `xlm-roberta-large` that was trained in 45 minutes. It reaches a state of the art 0.931 F1 on CoNLL03 without using document-level context. For reference, the current strongest spaCy model (`en_core_web_trf`) reaches 91.6.
+* [`tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context`](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context) is another SpanMarker model using the `xlm-roberta-large` encoder. It uses [document-level context](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html) to reach a state of the art 0.944 F1. For the best performance, inference should be performed using document-level context ([docs](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html#Inference)). This model was trained in 1 hour.
 
 ### CoNLL++
-* [tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context) was trained in an hour using the `xlm-roberta-large` encoder on the CoNLL++ dataset. Using [document-level context](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html), it reaches a very competitive 0.955 F1. For the best performance, inference should be performed using document-level context ([docs](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html#Inference)).
+* [`tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context`](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context) was trained in an hour using the `xlm-roberta-large` encoder on the CoNLL++ dataset. Using [document-level context](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html), it reaches a very competitive 0.955 F1. For the best performance, inference should be performed using document-level context ([docs](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html#Inference)).
 
 ## Using pretrained SpanMarker models with spaCy
 All [SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?library=span-marker) can also be easily used in spaCy. It's as simple as including 1 line to add the `span_marker` pipeline. See the Documentation or API Reference for more information.
@@ -145,7 +145,8 @@ doc = nlp(text)
 # And look at the entities
 print([(entity, entity.label_) for entity in doc.ents])
 """
-[(Cleopatra VII, "PERSON"), (Cleopatra the Great, "PERSON"), (the Ptolemaic Kingdom of Egypt, "GPE"), (69 BCE, "DATE"), (Egypt, "GPE"), (51 BCE, "DATE"), (30 BCE, "DATE")]
+[(Cleopatra VII, "PERSON"), (Cleopatra the Great, "PERSON"), (the Ptolemaic Kingdom of Egypt, "GPE"),
+(69 BCE, "DATE"), (Egypt, "GPE"), (51 BCE, "DATE"), (30 BCE, "DATE")]
 """
 ```
 ![image](https://user-images.githubusercontent.com/37621491/246170623-6351cb7e-bbb0-4472-af16-9a351a253da9.png)
