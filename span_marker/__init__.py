@@ -40,8 +40,13 @@ else:
         batch_size: int,
         device: Optional[Union[str, torch.device]],
     ) -> SpacySpanMarkerWrapper:
-        # Remove the existing NER component to allow for SpanMarker to act as a drop-in replacement
-        nlp.remove_pipe("ner")
+        # Remove the existing NER component, if it exists,
+        # to allow for SpanMarker to act as a drop-in replacement
+        try:
+            nlp.remove_pipe("ner")
+        except ValueError:
+            # The `ner` pipeline component was not found
+            pass
         return SpacySpanMarkerWrapper(model, batch_size=batch_size, device=device)
 
 
