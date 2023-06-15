@@ -11,7 +11,7 @@ span_marker.trainer module
 
 .. automodule:: span_marker.trainer
     :members:
-    :exclude-members: predict, get_train_dataloader, get_eval_dataloader, get_test_dataloader
+    :exclude-members: predict, get_train_dataloader, get_eval_dataloader, get_test_dataloader, REQUIRED_COLUMNS, OPTIONAL_COLUMNS
     :undoc-members:
     :show-inheritance:
     :member-order: bysource

@@ -53,6 +53,8 @@ html_context = {"github_user": "tomaarsen", "github_repo": "SpanMarkerNER"}
 # This can be uncommented to "refresh" the api .rst files.
 # Until then, I like being able to manually edit them slightly.
 """
+import os
+
 def run_apidoc(app) -> None:
     '''Generage API documentation'''
     import better_apidoc
@@ -72,7 +74,7 @@ def run_apidoc(app) -> None:
 
 def setup(app) -> None:
     app.connect('builder-inited', run_apidoc)
-"""
+# """
 
 # -- Setting up the "Usage" requirements
 
