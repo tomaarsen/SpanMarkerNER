@@ -238,6 +238,7 @@ class Trainer(TransformersTrainer):
         model_max_length: int,
         max_prev_context: Optional[int] = None,
         max_next_context: Optional[int] = None,
+        show_progress_bar: bool = True,
     ) -> Dataset:
         """Add document-level context from previous and next sentences in the same document.
 
@@ -250,6 +251,7 @@ class Trainer(TransformersTrainer):
                 representing as many previous sentences as fits.
             max_next_context (`Optional[int]`): The maximum number of next sentences to include. Defaults to None,
                 representing as many previous sentences as fits.
+            show_progress_bar (`bool`): Whether to show a progress bar. Defaults to `True`.
 
         Returns:
             Dataset: A copy of the Dataset with additional previous and next sentences added to input_ids.
@@ -258,7 +260,11 @@ class Trainer(TransformersTrainer):
         all_start_position_ids = []
         all_end_position_ids = []
         for sample_idx, sample in tqdm(
-            enumerate(dataset), desc="Adding document-level context", total=len(dataset), leave=False
+            enumerate(dataset),
+            desc="Adding document-level context",
+            total=len(dataset),
+            leave=False,
+            disable=not show_progress_bar,
         ):
             # Sequentially add next context, previous context, next context, previous context, etc. until
             # max token length or max_prev/next_context

@@ -25,6 +25,7 @@ Types of changes
 ### Changed
 
 - Heavily improved computational efficiency of sample spreading, resulting in notably faster inference speeds.
+- Disable progress bar for inference by default, and add `show_progress_bar` parameter to `SpanMarkerModel.predict`.
 
 ## [1.1.1]
 

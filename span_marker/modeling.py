@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 import torch.nn.functional as F
-from datasets import Dataset
+from datasets import Dataset, disable_progress_bar, enable_progress_bar
 from packaging.version import Version, parse
 from torch import device, nn
 from tqdm.autonotebook import trange
@@ -321,7 +321,10 @@ class SpanMarkerModel(PreTrainedModel):
             raise exc
 
     def predict(
-        self, inputs: Union[str, List[str], List[List[str]], Dataset], batch_size: int = 4
+        self,
+        inputs: Union[str, List[str], List[List[str]], Dataset],
+        batch_size: int = 4,
+        show_progress_bar: bool = False,
     ) -> Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
         """Predict named entities from input texts.
 
@@ -349,6 +352,10 @@ class SpanMarkerModel(PreTrainedModel):
                 * List[List[str]]: a list of multiple pre-tokenized string sentences, i.e. a list with lists of words.
                 * Dataset: A 🤗 :class:`~datasets.Dataset` with a ``tokens`` column and optionally ``document_id`` and ``sentence_id`` columns.
                     If the optional columns are provided, they will be used to provide document-level context.
+
+            batch_size (int): The number of samples to include in a batch, a higher batch size is faster,
+                but requires more memory. Defaults to 4
+            show_progress_bar (bool): Whether to show a progress bar, useful for longer inputs. Defaults to `False`.
 
         Returns:
             Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]:
@@ -448,6 +455,7 @@ class SpanMarkerModel(PreTrainedModel):
                 self.tokenizer.model_max_length,
                 max_prev_context=self.config.max_prev_context,
                 max_next_context=self.config.max_next_context,
+                show_progress_bar=show_progress_bar,
             )
             dataset = dataset.sort(column_names=["__sort_id"])
             dataset = dataset.remove_columns("__sort_id")
@@ -457,6 +465,8 @@ class SpanMarkerModel(PreTrainedModel):
                 "inference without document-level context may cause decreased performance."
             )
 
+        if not show_progress_bar:
+            disable_progress_bar()
         dataset = dataset.map(
             Trainer.spread_sample,
             batched=True,
@@ -466,7 +476,9 @@ class SpanMarkerModel(PreTrainedModel):
                 "marker_max_length": self.config.marker_max_length,
             },
         )
-        for batch_start_idx in trange(0, len(dataset), batch_size, leave=True):
+        if not show_progress_bar:
+            enable_progress_bar()
+        for batch_start_idx in trange(0, len(dataset), batch_size, leave=True, disable=not show_progress_bar):
             batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
             # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
             batch = self.data_collator(batch)
