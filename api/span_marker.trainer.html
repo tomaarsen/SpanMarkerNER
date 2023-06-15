@@ -234,26 +234,21 @@ representing as many previous sentences as fits.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.trainer.Trainer.spread_sample">
-<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spread_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.spread_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.spread_sample" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">spread_sample</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">batch</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_max_length</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.spread_sample"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.spread_sample" title="Permalink to this definition">¶</a></dt>
 <dd><p>Spread sentences between multiple samples if lack of space per sample requires it.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
+<li><p><strong>batch</strong> (<cite>Dict[str, List[Any]]</cite>) – A dictionary of dataset keys to lists of values.</p></li>
 <li><p><strong>model_max_length</strong> (<cite>int</cite>) – The total number of tokens that can be processed before
 truncation.</p></li>
 <li><p><strong>marker_max_length</strong> (<cite>int</cite>) – The maximum length for each of the span markers. A value of 128
 means that each training and inferencing sample contains a maximum of 128 start markers
 and 128 end markers, for a total of 256 markers per sample.</p></li>
-<li><p><strong>sample</strong> (<cite>Dict[str, List[Any]]</cite>) – A dictionary of dataset keys to singleton lists
-of values.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><dl class="simple">
-<dt>A dictionary of dataset keys to not strictly singleton lists</dt><dd><p>of values.</p>
-</dd>
-</dl>
-</p>
+<dd class="field-even"><p>A dictionary of dataset keys to lists of values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, List[Any]]</p>

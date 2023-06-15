@@ -291,10 +291,11 @@
         <span class="c1"># Tokenize and add start/end markers</span>
         <span class="k">with</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">entity_tracker</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-                <span class="k">lambda</span> <span class="n">batch</span><span class="p">:</span> <span class="n">tokenizer</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">return_num_words</span><span class="o">=</span><span class="n">is_evaluate</span><span class="p">),</span>
+                <span class="n">tokenizer</span><span class="p">,</span>
                 <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="n">remove_columns</span><span class="o">=</span><span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPTIONAL_COLUMNS</span><span class="p">),</span>
                 <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Tokenizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
+                <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;return_num_words&quot;</span><span class="p">:</span> <span class="n">is_evaluate</span><span class="p">},</span>
             <span class="p">)</span>
         <span class="c1"># If &quot;document_id&quot; AND &quot;sentence_id&quot; exist in the training dataset</span>
         <span class="k">if</span> <span class="p">{</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">}</span> <span class="o">&lt;=</span> <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">):</span>
@@ -309,12 +310,13 @@
         <span class="c1"># Spread between multiple samples where needed</span>
         <span class="n">original_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">(</span>
-                <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span> <span class="n">sample</span>
-            <span class="p">),</span>
+            <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">,</span>
             <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Spreading data between multiple samples&quot;</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;model_max_length&quot;</span><span class="p">:</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
+                <span class="s2">&quot;marker_max_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
         <span class="n">new_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
@@ -411,39 +413,42 @@
 
 <div class="viewcode-block" id="Trainer.spread_sample"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.spread_sample">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">spread_sample</span><span class="p">(</span>
-        <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]</span>
+        <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Spread sentences between multiple samples if lack of space per sample requires it.</span>
 
 <span class="sd">        Args:</span>
+<span class="sd">            batch (`Dict[str, List[Any]]`): A dictionary of dataset keys to lists of values.</span>
 <span class="sd">            model_max_length (`int`): The total number of tokens that can be processed before</span>
 <span class="sd">                truncation.</span>
 <span class="sd">            marker_max_length (`int`): The maximum length for each of the span markers. A value of 128</span>
 <span class="sd">                means that each training and inferencing sample contains a maximum of 128 start markers</span>
 <span class="sd">                and 128 end markers, for a total of 256 markers per sample.</span>
-<span class="sd">            sample (`Dict[str, List[Any]]`): A dictionary of dataset keys to singleton lists</span>
-<span class="sd">                of values.</span>
 
 <span class="sd">        Returns:</span>
-<span class="sd">            Dict[str, List[Any]]: A dictionary of dataset keys to not strictly singleton lists</span>
-<span class="sd">                of values.</span>
+<span class="sd">            Dict[str, List[Any]]: A dictionary of dataset keys to lists of values.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">sample</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sample</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+        <span class="n">keys</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+        <span class="n">values</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">values</span><span class="p">()</span>
         <span class="n">total_sample_length</span> <span class="o">=</span> <span class="n">model_max_length</span> <span class="o">+</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">marker_max_length</span>
-        <span class="n">sample_marker_space</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_sample_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]))</span> <span class="o">//</span> <span class="mi">2</span>
-        <span class="n">spread_between_n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">sample_marker_space</span><span class="p">)</span>
-        <span class="n">spread_samples</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spread_between_n</span><span class="p">):</span>
-            <span class="n">sample_copy</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-            <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
-            <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
-            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
-            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
-            <span class="k">if</span> <span class="s2">&quot;labels&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
-                <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
-            <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;num_spans&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span>
-            <span class="n">spread_samples</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_copy</span><span class="p">)</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[</span><span class="n">one_sample</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">for</span> <span class="n">one_sample</span> <span class="ow">in</span> <span class="n">spread_samples</span><span class="p">]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sample</span><span class="o">.</span><span class="n">keys</span><span class="p">()}</span></div>
+
+        <span class="n">batch_samples</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="p">[]</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">values</span><span class="p">):</span>
+            <span class="n">sample</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">keys</span><span class="p">,</span> <span class="n">sample</span><span class="p">))</span>
+            <span class="n">sample_marker_space</span> <span class="o">=</span> <span class="p">(</span><span class="n">total_sample_length</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]))</span> <span class="o">//</span> <span class="mi">2</span>
+            <span class="n">spread_between_n</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">ceil</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">sample_marker_space</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">spread_between_n</span><span class="p">):</span>
+                <span class="n">sample_copy</span> <span class="o">=</span> <span class="n">sample</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">i</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">sample_marker_space</span>
+                <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;end_position_ids&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="k">if</span> <span class="s2">&quot;labels&quot;</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">:</span>
+                    <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;labels&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;num_spans&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">sample_copy</span><span class="p">[</span><span class="s2">&quot;start_position_ids&quot;</span><span class="p">])</span>
+                <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">sample_copy</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="n">batch_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">batch_samples</span></div>
 
     <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed training DataLoader.&quot;&quot;&quot;</span>

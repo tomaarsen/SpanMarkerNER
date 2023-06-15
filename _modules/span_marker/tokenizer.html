@@ -155,7 +155,7 @@
 
 <span class="sd">            with tokenizer.entity_tracker(split=dataset_name):</span>
 <span class="sd">                dataset = dataset.map(</span>
-<span class="sd">                    lambda batch: tokenizer(batch[&quot;tokens&quot;], labels=batch[&quot;ner_tags&quot;]),</span>
+<span class="sd">                    tokenizer,</span>
 <span class="sd">                    ...</span>
 <span class="sd">                )</span>
 

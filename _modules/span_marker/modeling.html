@@ -544,6 +544,7 @@
             <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]},</span> <span class="n">return_num_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
         <span class="n">batch_encoding</span> <span class="o">=</span> <span class="n">tokenizer_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_encoding&quot;</span><span class="p">)</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">tokenizer_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">add_column</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
         <span class="c1"># Add context if possible</span>
@@ -562,14 +563,15 @@
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;__sort_id&quot;</span><span class="p">)</span>
 
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
-            <span class="k">lambda</span> <span class="n">sample</span><span class="p">:</span> <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span> <span class="n">sample</span>
-            <span class="p">),</span>
+            <span class="n">Trainer</span><span class="o">.</span><span class="n">spread_sample</span><span class="p">,</span>
             <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">desc</span><span class="o">=</span><span class="s2">&quot;Spreading data between multiple samples&quot;</span><span class="p">,</span>
+            <span class="n">fn_kwargs</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;model_max_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">,</span>
+                <span class="s2">&quot;marker_max_length&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">marker_max_length</span><span class="p">,</span>
+            <span class="p">},</span>
         <span class="p">)</span>
-        <span class="k">for</span> <span class="n">batch_start_idx</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">batch_start_idx</span> <span class="ow">in</span> <span class="n">trange</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">,</span> <span class="n">leave</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">batch_start_idx</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span> <span class="n">batch_start_idx</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">)))</span>
             <span class="c1"># Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.</span>
             <span class="n">batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span><span class="p">(</span><span class="n">batch</span><span class="p">)</span>
