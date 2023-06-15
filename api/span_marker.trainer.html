@@ -86,6 +86,7 @@
 <li class="toctree-l2"><a class="reference internal" href="span_marker.evaluation.html">span_marker.evaluation module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.output.html">span_marker.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.spacy_integration.html">span_marker.spacy_integration module</a></li>
 </ul>
 </li>
 </ul>
@@ -168,16 +169,6 @@ to <code class="docutils literal notranslate"><span class="pre">False</span></co
 in <code class="docutils literal notranslate"><span class="pre">train</span></code>)</p></li>
 </ul>
 </div></blockquote>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="span_marker.trainer.Trainer.REQUIRED_COLUMNS">
-<span class="sig-name descname"><span class="pre">REQUIRED_COLUMNS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('tokens',</span> <span class="pre">'ner_tags')</span></em><a class="headerlink" href="#span_marker.trainer.Trainer.REQUIRED_COLUMNS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="span_marker.trainer.Trainer.OPTIONAL_COLUMNS">
-<span class="sig-name descname"><span class="pre">OPTIONAL_COLUMNS</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.11)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">('document_id',</span> <span class="pre">'sentence_id')</span></em><a class="headerlink" href="#span_marker.trainer.Trainer.OPTIONAL_COLUMNS" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.trainer.Trainer.preprocess_dataset">
 <span class="sig-name descname"><span class="pre">preprocess_dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">label_normalizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'train'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_evaluate</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.preprocess_dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.preprocess_dataset" title="Permalink to this definition">¶</a></dt>
