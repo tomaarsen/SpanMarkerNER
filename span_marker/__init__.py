@@ -23,12 +23,16 @@ else:
     from span_marker.spacy_integration import SpacySpanMarkerWrapper
 
     DEFAULT_SPACY_CONFIG = {
-        "model": "tomaarsen/span-marker-bert-tiny-fewnerd-coarse-super",
+        "model": "tomaarsen/span-marker-roberta-large-ontonotes5",
         "batch_size": 4,
         "device": None,
     }
 
-    @Language.factory("span_marker", default_config=DEFAULT_SPACY_CONFIG)
+    @Language.factory(
+        "span_marker",
+        assigns=["doc.ents", "token.ent_iob", "token.ent_type"],
+        default_config=DEFAULT_SPACY_CONFIG,
+    )
     def _spacy_span_marker_factory(
         nlp: Language,  # pylint: disable=W0613
         name: str,  # pylint: disable=W0613
@@ -36,6 +40,8 @@ else:
         batch_size: int,
         device: Optional[Union[str, torch.device]],
     ) -> SpacySpanMarkerWrapper:
+        # Remove the existing NER component to allow for SpanMarker to act as a drop-in replacement
+        nlp.remove_pipe("ner")
         return SpacySpanMarkerWrapper(model, batch_size=batch_size, device=device)
 
 

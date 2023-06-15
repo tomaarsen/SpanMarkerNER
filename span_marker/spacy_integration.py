@@ -9,13 +9,22 @@ from span_marker.modeling import SpanMarkerModel
 
 
 class SpacySpanMarkerWrapper:
-    """A wrapper of SpanMarker for spaCy, allowing SpanMarker to be used as a spaCy pipeline component.
+    """This wrapper allows SpanMarker to be used as a drop-in replacement of the "ner" pipeline component.
 
-    The `span_marker` pipeline component sets the following extensions:
+    Usage:
 
-        * `Doc._.ents`: A tuple of `Span` instances, e.g. `(Cleopatra VII, Cleopatra the Great, 69 BCE)`
-        * `Span._.label`: A string representing the entity label, e.g. `PERSON`
-        * `Span._.score`: The SpanMarker confidence score for the prediction.
+    .. code-block:: diff
+
+         import spacy
+       + import span_marker
+
+         nlp = spacy.load("en_core_web_sm")
+       + nlp.add_pipe("span_marker", config={"model": "tomaarsen/span-marker-roberta-large-ontonotes5"})
+
+         text = '''Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the
+         Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her
+         death in 30 BCE.'''
+         doc = nlp(text)
 
     Example::
 
@@ -27,16 +36,16 @@ class SpacySpanMarkerWrapper:
         ... Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her
         ... death in 30 BCE.'''
         >>> doc = nlp(text)
-        >>> doc._.ents
+        >>> doc.ents
         (Cleopatra VII, Cleopatra the Great, 69 BCE, Egypt, 51 BCE, 30 BCE)
-        >>> for span in doc._.ents:
-        ...     print((span, span._.label, span._.score))
-        (Cleopatra VII, 'PERSON', 0.994394063949585)
-        (Cleopatra the Great, 'PERSON', 0.9954156875610352)
-        (69 BCE, 'DATE', 0.9956725835800171)
-        (Egypt, 'GPE', 0.9962241649627686)
-        (51 BCE, 'DATE', 0.9894670844078064)
-        (30 BCE, 'DATE', 0.9939478635787964)
+        >>> for span in doc.ents:
+        ...     print((span, span.label_))
+        (Cleopatra VII, 'PERSON')
+        (Cleopatra the Great, 'PERSON')
+        (69 BCE, 'DATE')
+        (Egypt, 'GPE')
+        (51 BCE, 'DATE')
+        (30 BCE, 'DATE')
     """
 
     def __init__(
@@ -47,18 +56,24 @@ class SpacySpanMarkerWrapper:
         device: Optional[Union[str, torch.device]] = None,
         **kwargs,
     ) -> None:
+        """Initialize a SpanMarker wrapper for spaCy.
+
+        Args:
+            pretrained_model_name_or_path (Union[str, os.PathLike]): The path to a locally pretrained SpanMarker model
+                or a model name from the Hugging Face hub, e.g. `tomaarsen/span-marker-roberta-large-ontonotes5`
+            batch_size (int): The number of samples to include per batch. Higher is faster, but requires more memory.
+                Defaults to 4.
+            device (Optional[Union[str, torch.device]]): The device to place the model on. Defaults to None.
+        """
         self.model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path, *args, **kwargs)
         if device:
             self.model.to(device)
         elif torch.cuda.is_available():
             self.model.to("cuda")
         self.batch_size = batch_size
-        Doc.set_extension("ents", default=[])
-        Span.set_extension("label", default="")
-        Span.set_extension("score", default=0.0)
 
     def __call__(self, doc: Doc) -> Doc:
-        """Fill the `doc._.ents`, `span._.label` and `span._.score` extensions using the SpanMarker model."""
+        """Fill `doc.ents` and `span.label_` using the chosen SpanMarker model."""
         sents = list(doc.sents)
         inputs = [[token.text for token in sent] for sent in sents]
         # use document-level context in the inference if the model was also trained that way
@@ -78,9 +93,8 @@ class SpacySpanMarkerWrapper:
                 start = entity["word_start_index"]
                 end = entity["word_end_index"]
                 span = sentence[start:end]
-                span._.label = entity["label"]
-                span._.score = entity["score"]
+                span.label_ = entity["label"]
                 outputs.append(span)
 
-        doc._.ents = tuple(outputs)
+        doc.set_ents(outputs)
         return doc
