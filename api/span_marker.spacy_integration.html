@@ -111,8 +111,58 @@
       <div id="main-content-container">
         <div id="main-content" role="main">
           
-  <section id="span-marker-spacy-integration-module">
-<h1>span_marker.spacy_integration module<a class="headerlink" href="#span-marker-spacy-integration-module" title="Permalink to this heading">¶</a></h1>
+  <section id="module-span_marker.spacy_integration">
+<span id="span-marker-spacy-integration-module"></span><h1>span_marker.spacy_integration module<a class="headerlink" href="#module-span_marker.spacy_integration" title="Permalink to this heading">¶</a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="span_marker.spacy_integration.SpacySpanMarkerWrapper">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.spacy_integration.</span></span><span class="sig-name descname"><span class="pre">SpacySpanMarkerWrapper</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/spacy_integration.html#SpacySpanMarkerWrapper"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.spacy_integration.SpacySpanMarkerWrapper" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>This wrapper allows SpanMarker to be used as a drop-in replacement of the “ner” pipeline component.</p>
+<p>Usage:</p>
+<div class="highlight-diff notranslate"><div class="highlight"><pre><span></span><span class="w"> </span> import spacy
+<span class="gi">+ import span_marker</span>
+
+<span class="w"> </span> nlp = spacy.load(&quot;en_core_web_sm&quot;)
+<span class="gi">+ nlp.add_pipe(&quot;span_marker&quot;, config={&quot;model&quot;: &quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;})</span>
+
+<span class="w"> </span> text = &#39;&#39;&#39;Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the
+<span class="w"> </span> Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her
+<span class="w"> </span> death in 30 BCE.&#39;&#39;&#39;
+<span class="w"> </span> doc = nlp(text)
+</pre></div>
+</div>
+<p>Example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">spacy</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">span_marker</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nlp</span> <span class="o">=</span> <span class="n">spacy</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;en_core_web_sm&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">nlp</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">(</span><span class="s2">&quot;span_marker&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;</span><span class="p">})</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">text</span> <span class="o">=</span> <span class="s1">&#39;&#39;&#39;Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the</span>
+<span class="gp">... </span><span class="s1">Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her</span>
+<span class="gp">... </span><span class="s1">death in 30 BCE.&#39;&#39;&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">doc</span><span class="o">.</span><span class="n">ents</span>
+<span class="go">(Cleopatra VII, Cleopatra the Great, 69 BCE, Egypt, 51 BCE, 30 BCE)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">((</span><span class="n">span</span><span class="p">,</span> <span class="n">span</span><span class="o">.</span><span class="n">label_</span><span class="p">))</span>
+<span class="go">(Cleopatra VII, &#39;PERSON&#39;)</span>
+<span class="go">(Cleopatra the Great, &#39;PERSON&#39;)</span>
+<span class="go">(69 BCE, &#39;DATE&#39;)</span>
+<span class="go">(Egypt, &#39;GPE&#39;)</span>
+<span class="go">(51 BCE, &#39;DATE&#39;)</span>
+<span class="go">(30 BCE, &#39;DATE&#39;)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>pretrained_model_name_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>PathLike</em></a>) – </p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://pytorch.org/docs/master/tensor_attributes.html#torch.device" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))"><em>device</em></a><em> | </em><em>None</em>) – </p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 

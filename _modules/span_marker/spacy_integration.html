@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.spacy_integration</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_training.html">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_configuration.html">Configuring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/how_it_works.html">How it works</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.spacy_integration.html">span_marker.spacy_integration module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.spacy_integration</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">spacy.tokens</span> <span class="kn">import</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">Span</span>
+
+<span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+
+
+<div class="viewcode-block" id="SpacySpanMarkerWrapper"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper">[docs]</a><span class="k">class</span> <span class="nc">SpacySpanMarkerWrapper</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;This wrapper allows SpanMarker to be used as a drop-in replacement of the &quot;ner&quot; pipeline component.</span>
+
+<span class="sd">    Usage:</span>
+
+<span class="sd">    .. code-block:: diff</span>
+
+<span class="sd">         import spacy</span>
+<span class="sd">       + import span_marker</span>
+
+<span class="sd">         nlp = spacy.load(&quot;en_core_web_sm&quot;)</span>
+<span class="sd">       + nlp.add_pipe(&quot;span_marker&quot;, config={&quot;model&quot;: &quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;})</span>
+
+<span class="sd">         text = &#39;&#39;&#39;Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the</span>
+<span class="sd">         Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her</span>
+<span class="sd">         death in 30 BCE.&#39;&#39;&#39;</span>
+<span class="sd">         doc = nlp(text)</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; import spacy</span>
+<span class="sd">        &gt;&gt;&gt; import span_marker</span>
+<span class="sd">        &gt;&gt;&gt; nlp = spacy.load(&quot;en_core_web_sm&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; nlp.add_pipe(&quot;span_marker&quot;, config={&quot;model&quot;: &quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;})</span>
+<span class="sd">        &gt;&gt;&gt; text = &#39;&#39;&#39;Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the</span>
+<span class="sd">        ... Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her</span>
+<span class="sd">        ... death in 30 BCE.&#39;&#39;&#39;</span>
+<span class="sd">        &gt;&gt;&gt; doc = nlp(text)</span>
+<span class="sd">        &gt;&gt;&gt; doc.ents</span>
+<span class="sd">        (Cleopatra VII, Cleopatra the Great, 69 BCE, Egypt, 51 BCE, 30 BCE)</span>
+<span class="sd">        &gt;&gt;&gt; for span in doc.ents:</span>
+<span class="sd">        ...     print((span, span.label_))</span>
+<span class="sd">        (Cleopatra VII, &#39;PERSON&#39;)</span>
+<span class="sd">        (Cleopatra the Great, &#39;PERSON&#39;)</span>
+<span class="sd">        (69 BCE, &#39;DATE&#39;)</span>
+<span class="sd">        (Egypt, &#39;GPE&#39;)</span>
+<span class="sd">        (51 BCE, &#39;DATE&#39;)</span>
+<span class="sd">        (30 BCE, &#39;DATE&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
+        <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a SpanMarker wrapper for spaCy.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            pretrained_model_name_or_path (Union[str, os.PathLike]): The path to a locally pretrained SpanMarker model</span>
+<span class="sd">                or a model name from the Hugging Face hub, e.g. `tomaarsen/span-marker-roberta-large-ontonotes5`</span>
+<span class="sd">            batch_size (int): The number of samples to include per batch. Higher is faster, but requires more memory.</span>
+<span class="sd">                Defaults to 4.</span>
+<span class="sd">            device (Optional[Union[str, torch.device]]): The device to place the model on. Defaults to None.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">device</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Doc</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill `doc.ents` and `span.label_` using the chosen SpanMarker model.&quot;&quot;&quot;</span>
+        <span class="n">sents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">)</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">]</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sents</span><span class="p">]</span>
+        <span class="c1"># use document-level context in the inference if the model was also trained that way</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
+                    <span class="s2">&quot;document_id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span>
+                    <span class="s2">&quot;sentence_id&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)),</span>
+                <span class="p">}</span>
+            <span class="p">)</span>
+        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="n">entities_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">entities</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sents</span><span class="p">,</span> <span class="n">entities_list</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+                <span class="n">start</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">]</span>
+                <span class="n">end</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span>
+                <span class="n">span</span> <span class="o">=</span> <span class="n">sentence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                <span class="n">span</span><span class="o">.</span><span class="n">label_</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+
+        <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">doc</span></div>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>
