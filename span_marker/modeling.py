@@ -48,6 +48,7 @@ class SpanMarkerModel(PreTrainedModel):
 
     config_class = SpanMarkerConfig
     base_model_prefix = "encoder"
+    _no_split_modules = []  # To support `load_in_8bit=True`` and `device_map="auto"`
 
     def __init__(self, config: SpanMarkerConfig, encoder: Optional[PreTrainedModel] = None, **kwargs) -> None:
         """Initialize a SpanMarkerModel using configuration.

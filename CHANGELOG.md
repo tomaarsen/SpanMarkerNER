@@ -15,11 +15,17 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Added
+
+- Added support for `load_in_8bit=True` and `device_map="auto"`.
+
 ## [1.2.0]
 
 ### Added
 
-- Added `trained_with_document_context` to the SpanMarkerConfig
+- Added `trained_with_document_context` to the SpanMarkerConfig.
   - Added warnings if a model is trained with document-context and evaluated/inferenced without, or vice versa.
 - Added `spaCy` integration via `nlp.add_pipe("span_marker")`. See the [SpanMarker with spaCy documentation](https://tomaarsen.github.io/SpanMarkerNER/notebooks/spacy_integration.html) for information.
 
