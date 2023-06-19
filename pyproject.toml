@@ -128,3 +128,8 @@ exclude = [
 
 [tool.black]
 line-length = 120
+
+[tool.poetry.plugins]
+
+[tool.poetry.plugins."spacy_factories"]
+"spacy" = "span_marker.__init__:_spacy_span_marker_factory"

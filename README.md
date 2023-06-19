@@ -145,7 +145,6 @@ These trained models have Hosted Inference API widgets that you can use to exper
 All [SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?library=span-marker) can also be easily used in spaCy. It's as simple as including 1 line to add the `span_marker` pipeline. See the Documentation or API Reference for more information.
 ```python
 import spacy
-import span_marker
 
 # Load the spaCy model with the span_marker pipeline component
 nlp = spacy.load("en_core_web_sm")

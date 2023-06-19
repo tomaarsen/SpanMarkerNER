@@ -19,6 +19,7 @@ Types of changes
 
 ### Added
 
+- Added support for using `span_marker` spaCy pipeline component without importing SpanMarker.
 - Added support for `load_in_8bit=True` and `device_map="auto"`.
 
 ## [1.2.0]
