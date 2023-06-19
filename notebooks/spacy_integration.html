@@ -123,7 +123,7 @@
 <p>In this short notebook, we’ll have a look at using pretrained SpanMarker models with spaCy.</p>
 <section id="Setup">
 <h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
-<p>First of all, both <code class="docutils literal notranslate"><span class="pre">spacy</span></code> and the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module need to be installed. Afterwards, we need to install a <code class="docutils literal notranslate"><span class="pre">spacy</span></code> model, too. We’ll choose the simplest one for now: <code class="docutils literal notranslate"><span class="pre">en_en_core_web_sm</span></code></p>
+<p>First of all, both <code class="docutils literal notranslate"><span class="pre">spacy</span></code> and the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module need to be installed. Afterwards, we need to install a <code class="docutils literal notranslate"><span class="pre">spacy</span></code> model, too. We’ll choose the simplest one for now: <code class="docutils literal notranslate"><span class="pre">en_core_web_sm</span></code></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
@@ -321,12 +321,18 @@
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nlp</span><span class="o">.</span><span class="n">remove_pipe</span><span class="p">(</span><span class="s2">&quot;span_marker&quot;</span><span class="p">)</span>
-<span class="n">nlp</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">(</span><span class="s2">&quot;span_marker&quot;</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super&quot;</span><span class="p">,</span> <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">})</span>
+<span class="n">nlp</span><span class="o">.</span><span class="n">add_pipe</span><span class="p">(</span>
+    <span class="s2">&quot;span_marker&quot;</span><span class="p">,</span>
+    <span class="n">config</span><span class="o">=</span><span class="p">{</span>
+        <span class="s2">&quot;model&quot;</span><span class="p">:</span> <span class="s2">&quot;tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;device&quot;</span><span class="p">:</span> <span class="s2">&quot;cpu&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+<span class="p">)</span>
 
 <span class="n">doc</span> <span class="o">=</span> <span class="n">nlp</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">)</span>
 <span class="n">displacy</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s2">&quot;ent&quot;</span><span class="p">)</span>
-</pre></div>
+<br/></pre></div>
 </div>
 </div>
 <div class="nboutput docutils container">
