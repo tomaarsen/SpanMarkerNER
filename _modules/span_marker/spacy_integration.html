@@ -131,7 +131,6 @@
 <span class="sd">    .. code-block:: diff</span>
 
 <span class="sd">         import spacy</span>
-<span class="sd">       + import span_marker</span>
 
 <span class="sd">         nlp = spacy.load(&quot;en_core_web_sm&quot;)</span>
 <span class="sd">       + nlp.add_pipe(&quot;span_marker&quot;, config={&quot;model&quot;: &quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;})</span>
@@ -145,7 +144,7 @@
 
 <span class="sd">        &gt;&gt;&gt; import spacy</span>
 <span class="sd">        &gt;&gt;&gt; import span_marker</span>
-<span class="sd">        &gt;&gt;&gt; nlp = spacy.load(&quot;en_core_web_sm&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; nlp = spacy.load(&quot;en_core_web_sm&quot;, disable=[&quot;ner&quot;])</span>
 <span class="sd">        &gt;&gt;&gt; nlp.add_pipe(&quot;span_marker&quot;, config={&quot;model&quot;: &quot;tomaarsen/span-marker-roberta-large-ontonotes5&quot;})</span>
 <span class="sd">        &gt;&gt;&gt; text = &#39;&#39;&#39;Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the</span>
 <span class="sd">        ... Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her</span>
