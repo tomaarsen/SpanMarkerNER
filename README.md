@@ -147,7 +147,7 @@ All [SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?li
 import spacy
 
 # Load the spaCy model with the span_marker pipeline component
-nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm", disable=["ner"])
 nlp.add_pipe("span_marker", config={"model": "tomaarsen/span-marker-roberta-large-ontonotes5"})
 
 # Feed some text through the model to get a spacy Doc

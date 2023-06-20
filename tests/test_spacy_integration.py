@@ -2,7 +2,7 @@ import spacy
 
 
 def test_span_marker_as_spacy_pipeline_component():
-    nlp = spacy.load("en_core_web_sm")
+    nlp = spacy.load("en_core_web_sm", disable=["ner"])
     batch_size = 2
     wrapper = nlp.add_pipe(
         "span_marker", config={"model": "tomaarsen/span-marker-bert-tiny-conll03", "batch_size": batch_size}
