@@ -1,21 +1,25 @@
-<h1 align="center">
+<div align="center">
+<h1>
 SpanMarker for Named Entity Recognition
 </h1>
-<div align="center">
+<a href="https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5" target="_blank">
+    <img src="https://github.com/tomaarsen/SpanMarkerNER/assets/37621491/c76d6393-bb0b-44c3-9412-fd9c8313dcc1">
+</a>
 
-[🤗 Models](https://huggingface.co/models?other=span-marker) |
+[🤗 Models](https://huggingface.co/models?library=span-marker) |
 [🛠️ Getting Started In Google Colab](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb) |
 [📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER)
 </div>
 
 SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
-Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.
+Built on top of the familiar [🤗 Transformers](https://github.com/huggingface/transformers) library, SpanMarker inherits a wide range of powerful functionalities, such as easily loading and saving models, hyperparameter optimization, automatic logging in various tools, checkpointing, callbacks, mixed precision training, 8-bit inference, and more.
+
+<!--Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.-->
 <!-- like performance dashboard integration, automatic mixed precision, 8-bit inference-->
 
 Based on the [PL-Marker](https://arxiv.org/pdf/2109.06067.pdf) paper, SpanMarker breaks the mold through its accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU` or no label annotation scheme.
 
 Additionally, the SpanMarker library has been integrated with the Hugging Face Hub and the Hugging Face Inference API. See the SpanMarker documentation on [Hugging Face](https://huggingface.co/docs/hub/span_marker) or see [all SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?library=span-marker).
-
 Through the Inference API integration, users can test any SpanMarker model on the Hugging Face Hub for free using a widget on the [model page](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super). Furthermore, each public SpanMarker model offers a free API for fast prototyping and can be deployed to production using Hugging Face Inference Endpoints.
 
 | Inference API Widget (on a model page) | Free Inference API (`Deploy` > `Inference API` on a model page) |
