@@ -146,7 +146,7 @@ These trained models have Hosted Inference API widgets that you can use to exper
 * [`tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context`](https://huggingface.co/tomaarsen/span-marker-xlm-roberta-large-conllpp-doc-context) was trained in an hour using the `xlm-roberta-large` encoder on the CoNLL++ dataset. Using [document-level context](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html), it reaches a very competitive 0.955 F1. For the best performance, inference should be performed using document-level context ([docs](https://tomaarsen.github.io/SpanMarkerNER/notebooks/document_level_context.html#Inference)).
 
 ## Using pretrained SpanMarker models with spaCy
-All [SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?library=span-marker) can also be easily used in spaCy. It's as simple as including 1 line to add the `span_marker` pipeline. See the Documentation or API Reference for more information.
+All [SpanMarker models on the Hugging Face Hub](https://huggingface.co/models?library=span-marker) can also be easily used in spaCy. It's as simple as including 1 line to add the `span_marker` pipeline. See the [Documentation](https://tomaarsen.github.io/SpanMarkerNER/notebooks/spacy_integration.html) or [API Reference](https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.spacy_integration.html) for more information.
 ```python
 import spacy
 
