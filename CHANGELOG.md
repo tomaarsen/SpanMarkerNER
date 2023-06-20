@@ -15,11 +15,16 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
-## [1.2.1]
+## [Unreleased]
 
 ### Added
 
 - Added support for using `span_marker` spaCy pipeline component without importing SpanMarker.
+
+## [1.2.1]
+
+### Added
+
 - Added support for `load_in_8bit=True` and `device_map="auto"`.
 
 ## [1.2.0]
