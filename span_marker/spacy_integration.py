@@ -74,7 +74,7 @@ class SpacySpanMarkerWrapper:
     def __call__(self, doc: Doc) -> Doc:
         """Fill `doc.ents` and `span.label_` using the chosen SpanMarker model."""
         sents = list(doc.sents)
-        inputs = [[token.text for token in sent] for sent in sents]
+        inputs = [[token.text if not token.is_space else "" for token in sent] for sent in sents]
         # use document-level context in the inference if the model was also trained that way
         if self.model.config.trained_with_document_context:
             inputs = Dataset.from_dict(

@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- Fix crash in spaCy inference when using subsequent whitespace.
+
 ## [1.2.2]
 
 ### Added
