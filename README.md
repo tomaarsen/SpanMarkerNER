@@ -8,7 +8,7 @@ SpanMarker for Named Entity Recognition
 
 [🤗 Models](https://huggingface.co/models?library=span-marker) |
 [🛠️ Getting Started In Google Colab](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb) |
-[📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER)
+[📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER) | 📊 [Thesis](https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf)
 </div>
 
 SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
@@ -128,6 +128,8 @@ entities = model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B
 All models in this list contain `train.py` files that show the training scripts used to generate them. Additionally, all training scripts used are stored in the [training_scripts](training_scripts) directory.
 These trained models have Hosted Inference API widgets that you can use to experiment with the models on their Hugging Face model pages. Additionally, Hugging Face provides each model with a free API (`Deploy` > `Inference API` on the model page).
 
+These models are further elaborated on in my [thesis](https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf).
+
 ### FewNERD
 * [`tomaarsen/span-marker-bert-base-fewnerd-fine-super`](https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super) is a model that I have trained in 2 hours on the finegrained, supervised [Few-NERD dataset](https://huggingface.co/datasets/DFKI-SLT/few-nerd). It reached a 0.7053 Test F1, competitive in the all-time [Few-NERD leaderboard](https://paperswithcode.com/sota/named-entity-recognition-on-few-nerd-sup) using `bert-base`. My training script resembles the one that you can see above.
   * Try the model out online using this [🤗 Space](https://tomaarsen-span-marker-bert-base-fewnerd-fine-super.hf.space/).
@@ -176,8 +178,7 @@ print([(entity, entity.label_) for entity in doc.ents])
     </a>
 </h1>
 
-I have developed this library as a part of my thesis work at [Argilla](https://github.com/argilla-io/argilla).
-Feel free to ⭐ star or watch the SpanMarker repository to get notified when my thesis is published.
+I have developed this library as a part of my thesis work at [Argilla](https://github.com/argilla-io/argilla). Feel free to read my finished thesis [here](https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf) in this repository!
 
 ## Changelog
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
