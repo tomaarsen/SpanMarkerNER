@@ -11,7 +11,7 @@ SpanMarker for Named Entity Recognition
 [📄 Documentation](https://tomaarsen.github.io/SpanMarkerNER) | 📊 [Thesis](https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf)
 </div>
 
-SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and DeBERTa.
+SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT, RoBERTa and ELECTRA.
 Built on top of the familiar [🤗 Transformers](https://github.com/huggingface/transformers) library, SpanMarker inherits a wide range of powerful functionalities, such as easily loading and saving models, hyperparameter optimization, automatic logging in various tools, checkpointing, callbacks, mixed precision training, 8-bit inference, and more.
 
 <!--Tightly implemented on top of the [🤗 Transformers](https://github.com/huggingface/transformers/) library, SpanMarker can take advantage of its valuable functionality.-->
