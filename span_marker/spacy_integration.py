@@ -31,7 +31,7 @@ class SpacySpanMarkerWrapper:
 
         >>> import spacy
         >>> import span_marker
-        >>> nlp = spacy.load("en_core_web_sm", disable=["ner"])
+        >>> nlp = spacy.load("en_core_web_sm", exclude=["ner"])
         >>> nlp.add_pipe("span_marker", config={"model": "tomaarsen/span-marker-roberta-large-ontonotes5"})
         >>> text = '''Cleopatra VII, also known as Cleopatra the Great, was the last active ruler of the
         ... Ptolemaic Kingdom of Egypt. She was born in 69 BCE and ruled Egypt from 51 BCE until her

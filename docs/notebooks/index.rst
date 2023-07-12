@@ -11,4 +11,4 @@ Usage Notebooks
     Configuring <model_configuration.ipynb>
     SpanMarker with spaCy <spacy_integration.ipynb>
     Document-level context <document_level_context.ipynb>
-    How it works <how_it_works.ipynb>
+    SpanMarker Thesis <https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf>

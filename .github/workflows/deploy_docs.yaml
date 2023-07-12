@@ -24,9 +24,6 @@ jobs:
         with:
           pandoc-version: "2.17.1"
 
-      - name: Install LaTeX
-        run: sudo apt install texlive-latex-extra dvipng -y
-
       - name: Try to load cached dependencies
         uses: actions/cache@v3
         id: restore-cache
