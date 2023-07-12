@@ -4,7 +4,7 @@ from typing import Optional, Union
 import torch
 from datasets import Dataset
 from spacy.tokens import Doc
-from spacy.util import minibatch
+from spacy.util import minibatch, filter_spans
 import types
 
 from span_marker.modeling import SpanMarkerModel
@@ -104,7 +104,7 @@ class SpacySpanMarkerWrapper:
                 span.label_ = entity["label"]
                 outputs.append(span)
 
-        doc.set_ents(outputs)
+        doc.set_ents(filter_spans(list(doc.ents) + outputs))
         return doc
 
     def pipe(self, stream, batch_size=128, include_sent=None):
@@ -131,5 +131,5 @@ class SpacySpanMarkerWrapper:
                     span = doc[start:end]
                     span.label_ = entity["label"]
                     outputs.append(span)
-                doc.set_ents(outputs)
+                doc.set_ents(filter_spans(list(doc.ents) + outputs))
                 yield doc
