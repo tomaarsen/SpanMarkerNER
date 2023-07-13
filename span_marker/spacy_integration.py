@@ -1,11 +1,12 @@
 import os
+import types
+import warnings
 from typing import Optional, Union
 
 import torch
 from datasets import Dataset
 from spacy.tokens import Doc
-from spacy.util import minibatch, filter_spans
-import types
+from spacy.util import filter_spans, minibatch
 
 from span_marker.modeling import SpanMarkerModel
 
@@ -107,8 +108,16 @@ class SpacySpanMarkerWrapper:
         doc.set_ents(filter_spans(list(doc.ents) + outputs))
         return doc
 
-    def pipe(self, stream, batch_size=128, include_sent=None):
+    def pipe(self, stream, batch_size=128):
         """Fill `doc.ents` and `span.label_` using the chosen SpanMarker model."""
+        if batch_size != self.batch_size:
+            warnings.warn(
+                (
+                    f"Using a different spaCy batch size ({batch_size}) than the one used for initialization of SpanMarker ({self.batch_size}).",
+                    "This might lead to sub-optimal inference. Consider using the same batch size for both."
+                )
+            )
+
         if isinstance(stream, str):
             stream = [stream]
 
