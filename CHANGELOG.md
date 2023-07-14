@@ -23,8 +23,8 @@ Types of changes
 
 ### Added
 
-- Add `overwrite_entities` parameter to allow for choosing overwriting spaCy entities.
-- Add `.pipe()` method to spaCy integration to allow for batched inference.
+- Added `overwrite_entities` parameter to allow for choosing overwriting spaCy entities.
+- Added `.pipe()` method to spaCy integration to allow for batched inference.
 
 ## [1.2.3]
 
