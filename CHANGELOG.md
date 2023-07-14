@@ -15,6 +15,17 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.2.4]
+
+### Fixed
+
+- Fix overwriting spaCy entities by default
+
+### Added
+
+- Add `overwrite_entities` parameter to allow for choosing overwriting spaCy entities.
+- Add `.pipe()` method to spaCy integration to allow for batched inference.
+
 ## [1.2.3]
 
 ### Fixed

@@ -1,6 +1,5 @@
 import os
 import types
-import warnings
 from typing import Optional, Union
 
 import torch
@@ -56,6 +55,7 @@ class SpacySpanMarkerWrapper:
         *args,
         batch_size: int = 4,
         device: Optional[Union[str, torch.device]] = None,
+        overwrite_entities: Optional[bool] = False,
         **kwargs,
     ) -> None:
         """Initialize a SpanMarker wrapper for spaCy.
@@ -66,6 +66,7 @@ class SpacySpanMarkerWrapper:
             batch_size (int): The number of samples to include per batch. Higher is faster, but requires more memory.
                 Defaults to 4.
             device (Optional[Union[str, torch.device]]): The device to place the model on. Defaults to None.
+            overwrite_entities (Optional[bool]): Whether to overwrite the existing entities in the `doc.ents` attribute.
         """
         self.model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path, *args, **kwargs)
         if device:
@@ -73,6 +74,7 @@ class SpacySpanMarkerWrapper:
         elif torch.cuda.is_available():
             self.model.to("cuda")
         self.batch_size = batch_size
+        self.overwrite_entities = overwrite_entities
 
     @staticmethod
     def convert_inputs_to_dataset(inputs):
@@ -105,19 +107,15 @@ class SpacySpanMarkerWrapper:
                 span.label_ = entity["label"]
                 outputs.append(span)
 
-        doc.set_ents(filter_spans(list(doc.ents) + outputs))
+        if self.overwrite_entities:
+            doc.set_ents(outputs)
+        else:
+            doc.set_ents(filter_spans(list(doc.ents) + outputs))
+
         return doc
 
     def pipe(self, stream, batch_size=128):
         """Fill `doc.ents` and `span.label_` using the chosen SpanMarker model."""
-        if batch_size != self.batch_size:
-            warnings.warn(
-                (
-                    f"Using a different spaCy batch size ({batch_size}) than the one used for initialization of SpanMarker ({self.batch_size}).",
-                    "This might lead to sub-optimal inference. Consider using the same batch size for both."
-                )
-            )
-
         if isinstance(stream, str):
             stream = [stream]
 
@@ -140,5 +138,10 @@ class SpacySpanMarkerWrapper:
                     span = doc[start:end]
                     span.label_ = entity["label"]
                     outputs.append(span)
-                doc.set_ents(filter_spans(list(doc.ents) + outputs))
+
+                if self.overwrite_entities:
+                    doc.set_ents(outputs)
+                else:
+                    doc.set_ents(filter_spans(list(doc.ents) + outputs))
+
                 yield doc
