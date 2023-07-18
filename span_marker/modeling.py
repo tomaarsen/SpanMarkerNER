@@ -134,6 +134,8 @@ class SpanMarkerModel(PreTrainedModel):
             num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.
             labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
             num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
+            document_ids (Optional[~torch.Tensor]): The document ID of each batch sample. Defaults to None.
+            sentence_ids (Optional[~torch.Tensor]): The index of each sentence in their respective document. Defaults to None.
 
         Returns:
             SpanMarkerOutput: The output dataclass.
@@ -170,7 +172,7 @@ class SpanMarkerModel(PreTrainedModel):
                 )
             )
         padded_embeddings = [
-            F.pad(embedding, (0, 0, 0, sequence_length // 2 - len(embedding))) for embedding in embeddings
+            F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
         ]
         feature_vector = torch.stack(padded_embeddings)
 
