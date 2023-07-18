@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.2.4]
+
+### Fixed
+
+- Resolved broken license information.
+
 ## [1.2.3]
 
 ### Fixed

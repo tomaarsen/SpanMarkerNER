@@ -1,4 +1,4 @@
-__version__ = "1.2.4.dev"
+__version__ = "1.2.4"
 
 import logging
 from typing import Optional, Union
