@@ -122,6 +122,7 @@ class SpanMarkerModel(PreTrainedModel):
         num_words: Optional[torch.Tensor] = None,
         document_ids: Optional[torch.Tensor] = None,
         sentence_ids: Optional[torch.Tensor] = None,
+        **kwargs,
     ) -> SpanMarkerOutput:
         """Forward call of the SpanMarkerModel.
 
