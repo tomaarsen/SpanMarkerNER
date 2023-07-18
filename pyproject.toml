@@ -7,7 +7,7 @@ name = "span_marker"
 description = "Named Entity Recognition using Span Markers"
 readme = "README.md"
 requires-python = ">=3.7"
-license = "Apache-2.0"
+license = {text = "Apache-2.0"}
 keywords = [
     "data-science",
     "natural-language-processing",
