@@ -265,7 +265,7 @@ of [<cite>Trainer</cite>]. If present, training will resume from the model/optim
 <li><p><strong>trial</strong> (<cite>optuna.Trial</cite> or <cite>Dict[str, Any]</cite>, <em>optional</em>) – The trial run or the hyperparameter dictionary for hyperparameter search.</p></li>
 <li><p><strong>ignore_keys_for_eval</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
 gathering predictions for evaluation during the training.</p></li>
-<li><p><strong>kwargs</strong> – Additional keyword arguments used to hide deprecated arguments</p></li>
+<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments used to hide deprecated arguments</p></li>
 </ul>
 </dd>
 </dl>
@@ -309,7 +309,7 @@ dictionary also contains the epoch number which comes from the training state.</
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>commit_message</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“End of training”</cite>) – Message to commit while pushing.</p></li>
 <li><p><strong>blocking</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>True</cite>) – Whether the function should return only when the <cite>git push</cite> has finished.</p></li>
-<li><p><strong>kwargs</strong> – Additional keyword arguments passed along to [<cite>~Trainer.create_model_card</cite>].</p></li>
+<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments passed along to [<cite>~Trainer.create_model_card</cite>].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>

@@ -132,6 +132,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">import</span> <span class="nn">contextlib</span>
+<span class="kn">import</span> <span class="nn">copy</span>
 <span class="kn">import</span> <span class="nn">functools</span>
 <span class="kn">import</span> <span class="nn">glob</span>
 <span class="kn">import</span> <span class="nn">inspect</span>
@@ -147,24 +148,13 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">tqdm.auto</span> <span class="kn">import</span> <span class="n">tqdm</span>
-
 
 <span class="c1"># Integrations must be imported before ML frameworks:</span>
 <span class="c1"># isort: off</span>
 <span class="kn">from</span> <span class="nn">.integrations</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">default_hp_search_backend</span><span class="p">,</span>
     <span class="n">get_reporting_integration_callbacks</span><span class="p">,</span>
     <span class="n">hp_params</span><span class="p">,</span>
     <span class="n">is_fairscale_available</span><span class="p">,</span>
-    <span class="n">is_optuna_available</span><span class="p">,</span>
-    <span class="n">is_ray_tune_available</span><span class="p">,</span>
-    <span class="n">is_sigopt_available</span><span class="p">,</span>
-    <span class="n">is_wandb_available</span><span class="p">,</span>
-    <span class="n">run_hp_search_optuna</span><span class="p">,</span>
-    <span class="n">run_hp_search_ray</span><span class="p">,</span>
-    <span class="n">run_hp_search_sigopt</span><span class="p">,</span>
-    <span class="n">run_hp_search_wandb</span><span class="p">,</span>
 <span class="p">)</span>
 
 <span class="c1"># isort: on</span>
@@ -176,19 +166,19 @@
 <span class="kn">from</span> <span class="nn">packaging</span> <span class="kn">import</span> <span class="n">version</span>
 <span class="kn">from</span> <span class="nn">torch</span> <span class="kn">import</span> <span class="n">nn</span>
 <span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">RandomSampler</span><span class="p">,</span> <span class="n">SequentialSampler</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data.distributed</span> <span class="kn">import</span> <span class="n">DistributedSampler</span>
 
 <span class="kn">from</span> <span class="nn">.</span> <span class="kn">import</span> <span class="n">__version__</span>
 <span class="kn">from</span> <span class="nn">.configuration_utils</span> <span class="kn">import</span> <span class="n">PretrainedConfig</span>
 <span class="kn">from</span> <span class="nn">.data.data_collator</span> <span class="kn">import</span> <span class="n">DataCollator</span><span class="p">,</span> <span class="n">DataCollatorWithPadding</span><span class="p">,</span> <span class="n">default_data_collator</span>
 <span class="kn">from</span> <span class="nn">.debug_utils</span> <span class="kn">import</span> <span class="n">DebugOption</span><span class="p">,</span> <span class="n">DebugUnderflowOverflow</span>
-<span class="kn">from</span> <span class="nn">.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span><span class="p">,</span> <span class="n">is_deepspeed_zero3_enabled</span>
+<span class="kn">from</span> <span class="nn">.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span>
 <span class="kn">from</span> <span class="nn">.dependency_versions_check</span> <span class="kn">import</span> <span class="n">dep_version_check</span>
+<span class="kn">from</span> <span class="nn">.hyperparameter_search</span> <span class="kn">import</span> <span class="n">ALL_HYPERPARAMETER_SEARCH_BACKENDS</span><span class="p">,</span> <span class="n">default_hp_search_backend</span>
 <span class="kn">from</span> <span class="nn">.modelcard</span> <span class="kn">import</span> <span class="n">TrainingSummary</span>
 <span class="kn">from</span> <span class="nn">.modeling_utils</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">load_sharded_checkpoint</span><span class="p">,</span> <span class="n">unwrap_model</span>
 <span class="kn">from</span> <span class="nn">.models.auto.modeling_auto</span> <span class="kn">import</span> <span class="n">MODEL_FOR_CAUSAL_LM_MAPPING_NAMES</span><span class="p">,</span> <span class="n">MODEL_MAPPING_NAMES</span>
 <span class="kn">from</span> <span class="nn">.optimization</span> <span class="kn">import</span> <span class="n">Adafactor</span><span class="p">,</span> <span class="n">get_scheduler</span>
-<span class="kn">from</span> <span class="nn">.pytorch_utils</span> <span class="kn">import</span> <span class="n">ALL_LAYERNORM_LAYERS</span><span class="p">,</span> <span class="n">is_torch_greater_or_equal_than_1_10</span><span class="p">,</span> <span class="n">is_torch_less_than_1_11</span>
+<span class="kn">from</span> <span class="nn">.pytorch_utils</span> <span class="kn">import</span> <span class="n">ALL_LAYERNORM_LAYERS</span>
 <span class="kn">from</span> <span class="nn">.tokenization_utils_base</span> <span class="kn">import</span> <span class="n">PreTrainedTokenizerBase</span>
 <span class="kn">from</span> <span class="nn">.trainer_callback</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CallbackHandler</span><span class="p">,</span>
@@ -200,14 +190,11 @@
     <span class="n">TrainerState</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.trainer_pt_utils</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">DistributedLengthGroupedSampler</span><span class="p">,</span>
-    <span class="n">DistributedSamplerWithLoop</span><span class="p">,</span>
     <span class="n">DistributedTensorGatherer</span><span class="p">,</span>
     <span class="n">IterableDatasetShard</span><span class="p">,</span>
     <span class="n">LabelSmoother</span><span class="p">,</span>
     <span class="n">LengthGroupedSampler</span><span class="p">,</span>
     <span class="n">SequentialDistributedSampler</span><span class="p">,</span>
-    <span class="n">ShardSampler</span><span class="p">,</span>
     <span class="n">distributed_broadcast_scalars</span><span class="p">,</span>
     <span class="n">distributed_concat</span><span class="p">,</span>
     <span class="n">find_batch_size</span><span class="p">,</span>
@@ -217,7 +204,6 @@
     <span class="n">nested_concat</span><span class="p">,</span>
     <span class="n">nested_detach</span><span class="p">,</span>
     <span class="n">nested_numpify</span><span class="p">,</span>
-    <span class="n">nested_truncate</span><span class="p">,</span>
     <span class="n">nested_xla_mesh_reduce</span><span class="p">,</span>
     <span class="n">reissue_pt_warnings</span><span class="p">,</span>
 <span class="p">)</span>
@@ -236,7 +222,6 @@
     <span class="n">TrainerMemoryTracker</span><span class="p">,</span>
     <span class="n">TrainOutput</span><span class="p">,</span>
     <span class="n">default_compute_objective</span><span class="p">,</span>
-    <span class="n">default_hp_space</span><span class="p">,</span>
     <span class="n">denumpify_detensorize</span><span class="p">,</span>
     <span class="n">enable_full_determinism</span><span class="p">,</span>
     <span class="n">find_executable_batch_size</span><span class="p">,</span>
@@ -249,6 +234,7 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.training_args</span> <span class="kn">import</span> <span class="n">OptimizerNames</span><span class="p">,</span> <span class="n">ParallelMode</span><span class="p">,</span> <span class="n">TrainingArguments</span>
 <span class="kn">from</span> <span class="nn">.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ADAPTER_CONFIG_NAME</span><span class="p">,</span>
     <span class="n">ADAPTER_SAFE_WEIGHTS_NAME</span><span class="p">,</span>
     <span class="n">ADAPTER_WEIGHTS_NAME</span><span class="p">,</span>
     <span class="n">CONFIG_NAME</span><span class="p">,</span>
@@ -274,10 +260,7 @@
     <span class="n">logging</span><span class="p">,</span>
     <span class="n">strtobool</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">.utils.generic</span> <span class="kn">import</span> <span class="n">ContextManagers</span>
 
-
-<span class="n">_is_native_cpu_amp_available</span> <span class="o">=</span> <span class="n">is_torch_greater_or_equal_than_1_10</span>
 
 <span class="n">DEFAULT_CALLBACKS</span> <span class="o">=</span> <span class="p">[</span><span class="n">DefaultFlowCallback</span><span class="p">]</span>
 <span class="n">DEFAULT_PROGRESS_CALLBACK</span> <span class="o">=</span> <span class="n">ProgressCallback</span>
@@ -296,7 +279,6 @@
 <span class="k">if</span> <span class="n">is_torch_tpu_available</span><span class="p">(</span><span class="n">check_device</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
     <span class="kn">import</span> <span class="nn">torch_xla.core.xla_model</span> <span class="k">as</span> <span class="nn">xm</span>
     <span class="kn">import</span> <span class="nn">torch_xla.debug.metrics</span> <span class="k">as</span> <span class="nn">met</span>
-    <span class="kn">import</span> <span class="nn">torch_xla.distributed.parallel_loader</span> <span class="k">as</span> <span class="nn">pl</span>
 
 <span class="k">if</span> <span class="n">is_fairscale_available</span><span class="p">():</span>
     <span class="n">dep_version_check</span><span class="p">(</span><span class="s2">&quot;fairscale&quot;</span><span class="p">)</span>
@@ -327,15 +309,18 @@
     <span class="kn">from</span> <span class="nn">peft</span> <span class="kn">import</span> <span class="n">PeftModel</span>
 
 
-<span class="n">skip_first_batches</span> <span class="o">=</span> <span class="kc">None</span>
 <span class="k">if</span> <span class="n">is_accelerate_available</span><span class="p">():</span>
+    <span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">Accelerator</span><span class="p">,</span> <span class="n">skip_first_batches</span>
     <span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">accelerate_version</span>
+    <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="n">DistributedDataParallelKwargs</span><span class="p">,</span> <span class="n">GradientAccumulationPlugin</span>
 
-    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">accelerate_version</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.16&quot;</span><span class="p">):</span>
-        <span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">skip_first_batches</span>
-
-    <span class="kn">from</span> <span class="nn">accelerate</span> <span class="kn">import</span> <span class="n">Accelerator</span>
-    <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="n">DistributedDataParallelKwargs</span>
+    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">accelerate_version</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.20.3&quot;</span><span class="p">):</span>
+        <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="p">(</span>
+            <span class="n">load_fsdp_model</span><span class="p">,</span>
+            <span class="n">load_fsdp_optimizer</span><span class="p">,</span>
+            <span class="n">save_fsdp_model</span><span class="p">,</span>
+            <span class="n">save_fsdp_optimizer</span><span class="p">,</span>
+        <span class="p">)</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -435,6 +420,7 @@
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="c1"># Those are used as methods of the Trainer in examples.</span>
     <span class="kn">from</span> <span class="nn">.trainer_pt_utils</span> <span class="kn">import</span> <span class="n">_get_learning_rate</span><span class="p">,</span> <span class="n">log_metrics</span><span class="p">,</span> <span class="n">metrics_format</span><span class="p">,</span> <span class="n">save_metrics</span><span class="p">,</span> <span class="n">save_state</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -459,6 +445,7 @@
         <span class="c1"># Seed must be set before instantiating the model when using model</span>
         <span class="n">enable_full_determinism</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">full_determinism</span> <span class="k">else</span> <span class="n">set_seed</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hp_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">is_in_train</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">create_accelerator_and_postprocess</span><span class="p">()</span>
@@ -622,7 +609,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">eval_dataset</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_model_on_device</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_loaded_in_8bit&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="c1"># Quantized models doesn&#39;t support `.to` operation.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">place_model_on_device</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_quantized&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_move_model_to_device</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
         <span class="c1"># Force n_gpu to 1 to avoid DataParallel as MP will manage the GPUs</span>
@@ -739,10 +727,8 @@
                 <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
                     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">fp16</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tried to use `fp16` but it is not supported on cpu&quot;</span><span class="p">)</span>
-                    <span class="k">elif</span> <span class="n">_is_native_cpu_amp_available</span><span class="p">:</span>
-                        <span class="n">args</span><span class="o">.</span><span class="n">half_precision_backend</span> <span class="o">=</span> <span class="s2">&quot;cpu_amp&quot;</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Tried to use cpu amp but native cpu amp is not available&quot;</span><span class="p">)</span>
+                        <span class="n">args</span><span class="o">.</span><span class="n">half_precision_backend</span> <span class="o">=</span> <span class="s2">&quot;cpu_amp&quot;</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">args</span><span class="o">.</span><span class="n">half_precision_backend</span> <span class="o">=</span> <span class="s2">&quot;cuda_amp&quot;</span>
 
@@ -817,8 +803,9 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">can_return_loss</span> <span class="o">=</span> <span class="n">can_return_loss</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_init_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
 
-        <span class="c1"># Internal variables to keep track of the original batch size</span>
+        <span class="c1"># Internal variables to help with automatic batch size reduction</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_created_lr_scheduler</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># very last</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_memory_tracker</span><span class="o">.</span><span class="n">stop_and_update_metrics</span><span class="p">()</span>
@@ -927,20 +914,6 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">has_length</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">None</span>
 
-        <span class="n">generator</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">generator</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">Generator</span><span class="p">()</span>
-            <span class="c1"># for backwards compatibility, we generate a seed here (which is sampled from a generator seeded with</span>
-            <span class="c1"># `args.seed`) if data_seed isn&#39;t provided.</span>
-            <span class="c1"># Further on in this method, we default to `args.seed` instead.</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">data_seed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">empty</span><span class="p">((),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">random_</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">())</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">data_seed</span>
-            <span class="n">generator</span><span class="o">.</span><span class="n">manual_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
-
-        <span class="n">seed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">data_seed</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">data_seed</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">seed</span>
-
         <span class="c1"># Build the sampler.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">group_by_length</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">is_datasets_available</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">datasets</span><span class="o">.</span><span class="n">Dataset</span><span class="p">):</span>
@@ -952,47 +925,15 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">lengths</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="n">model_input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_input_names</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">LengthGroupedSampler</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
-                    <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
-                    <span class="n">lengths</span><span class="o">=</span><span class="n">lengths</span><span class="p">,</span>
-                    <span class="n">model_input_name</span><span class="o">=</span><span class="n">model_input_name</span><span class="p">,</span>
-                    <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">DistributedLengthGroupedSampler</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
-                    <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
-                    <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                    <span class="n">lengths</span><span class="o">=</span><span class="n">lengths</span><span class="p">,</span>
-                    <span class="n">model_input_name</span><span class="o">=</span><span class="n">model_input_name</span><span class="p">,</span>
-                    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">LengthGroupedSampler</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
+                <span class="n">dataset</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
+                <span class="n">lengths</span><span class="o">=</span><span class="n">lengths</span><span class="p">,</span>
+                <span class="n">model_input_name</span><span class="o">=</span><span class="n">model_input_name</span><span class="p">,</span>
+            <span class="p">)</span>
 
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">RandomSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">generator</span><span class="o">=</span><span class="n">generator</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">parallel_mode</span> <span class="ow">in</span> <span class="p">[</span><span class="n">ParallelMode</span><span class="o">.</span><span class="n">TPU</span><span class="p">,</span> <span class="n">ParallelMode</span><span class="o">.</span><span class="n">SAGEMAKER_MODEL_PARALLEL</span><span class="p">]</span>
-                <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span>
-            <span class="p">):</span>
-                <span class="c1"># Use a loop for TPUs when drop_last is False to have all batches have the same size.</span>
-                <span class="k">return</span> <span class="n">DistributedSamplerWithLoop</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
-                    <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="p">,</span>
-                    <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">DistributedSampler</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span>
-                    <span class="n">num_replicas</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">rank</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                    <span class="n">seed</span><span class="o">=</span><span class="n">seed</span><span class="p">,</span>
-                <span class="p">)</span>
+            <span class="k">return</span> <span class="n">RandomSampler</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1013,36 +954,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_collator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_collator_with_removed_columns</span><span class="p">(</span><span class="n">data_collator</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;training&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">train_dataset</span> <span class="o">=</span> <span class="n">IterableDatasetShard</span><span class="p">(</span>
-                    <span class="n">train_dataset</span><span class="p">,</span>
-                    <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="p">,</span>
-                    <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-                    <span class="n">num_processes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">process_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                <span class="p">)</span>
+        <span class="n">dataloader_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;collate_fn&quot;</span><span class="p">:</span> <span class="n">data_collator</span><span class="p">,</span>
+            <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
+            <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
+        <span class="p">}</span>
 
-            <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-                <span class="n">train_dataset</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="p">,</span>
-                <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-                <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-                <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;sampler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_sampler</span><span class="p">()</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;drop_last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;worker_init_fn&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">seed_worker</span>
 
-        <span class="n">train_sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_train_sampler</span><span class="p">()</span>
-
-        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">train_dataset</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="p">,</span>
-            <span class="n">sampler</span><span class="o">=</span><span class="n">train_sampler</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-            <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-            <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-            <span class="n">worker_init_fn</span><span class="o">=</span><span class="n">seed_worker</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">dataloader_params</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">_get_eval_sampler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">Sampler</span><span class="p">]:</span>
         <span class="c1"># Deprecated code</span>
@@ -1058,20 +982,13 @@
                     <span class="n">rank</span><span class="o">=</span><span class="n">smp</span><span class="o">.</span><span class="n">dp_rank</span><span class="p">(),</span>
                     <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_eval_batch_size</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">parallel_mode</span> <span class="o">==</span> <span class="n">ParallelMode</span><span class="o">.</span><span class="n">DISTRIBUTED</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">SequentialDistributedSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">SequentialSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">SequentialSampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">ShardSampler</span><span class="p">(</span>
-                <span class="n">eval_dataset</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_eval_batch_size</span><span class="p">,</span>
-                <span class="n">num_processes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                <span class="n">process_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">get_eval_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1094,34 +1011,18 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_collator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_collator_with_removed_columns</span><span class="p">(</span><span class="n">data_collator</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;evaluation&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">IterableDatasetShard</span><span class="p">(</span>
-                    <span class="n">eval_dataset</span><span class="p">,</span>
-                    <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_eval_batch_size</span><span class="p">,</span>
-                    <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-                    <span class="n">num_processes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">process_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-                <span class="n">eval_dataset</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
-                <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-                <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-                <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="n">dataloader_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;collate_fn&quot;</span><span class="p">:</span> <span class="n">data_collator</span><span class="p">,</span>
+            <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
+            <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
+        <span class="p">}</span>
 
-        <span class="n">eval_sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eval_sampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;sampler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eval_sampler</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;drop_last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span>
 
-        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">eval_dataset</span><span class="p">,</span>
-            <span class="n">sampler</span><span class="o">=</span><span class="n">eval_sampler</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-            <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-            <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">dataloader_params</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1141,35 +1042,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="n">data_collator</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_collator_with_removed_columns</span><span class="p">(</span><span class="n">data_collator</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-                <span class="n">test_dataset</span> <span class="o">=</span> <span class="n">IterableDatasetShard</span><span class="p">(</span>
-                    <span class="n">test_dataset</span><span class="p">,</span>
-                    <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
-                    <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-                    <span class="n">num_processes</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span><span class="p">,</span>
-                    <span class="n">process_index</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span><span class="p">,</span>
-                <span class="p">)</span>
-            <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-                <span class="n">test_dataset</span><span class="p">,</span>
-                <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
-                <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-                <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-                <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-            <span class="p">)</span>
+        <span class="n">dataloader_params</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
+            <span class="s2">&quot;collate_fn&quot;</span><span class="p">:</span> <span class="n">data_collator</span><span class="p">,</span>
+            <span class="s2">&quot;num_workers&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
+            <span class="s2">&quot;pin_memory&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
+        <span class="p">}</span>
 
-        <span class="n">test_sampler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eval_sampler</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">IterableDataset</span><span class="p">):</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;sampler&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_eval_sampler</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
+            <span class="n">dataloader_params</span><span class="p">[</span><span class="s2">&quot;drop_last&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span>
 
         <span class="c1"># We use the same batch_size as for eval.</span>
-        <span class="k">return</span> <span class="n">DataLoader</span><span class="p">(</span>
-            <span class="n">test_dataset</span><span class="p">,</span>
-            <span class="n">sampler</span><span class="o">=</span><span class="n">test_sampler</span><span class="p">,</span>
-            <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">eval_batch_size</span><span class="p">,</span>
-            <span class="n">collate_fn</span><span class="o">=</span><span class="n">data_collator</span><span class="p">,</span>
-            <span class="n">drop_last</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_drop_last</span><span class="p">,</span>
-            <span class="n">num_workers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_num_workers</span><span class="p">,</span>
-            <span class="n">pin_memory</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">dataloader_pin_memory</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="n">DataLoader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="o">**</span><span class="n">dataloader_params</span><span class="p">))</span>
 
     <span class="k">def</span> <span class="nf">create_optimizer_and_scheduler</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_training_steps</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1381,6 +1266,7 @@
                 <span class="n">num_warmup_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">get_warmup_steps</span><span class="p">(</span><span class="n">num_training_steps</span><span class="p">),</span>
                 <span class="n">num_training_steps</span><span class="o">=</span><span class="n">num_training_steps</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_created_lr_scheduler</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span>
 
     <span class="k">def</span> <span class="nf">num_examples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataloader</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -1497,9 +1383,14 @@
             <span class="n">example_batch</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">dataloader</span><span class="p">))</span>
             <span class="n">example_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_inputs</span><span class="p">(</span><span class="n">example_batch</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="n">jit_model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-                <span class="k">with</span> <span class="n">ContextManagers</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">autocast_smart_context_manager</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">()]):</span>
-                    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">base_version</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;1.14.0&quot;</span><span class="p">):</span>
+                <span class="n">jit_model</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+                <span class="n">jit_model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
+                <span class="n">original_forward</span> <span class="o">=</span> <span class="n">jit_model</span><span class="o">.</span><span class="vm">__dict__</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;_original_forward&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="c1"># remove mixed precision hooks from the model</span>
+                <span class="k">if</span> <span class="n">original_forward</span><span class="p">:</span>
+                    <span class="n">jit_model</span><span class="o">.</span><span class="n">forward</span> <span class="o">=</span> <span class="n">original_forward</span>
+                <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="n">torch</span><span class="o">.</span><span class="n">no_grad</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">base_version</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;2.0.0&quot;</span><span class="p">):</span>
                         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">example_batch</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
                             <span class="n">jit_model</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">jit</span><span class="o">.</span><span class="n">trace</span><span class="p">(</span><span class="n">jit_model</span><span class="p">,</span> <span class="n">example_kwarg_inputs</span><span class="o">=</span><span class="n">example_batch</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                         <span class="k">else</span><span class="p">:</span>
@@ -1674,6 +1565,9 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ddp_bucket_cap_mb</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;bucket_cap_mb&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ddp_bucket_cap_mb</span>
 
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ddp_broadcast_buffers</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;broadcast_buffers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">ddp_broadcast_buffers</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">ddp_handler</span> <span class="o">=</span> <span class="n">DistributedDataParallelKwargs</span><span class="p">(</span><span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">model</span>
@@ -1698,7 +1592,7 @@
 <span class="sd">            ignore_keys_for_eval (`List[str]`, *optional*)</span>
 <span class="sd">                A list of keys in the output of your model (if it is a dictionary) that should be ignored when</span>
 <span class="sd">                gathering predictions for evaluation during the training.</span>
-<span class="sd">            kwargs:</span>
+<span class="sd">            kwargs (`Dict[str, Any]`, *optional*):</span>
 <span class="sd">                Additional keyword arguments used to hide deprecated arguments</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">resume_from_checkpoint</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">:</span>
@@ -1777,7 +1671,7 @@
         <span class="c1"># number of training epochs: num_train_epochs</span>
         <span class="c1"># number of training steps per epoch: num_update_steps_per_epoch</span>
         <span class="c1"># total number of training steps to execute: max_steps</span>
-        <span class="n">total_train_batch_size</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">world_size</span>
+        <span class="n">total_train_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">*</span> <span class="n">args</span><span class="o">.</span><span class="n">world_size</span>
 
         <span class="n">len_dataloader</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">has_length</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">):</span>
@@ -1836,6 +1730,11 @@
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="p">)</span>
 
+        <span class="c1"># We need to reset the scheduler, as its parameters may be different on subsequent calls</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created_lr_scheduler</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_created_lr_scheduler</span> <span class="o">=</span> <span class="kc">False</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">deepspeed_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_training_steps</span><span class="o">=</span><span class="n">max_steps</span><span class="p">)</span>
 
@@ -1864,6 +1763,7 @@
 
         <span class="c1"># prepare using `accelerator` prepare</span>
         <span class="k">if</span> <span class="n">use_accelerator_prepare</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="s2">&quot;step&quot;</span><span class="p">):</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_apex</span><span class="p">:</span>
                     <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
@@ -1901,7 +1801,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;***** Running training *****&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num examples = </span><span class="si">{</span><span class="n">num_examples</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num Epochs = </span><span class="si">{</span><span class="n">num_train_epochs</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Instantaneous batch size per device = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Instantaneous batch size per device = </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Training with DataParallel so batch size has been adjusted to: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total train batch size (w. parallel, distributed &amp; accumulation) = </span><span class="si">{</span><span class="n">total_train_batch_size</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Gradient Accumulation steps = </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Total optimization steps = </span><span class="si">{</span><span class="n">max_steps</span><span class="si">:</span><span class="s2">,</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -1929,22 +1831,10 @@
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Continuing training from epoch </span><span class="si">{</span><span class="n">epochs_trained</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Continuing training from global step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">ignore_data_skip</span><span class="p">:</span>
-                <span class="k">if</span> <span class="n">skip_first_batches</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;  Will skip the first </span><span class="si">{</span><span class="n">epochs_trained</span><span class="si">}</span><span class="s2"> epochs then the first&quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">steps_trained_in_current_epoch</span><span class="si">}</span><span class="s2"> batches in the first epoch. If this takes a lot of time,&quot;</span>
-                        <span class="s2">&quot; you can install the latest version of Accelerate with `pip install -U accelerate`.You can&quot;</span>
-                        <span class="s2">&quot; also add the `--ignore_data_skip` flag to your launch command, but you will resume the&quot;</span>
-                        <span class="s2">&quot; training on data already seen by your model.&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;  Will skip the first </span><span class="si">{</span><span class="n">epochs_trained</span><span class="si">}</span><span class="s2"> epochs then the first&quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">steps_trained_in_current_epoch</span><span class="si">}</span><span class="s2"> batches in the first epoch.&quot;</span>
-                    <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_local_process_zero</span><span class="p">()</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">disable_tqdm</span> <span class="ow">and</span> <span class="n">skip_first_batches</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                    <span class="n">steps_trained_progress_bar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="n">steps_trained_in_current_epoch</span><span class="p">)</span>
-                    <span class="n">steps_trained_progress_bar</span><span class="o">.</span><span class="n">set_description</span><span class="p">(</span><span class="s2">&quot;Skipping the first batches&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;  Will skip the first </span><span class="si">{</span><span class="n">epochs_trained</span><span class="si">}</span><span class="s2"> epochs then the first&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">steps_trained_in_current_epoch</span><span class="si">}</span><span class="s2"> batches in the first epoch.&quot;</span>
+                <span class="p">)</span>
 
         <span class="c1"># Update the references</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
@@ -1979,31 +1869,12 @@
         <span class="c1"># Skip the first epochs_trained epochs to get the random state of the dataloader at the right point.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">args</span><span class="o">.</span><span class="n">ignore_data_skip</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs_trained</span><span class="p">):</span>
-                <span class="n">is_random_sampler</span> <span class="o">=</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="s2">&quot;sampler&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
-                    <span class="n">train_dataloader</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="n">RandomSampler</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="n">is_torch_less_than_1_11</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">is_random_sampler</span><span class="p">:</span>
-                    <span class="c1"># We just need to begin an iteration to create the randomization of the sampler.</span>
-                    <span class="c1"># That was before PyTorch 1.11 however...</span>
-                    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">train_dataloader</span><span class="p">:</span>
-                        <span class="k">break</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># Otherwise we need to call the whooooole sampler cause there is some random operation added</span>
-                    <span class="c1"># AT THE VERY END!</span>
-                    <span class="n">_</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">sampler</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">train_dataloader</span><span class="p">:</span>
+                    <span class="k">break</span>
 
         <span class="n">total_batched_samples</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs_trained</span><span class="p">,</span> <span class="n">num_train_epochs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="n">DataLoader</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">sampler</span><span class="p">,</span> <span class="n">DistributedSampler</span><span class="p">):</span>
-                <span class="n">train_dataloader</span><span class="o">.</span><span class="n">sampler</span><span class="o">.</span><span class="n">set_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="p">,</span> <span class="n">IterableDatasetShard</span><span class="p">):</span>
-                <span class="n">train_dataloader</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">set_epoch</span><span class="p">(</span><span class="n">epoch</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
-                <span class="n">parallel_loader</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">ParallelLoader</span><span class="p">(</span><span class="n">train_dataloader</span><span class="p">,</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">])</span><span class="o">.</span><span class="n">per_device_loader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-                <span class="n">epoch_iterator</span> <span class="o">=</span> <span class="n">parallel_loader</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">epoch_iterator</span> <span class="o">=</span> <span class="n">train_dataloader</span>
+            <span class="n">epoch_iterator</span> <span class="o">=</span> <span class="n">train_dataloader</span>
 
             <span class="c1"># Reset the past mems state at the beginning of each epoch if necessary.</span>
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">past_index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
@@ -2021,7 +1892,7 @@
 
             <span class="n">rng_to_sync</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="n">steps_skipped</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">skip_first_batches</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">steps_trained_in_current_epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">steps_trained_in_current_epoch</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">epoch_iterator</span> <span class="o">=</span> <span class="n">skip_first_batches</span><span class="p">(</span><span class="n">epoch_iterator</span><span class="p">,</span> <span class="n">steps_trained_in_current_epoch</span><span class="p">)</span>
                 <span class="n">steps_skipped</span> <span class="o">=</span> <span class="n">steps_trained_in_current_epoch</span>
                 <span class="n">steps_trained_in_current_epoch</span> <span class="o">=</span> <span class="mi">0</span>
@@ -2064,14 +1935,23 @@
 
                 <span class="bp">self</span><span class="o">.</span><span class="n">current_flos</span> <span class="o">+=</span> <span class="nb">float</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">floating_point_ops</span><span class="p">(</span><span class="n">inputs</span><span class="p">))</span>
 
-                <span class="c1"># should this be under the accumulate context manager?</span>
-                <span class="c1"># the `or` condition of `steps_in_epoch &lt;= args.gradient_accumulation_steps` is not covered</span>
-                <span class="c1"># in accelerate</span>
-                <span class="k">if</span> <span class="n">total_batched_samples</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span>
+                <span class="n">is_last_step_and_steps_less_than_grad_acc</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="n">steps_in_epoch</span> <span class="o">&lt;=</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">steps_in_epoch</span>
+                <span class="p">)</span>
+
+                <span class="k">if</span> <span class="p">(</span>
+                    <span class="n">total_batched_samples</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span>
+                    <span class="ow">or</span>
                     <span class="c1"># last step in epoch but step is always smaller than gradient_accumulation_steps</span>
-                    <span class="n">steps_in_epoch</span> <span class="o">&lt;=</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span>
-                    <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">steps_in_epoch</span>
+                    <span class="n">is_last_step_and_steps_less_than_grad_acc</span>
                 <span class="p">):</span>
+                    <span class="c1"># the `or` condition of `is_last_step_and_steps_less_than_grad_acc` is not covered</span>
+                    <span class="c1"># in accelerate. So, explicitly enable sync gradients to True in that case.</span>
+                    <span class="k">if</span> <span class="n">is_last_step_and_steps_less_than_grad_acc</span> <span class="ow">or</span> <span class="p">(</span>
+                        <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">accelerate_version</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.20.3&quot;</span><span class="p">)</span>
+                    <span class="p">):</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gradient_state</span><span class="o">.</span><span class="n">_set_sync_gradients</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+
                     <span class="c1"># Gradient clipping</span>
                     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">max_grad_norm</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
                         <span class="c1"># deepspeed does its own clipping</span>
@@ -2111,7 +1991,8 @@
                             <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
                             <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">update</span><span class="p">()</span>
                         <span class="k">else</span><span class="p">:</span>
-                            <span class="n">xm</span><span class="o">.</span><span class="n">optimizer_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
+                            <span class="c1"># tpu-comment: accelerate wrapped optimizers call xm.optimizer_step</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
                     <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grad_scaling</span><span class="p">:</span>
                         <span class="n">scale_before</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">get_scale</span><span class="p">()</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
@@ -2231,14 +2112,23 @@
             <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span>
 
         <span class="n">config_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">CONFIG_NAME</span><span class="p">)</span>
-
+        <span class="n">adapter_weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">ADAPTER_WEIGHTS_NAME</span><span class="p">)</span>
+        <span class="n">adapter_safe_weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">ADAPTER_SAFE_WEIGHTS_NAME</span><span class="p">)</span>
         <span class="n">weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">)</span>
         <span class="n">weights_index_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">WEIGHTS_INDEX_NAME</span><span class="p">)</span>
         <span class="n">safe_weights_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">)</span>
         <span class="n">safe_weights_index_file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_INDEX_NAME</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">any</span><span class="p">(</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span><span class="n">weights_file</span><span class="p">,</span> <span class="n">safe_weights_file</span><span class="p">,</span> <span class="n">weights_index_file</span><span class="p">,</span> <span class="n">safe_weights_index_file</span><span class="p">]</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="n">weights_file</span><span class="p">,</span>
+                <span class="n">safe_weights_file</span><span class="p">,</span>
+                <span class="n">weights_index_file</span><span class="p">,</span>
+                <span class="n">safe_weights_index_file</span><span class="p">,</span>
+                <span class="n">adapter_weights_file</span><span class="p">,</span>
+                <span class="n">adapter_safe_weights_file</span><span class="p">,</span>
+            <span class="p">]</span>
         <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Can&#39;t find a valid checkpoint at </span><span class="si">{</span><span class="n">resume_from_checkpoint</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -2277,7 +2167,7 @@
                     <span class="c1"># release memory</span>
                     <span class="k">del</span> <span class="n">state_dict</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">resume_from_checkpoint</span><span class="p">)</span>
+                <span class="n">load_fsdp_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">resume_from_checkpoint</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># We load the model state dict on the CPU to avoid an OOM error.</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_safetensors</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">safe_weights_file</span><span class="p">):</span>
@@ -2291,6 +2181,21 @@
                 <span class="c1"># release memory</span>
                 <span class="k">del</span> <span class="n">state_dict</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_issue_warnings_after_load</span><span class="p">(</span><span class="n">load_result</span><span class="p">)</span>
+
+        <span class="c1"># Load adapters following PR # 24096</span>
+        <span class="k">elif</span> <span class="n">is_peft_available</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PeftModel</span><span class="p">):</span>
+            <span class="c1"># If train a model using PEFT &amp; LoRA, assume that adapter have been saved properly.</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;active_adapter&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;load_adapter&quot;</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">):</span>
+                    <span class="n">model</span><span class="o">.</span><span class="n">load_adapter</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">,</span> <span class="n">model</span><span class="o">.</span><span class="n">active_adapter</span><span class="p">,</span> <span class="n">is_trainable</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;The intermediate checkpoints of PEFT may not be saved correctly, &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;consider using a custom callback to save </span><span class="si">{</span><span class="n">ADAPTER_WEIGHTS_NAME</span><span class="si">}</span><span class="s2"> in corresponding saving folders. &quot;</span>
+                        <span class="s2">&quot;Check some examples here: https://github.com/huggingface/peft/issues/96&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not load adapter model, make sure to have `peft&gt;=0.3.0` installed&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># We load the sharded checkpoint</span>
             <span class="n">load_result</span> <span class="o">=</span> <span class="n">load_sharded_checkpoint</span><span class="p">(</span>
@@ -2338,8 +2243,8 @@
                         <span class="n">state_dict</span><span class="p">[</span><span class="s2">&quot;_smp_is_partial&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="n">load_result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">state_dict</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">load_model</span><span class="p">(</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span>
+                    <span class="n">load_fsdp_model</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">if</span> <span class="n">is_peft_available</span><span class="p">()</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">PeftModel</span><span class="p">):</span>
@@ -2354,8 +2259,8 @@
                             <span class="k">else</span><span class="p">:</span>
                                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                                     <span class="s2">&quot;The intermediate checkpoints of PEFT may not be saved correctly, &quot;</span>
-                                    <span class="sa">f</span><span class="s2">&quot;using `TrainerCallback` to save </span><span class="si">{</span><span class="n">ADAPTER_WEIGHTS_NAME</span><span class="si">}</span><span class="s2"> in corresponding folders, &quot;</span>
-                                    <span class="s2">&quot;here are some examples https://github.com/huggingface/peft/issues/96&quot;</span>
+                                    <span class="sa">f</span><span class="s2">&quot;consider using a custom callback to save </span><span class="si">{</span><span class="n">ADAPTER_WEIGHTS_NAME</span><span class="si">}</span><span class="s2"> in corresponding saving folders. &quot;</span>
+                                    <span class="s2">&quot;Check some examples here: https://github.com/huggingface/peft/issues/96&quot;</span>
                                 <span class="p">)</span>
                                 <span class="n">has_been_loaded</span> <span class="o">=</span> <span class="kc">False</span>
                         <span class="k">else</span><span class="p">:</span>
@@ -2511,11 +2416,16 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sharded_ddp</span> <span class="o">==</span> <span class="n">ShardedDDPOption</span><span class="o">.</span><span class="n">SIMPLE</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">consolidate_state_dict</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span><span class="p">:</span>
-            <span class="c1"># FSDP has a different interface for saving optimizer states.</span>
-            <span class="c1"># Needs to be called on all ranks to gather all states.</span>
-            <span class="c1"># full_optim_state_dict will be deprecated after Pytorch 2.2!</span>
-            <span class="n">full_osd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">full_optim_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
+                <span class="n">save_fsdp_optimizer</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># FSDP has a different interface for saving optimizer states.</span>
+                <span class="c1"># Needs to be called on all ranks to gather all states.</span>
+                <span class="c1"># full_optim_state_dict will be deprecated after Pytorch 2.2!</span>
+                <span class="n">full_osd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">full_optim_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
             <span class="n">xm</span><span class="o">.</span><span class="n">rendezvous</span><span class="p">(</span><span class="s2">&quot;saving_optimizer_states&quot;</span><span class="p">)</span>
@@ -2541,7 +2451,7 @@
                     <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SCALER_NAME</span><span class="p">))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="c1"># deepspeed.save_checkpoint above saves model/optim/sched</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">full_osd</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
@@ -2655,14 +2565,23 @@
                     <span class="c1"># In distributed training however, we load directly on each GPU and risk the GPU OOM as it&#39;s more</span>
                     <span class="c1"># likely to get OOM on CPU (since we load num_gpu times the optimizer state</span>
                     <span class="n">map_location</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">world_size</span> <span class="o">&gt;</span> <span class="mi">1</span> <span class="k">else</span> <span class="s2">&quot;cpu&quot;</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span><span class="p">:</span>
-                        <span class="n">full_osd</span> <span class="o">=</span> <span class="kc">None</span>
-                        <span class="c1"># In FSDP, we need to load the full optimizer state dict on rank 0 and then shard it</span>
-                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">full_osd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
-                        <span class="c1"># call scatter_full_optim_state_dict on all ranks</span>
-                        <span class="n">sharded_osd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">scatter_full_optim_state_dict</span><span class="p">(</span><span class="n">full_osd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">sharded_osd</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
+                            <span class="n">load_fsdp_optimizer</span><span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span>
+                                <span class="n">checkpoint</span><span class="p">,</span>
+                            <span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="n">full_osd</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="c1"># In FSDP, we need to load the full optimizer state dict on rank 0 and then shard it</span>
+                            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">process_index</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                                <span class="n">full_osd</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
+                            <span class="c1"># call scatter_full_optim_state_dict on all ranks</span>
+                            <span class="n">sharded_osd</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="n">scatter_full_optim_state_dict</span><span class="p">(</span><span class="n">full_osd</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">sharded_osd</span><span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span>
                             <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">),</span> <span class="n">map_location</span><span class="o">=</span><span class="n">map_location</span><span class="p">)</span>
@@ -2730,41 +2649,20 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">backend</span> <span class="o">=</span> <span class="n">default_hp_search_backend</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">backend</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                    <span class="s2">&quot;At least one of optuna or ray should be installed. &quot;</span>
-                    <span class="s2">&quot;To install optuna run `pip install optuna`. &quot;</span>
-                    <span class="s2">&quot;To install ray run `pip install ray[tune]`. &quot;</span>
-                    <span class="s2">&quot;To install sigopt run `pip install sigopt`.&quot;</span>
-                <span class="p">)</span>
         <span class="n">backend</span> <span class="o">=</span> <span class="n">HPSearchBackend</span><span class="p">(</span><span class="n">backend</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">OPTUNA</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_optuna_available</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;You picked the optuna backend, but it is not installed. Use `pip install optuna`.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">RAY</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_ray_tune_available</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
-                <span class="s2">&quot;You picked the Ray Tune backend, but it is not installed. Use `pip install &#39;ray[tune]&#39;`.&quot;</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">SIGOPT</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_sigopt_available</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;You picked the sigopt backend, but it is not installed. Use `pip install sigopt`.&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">WANDB</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_wandb_available</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;You picked the wandb backend, but it is not installed. Use `pip install wandb`.&quot;</span><span class="p">)</span>
+        <span class="n">backend_obj</span> <span class="o">=</span> <span class="n">ALL_HYPERPARAMETER_SEARCH_BACKENDS</span><span class="p">[</span><span class="n">backend</span><span class="p">]()</span>
+        <span class="n">backend_obj</span><span class="o">.</span><span class="n">ensure_available</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hp_search_backend</span> <span class="o">=</span> <span class="n">backend</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_init</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;To use hyperparameter search, you need to pass your model through a model_init function.&quot;</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">hp_space</span> <span class="o">=</span> <span class="n">default_hp_space</span><span class="p">[</span><span class="n">backend</span><span class="p">]</span> <span class="k">if</span> <span class="n">hp_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hp_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">hp_space</span> <span class="o">=</span> <span class="n">backend_obj</span><span class="o">.</span><span class="n">default_hp_space</span> <span class="k">if</span> <span class="n">hp_space</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">hp_space</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">hp_name</span> <span class="o">=</span> <span class="n">hp_name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_objective</span> <span class="o">=</span> <span class="n">default_compute_objective</span> <span class="k">if</span> <span class="n">compute_objective</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">compute_objective</span>
 
-        <span class="n">backend_dict</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">OPTUNA</span><span class="p">:</span> <span class="n">run_hp_search_optuna</span><span class="p">,</span>
-            <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">RAY</span><span class="p">:</span> <span class="n">run_hp_search_ray</span><span class="p">,</span>
-            <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">SIGOPT</span><span class="p">:</span> <span class="n">run_hp_search_sigopt</span><span class="p">,</span>
-            <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">WANDB</span><span class="p">:</span> <span class="n">run_hp_search_wandb</span><span class="p">,</span>
-        <span class="p">}</span>
-        <span class="n">best_run</span> <span class="o">=</span> <span class="n">backend_dict</span><span class="p">[</span><span class="n">backend</span><span class="p">](</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">best_run</span> <span class="o">=</span> <span class="n">backend_obj</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n_trials</span><span class="p">,</span> <span class="n">direction</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">hp_search_backend</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">best_run</span></div>
@@ -2832,14 +2730,11 @@
 <span class="sd">        arguments, depending on the situation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cuda_amp</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_amp</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">is_torch_greater_or_equal_than_1_10</span><span class="p">:</span>
-                <span class="n">ctx_manager</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">cpu</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="n">cache_enabled</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">amp_dtype</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_amp</span>
-                    <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="n">cache_enabled</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">amp_dtype</span><span class="p">)</span>
-                <span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">ctx_manager</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">()</span>
+            <span class="n">ctx_manager</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">torch</span><span class="o">.</span><span class="n">cpu</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="n">cache_enabled</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">amp_dtype</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_cpu_amp</span>
+                <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">amp</span><span class="o">.</span><span class="n">autocast</span><span class="p">(</span><span class="n">cache_enabled</span><span class="o">=</span><span class="n">cache_enabled</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">amp_dtype</span><span class="p">)</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">ctx_manager</span> <span class="o">=</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">nullcontext</span><span class="p">()</span> <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">)</span> <span class="k">else</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">suppress</span><span class="p">()</span>
 
@@ -2964,40 +2859,26 @@
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
             <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span>
         <span class="p">):</span>
+            <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
-                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">state_dict</span><span class="p">()</span>
+                <span class="n">save_fsdp_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
 
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="c1"># this takes care of everything as long as we aren&#39;t under zero3</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="n">is_deepspeed_zero3_enabled</span><span class="p">():</span>
-                <span class="c1"># It&#39;s too complicated to try to override different places where the weights dump gets</span>
-                <span class="c1"># saved, so since under zero3 the file is bogus, simply delete it. The user should</span>
-                <span class="c1"># either user deepspeed checkpoint to resume or to recover full weights use</span>
-                <span class="c1"># zero_to_fp32.py stored in the checkpoint.</span>
+            <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">accelerate_version</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.20.3&quot;</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Install Accelerate from main branch&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">state_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">get_state_dict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-                    <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-                        <span class="c1"># logger.info(f&quot;deepspeed zero3: removing {file}, see zero_to_fp32.py to recover weights&quot;)</span>
-                        <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
-
-                <span class="c1"># now save the real model if stage3_gather_16bit_weights_on_model_save=True</span>
-                <span class="c1"># if false it will not be saved.</span>
-                <span class="c1"># This must be called on all ranks</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span><span class="o">.</span><span class="n">save_16bit_model</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">):</span>
-                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                        <span class="s2">&quot;deepspeed.save_16bit_model didn&#39;t save the model, since&quot;</span>
-                        <span class="s2">&quot; stage3_gather_16bit_weights_on_model_save=false. Saving the full checkpoint instead, use&quot;</span>
-                        <span class="s2">&quot; zero_to_fp32.py to recover weights&quot;</span>
-                    <span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot; stage3_gather_16bit_weights_on_model_save=false. Saving the full checkpoint instead, use&quot;</span>
+                    <span class="s2">&quot; zero_to_fp32.py to recover weights&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
@@ -3279,7 +3160,7 @@
         <span class="n">prediction_loss_only</span> <span class="o">=</span> <span class="n">prediction_loss_only</span> <span class="k">if</span> <span class="n">prediction_loss_only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">prediction_loss_only</span>
 
         <span class="c1"># if eval is called w/o train, handle model prep here</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">deepspeed_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_training_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inference</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataloader</span><span class="o">=</span><span class="n">dataloader</span><span class="p">)</span>
@@ -3325,9 +3206,6 @@
         <span class="c1"># Do this before wrapping.</span>
         <span class="n">eval_dataset</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
-            <span class="n">dataloader</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">ParallelLoader</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">])</span><span class="o">.</span><span class="n">per_device_loader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">past_index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_past</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -3365,31 +3243,33 @@
 
             <span class="c1"># Update containers on host</span>
             <span class="k">if</span> <span class="n">loss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nested_gather</span><span class="p">(</span><span class="n">loss</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">batch_size</span><span class="p">))</span>
-                <span class="n">losses_host</span> <span class="o">=</span> <span class="n">losses</span> <span class="k">if</span> <span class="n">losses_host</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">torch</span><span class="o">.</span><span class="n">cat</span><span class="p">((</span><span class="n">losses_host</span><span class="p">,</span> <span class="n">losses</span><span class="p">),</span> <span class="n">dim</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">losses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather_for_metrics</span><span class="p">((</span><span class="n">loss</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">batch_size</span><span class="p">)))</span>
+                <span class="n">losses_host</span> <span class="o">=</span> <span class="n">losses</span> <span class="k">if</span> <span class="n">losses_host</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nested_concat</span><span class="p">(</span><span class="n">losses_host</span><span class="p">,</span> <span class="n">losses</span><span class="p">,</span> <span class="n">padding_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_across_processes</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">pad_across_processes</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">inputs_decode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">inputs_decode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_across_processes</span><span class="p">(</span><span class="n">inputs_decode</span><span class="p">)</span>
-                <span class="n">inputs_decode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nested_gather</span><span class="p">(</span><span class="n">inputs_decode</span><span class="p">)</span>
+                <span class="n">inputs_decode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">pad_across_processes</span><span class="p">(</span><span class="n">inputs_decode</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+                <span class="n">inputs_decode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather_for_metrics</span><span class="p">((</span><span class="n">inputs_decode</span><span class="p">))</span>
                 <span class="n">inputs_host</span> <span class="o">=</span> <span class="p">(</span>
                     <span class="n">inputs_decode</span>
                     <span class="k">if</span> <span class="n">inputs_host</span> <span class="ow">is</span> <span class="kc">None</span>
                     <span class="k">else</span> <span class="n">nested_concat</span><span class="p">(</span><span class="n">inputs_host</span><span class="p">,</span> <span class="n">inputs_decode</span><span class="p">,</span> <span class="n">padding_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
                 <span class="p">)</span>
             <span class="k">if</span> <span class="n">logits</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_across_processes</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">pad_across_processes</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">dim</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_logits_for_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_logits_for_metrics</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
-                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nested_gather</span><span class="p">(</span><span class="n">logits</span><span class="p">)</span>
+                <span class="n">logits</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather_for_metrics</span><span class="p">((</span><span class="n">logits</span><span class="p">))</span>
                 <span class="n">preds_host</span> <span class="o">=</span> <span class="n">logits</span> <span class="k">if</span> <span class="n">preds_host</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nested_concat</span><span class="p">(</span><span class="n">preds_host</span><span class="p">,</span> <span class="n">logits</span><span class="p">,</span> <span class="n">padding_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+
             <span class="k">if</span> <span class="n">labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nested_gather</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+                <span class="n">labels</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather_for_metrics</span><span class="p">((</span><span class="n">labels</span><span class="p">))</span>
                 <span class="n">labels_host</span> <span class="o">=</span> <span class="n">labels</span> <span class="k">if</span> <span class="n">labels_host</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">nested_concat</span><span class="p">(</span><span class="n">labels_host</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">padding_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">)</span>
+
             <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_prediction_step</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
 
             <span class="c1"># Gather all tensors and put them back on the CPU if we have done enough accumulation steps.</span>
-            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">sync_gradients</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">losses_host</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">losses</span> <span class="o">=</span> <span class="n">nested_numpify</span><span class="p">(</span><span class="n">losses_host</span><span class="p">)</span>
                     <span class="n">all_losses</span> <span class="o">=</span> <span class="n">losses</span> <span class="k">if</span> <span class="n">all_losses</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">all_losses</span><span class="p">,</span> <span class="n">losses</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -3447,17 +3327,6 @@
         <span class="k">if</span> <span class="n">num_samples</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">observed_num_examples</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">num_samples</span> <span class="o">=</span> <span class="n">observed_num_examples</span>
 
-        <span class="c1"># Number of losses has been rounded to a multiple of batch_size and in a distributed training, the number of</span>
-        <span class="c1"># samplers has been rounded to a multiple of batch_size, so we truncate.</span>
-        <span class="k">if</span> <span class="n">all_losses</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">all_losses</span> <span class="o">=</span> <span class="n">all_losses</span><span class="p">[:</span><span class="n">num_samples</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">all_preds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">all_preds</span> <span class="o">=</span> <span class="n">nested_truncate</span><span class="p">(</span><span class="n">all_preds</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">all_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">all_labels</span> <span class="o">=</span> <span class="n">nested_truncate</span><span class="p">(</span><span class="n">all_labels</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">all_inputs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">all_inputs</span> <span class="o">=</span> <span class="n">nested_truncate</span><span class="p">(</span><span class="n">all_inputs</span><span class="p">,</span> <span class="n">num_samples</span><span class="p">)</span>
-
         <span class="c1"># Metrics!</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">all_preds</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">all_labels</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">include_inputs_for_metrics</span><span class="p">:</span>
@@ -3498,45 +3367,10 @@
         <span class="k">elif</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">():</span>
             <span class="n">tensors</span> <span class="o">=</span> <span class="n">smp_gather</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
         <span class="k">elif</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">distributed_state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">distributed_state</span><span class="o">.</span><span class="n">distributed_type</span> <span class="o">!=</span> <span class="s2">&quot;NO&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">distributed_state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">distributed_state</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">local_rank</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="p">):</span>
             <span class="n">tensors</span> <span class="o">=</span> <span class="n">distributed_concat</span><span class="p">(</span><span class="n">tensors</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">tensors</span>
-
-    <span class="c1"># Copied from Accelerate.</span>
-    <span class="k">def</span> <span class="nf">_pad_across_processes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tensor</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=-</span><span class="mi">100</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Recursively pad the tensors in a nested list/tuple/dictionary of tensors from all devices to the same size so</span>
-<span class="sd">        they can safely be gathered.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="p">(</span><span class="nb">list</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">)):</span>
-            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">tensor</span><span class="p">)(</span><span class="bp">self</span><span class="o">.</span><span class="n">_pad_across_processes</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=</span><span class="n">pad_index</span><span class="p">)</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tensor</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="n">tensor</span><span class="p">)({</span><span class="n">k</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pad_across_processes</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">pad_index</span><span class="o">=</span><span class="n">pad_index</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tensor</span><span class="o">.</span><span class="n">items</span><span class="p">()})</span>
-        <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Can&#39;t pad the values of type </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">tensor</span><span class="p">)</span><span class="si">}</span><span class="s2">, only of nested list/tuple/dicts of tensors.&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">2</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">tensor</span>
-        <span class="c1"># Gather all sizes</span>
-        <span class="n">size</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">tensor</span><span class="o">.</span><span class="n">device</span><span class="p">)[</span><span class="kc">None</span><span class="p">]</span>
-        <span class="n">sizes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_nested_gather</span><span class="p">(</span><span class="n">size</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span>
-
-        <span class="n">max_size</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">s</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sizes</span><span class="p">)</span>
-        <span class="c1"># When extracting XLA graphs for compilation, max_size is 0,</span>
-        <span class="c1"># so use inequality to avoid errors.</span>
-        <span class="k">if</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">max_size</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">tensor</span>
-
-        <span class="c1"># Then pad to the maximum size</span>
-        <span class="n">old_size</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">shape</span>
-        <span class="n">new_size</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">old_size</span><span class="p">)</span>
-        <span class="n">new_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="n">max_size</span>
-        <span class="n">new_tensor</span> <span class="o">=</span> <span class="n">tensor</span><span class="o">.</span><span class="n">new_zeros</span><span class="p">(</span><span class="nb">tuple</span><span class="p">(</span><span class="n">new_size</span><span class="p">))</span> <span class="o">+</span> <span class="n">pad_index</span>
-        <span class="n">new_tensor</span><span class="p">[:,</span> <span class="p">:</span> <span class="n">old_size</span><span class="p">[</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">tensor</span>
-        <span class="k">return</span> <span class="n">new_tensor</span>
 
     <span class="k">def</span> <span class="nf">prediction_step</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
@@ -3775,6 +3609,8 @@
         <span class="n">output_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span>
         <span class="c1"># To avoid a new synchronization of all model weights, we just copy the file from the checkpoint folder</span>
         <span class="n">modeling_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">CONFIG_NAME</span><span class="p">,</span> <span class="n">WEIGHTS_NAME</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">is_peft_available</span><span class="p">():</span>
+            <span class="n">modeling_files</span><span class="o">.</span><span class="n">extend</span><span class="p">([</span><span class="n">ADAPTER_CONFIG_NAME</span><span class="p">,</span> <span class="n">ADAPTER_WEIGHTS_NAME</span><span class="p">,</span> <span class="n">ADAPTER_SAFE_WEIGHTS_NAME</span><span class="p">])</span>
         <span class="k">for</span> <span class="n">modeling_file</span> <span class="ow">in</span> <span class="n">modeling_files</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_folder</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">)):</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint_folder</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">modeling_file</span><span class="p">))</span>
@@ -3818,7 +3654,7 @@
 <span class="sd">                Message to commit while pushing.</span>
 <span class="sd">            blocking (`bool`, *optional*, defaults to `True`):</span>
 <span class="sd">                Whether the function should return only when the `git push` has finished.</span>
-<span class="sd">            kwargs:</span>
+<span class="sd">            kwargs (`Dict[str, Any]`, *optional*):</span>
 <span class="sd">                Additional keyword arguments passed along to [`~Trainer.create_model_card`].</span>
 
 <span class="sd">        Returns:</span>
@@ -3890,7 +3726,7 @@
         <span class="n">prediction_loss_only</span> <span class="o">=</span> <span class="n">prediction_loss_only</span> <span class="k">if</span> <span class="n">prediction_loss_only</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">args</span><span class="o">.</span><span class="n">prediction_loss_only</span>
 
         <span class="c1"># if eval is called w/o train, handle model prep here</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">deepspeed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">deepspeed_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_training_steps</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">inference</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
         <span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_wrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">training</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dataloader</span><span class="o">=</span><span class="n">dataloader</span><span class="p">)</span>
@@ -3945,9 +3781,6 @@
             <span class="n">inputs_gatherer</span> <span class="o">=</span> <span class="n">DistributedTensorGatherer</span><span class="p">(</span><span class="n">world_size</span><span class="p">,</span> <span class="n">num_examples</span><span class="p">,</span> <span class="n">make_multiple_of</span><span class="o">=</span><span class="n">make_multiple_of</span><span class="p">)</span>
 
         <span class="n">model</span><span class="o">.</span><span class="n">eval</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
-            <span class="n">dataloader</span> <span class="o">=</span> <span class="n">pl</span><span class="o">.</span><span class="n">ParallelLoader</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">])</span><span class="o">.</span><span class="n">per_device_loader</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">past_index</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_past</span> <span class="o">=</span> <span class="kc">None</span>
@@ -4079,10 +3912,14 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">repo</span><span class="o">.</span><span class="n">git_push</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">create_accelerator_and_postprocess</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">grad_acc_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;num_steps&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">}</span>
+        <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">accelerate_version</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;0.20.3&quot;</span><span class="p">):</span>
+            <span class="n">grad_acc_kwargs</span><span class="p">[</span><span class="s2">&quot;sync_with_dataloader&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">gradient_accumulation_plugin</span> <span class="o">=</span> <span class="n">GradientAccumulationPlugin</span><span class="p">(</span><span class="o">**</span><span class="n">grad_acc_kwargs</span><span class="p">)</span>
+
         <span class="c1"># create accelerator object</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span> <span class="o">=</span> <span class="n">Accelerator</span><span class="p">(</span>
-            <span class="n">deepspeed_plugin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed_plugin</span><span class="p">,</span>
-            <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span><span class="p">,</span>
+            <span class="n">deepspeed_plugin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed_plugin</span><span class="p">,</span> <span class="n">gradient_accumulation_plugin</span><span class="o">=</span><span class="n">gradient_accumulation_plugin</span>
         <span class="p">)</span>
 
         <span class="c1"># deepspeed and accelerate flags covering both trainer args and accelerate launcher</span>
@@ -4092,8 +3929,10 @@
         <span class="c1"># post accelerator creation setup</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
             <span class="n">fsdp_plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span>
-            <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">limit_all_gathers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;limit_all_gathers&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
-            <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">use_orig_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_orig_params&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">limit_all_gathers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;limit_all_gathers&quot;</span><span class="p">,</span> <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">limit_all_gathers</span>
+            <span class="p">)</span>
+            <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">use_orig_params</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;use_orig_params&quot;</span><span class="p">,</span> <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">use_orig_params</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;hf_deepspeed_config&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
