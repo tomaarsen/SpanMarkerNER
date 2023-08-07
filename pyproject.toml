@@ -27,7 +27,7 @@ dependencies = [
     "torch",
     "accelerate",
     "transformers>=4.19.0", # required for EvalPrediction.inputs
-    "datasets>=2.0.0",
+    "datasets==2.13.1",
     "packaging>=20.0",
     "evaluate",
     "seqeval",
