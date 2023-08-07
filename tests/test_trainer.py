@@ -1,4 +1,5 @@
 import logging
+import os
 import re
 from pathlib import Path
 from typing import Dict, List
@@ -66,7 +67,6 @@ def test_trainer_standard(
         # If there's document context, let's evaluate the doc-context model again, but with just tokens
         caplog.clear()
         trainer.evaluate(dataset["test"].remove_columns(("document_id", "sentence_id")))
-        print(caplog.record_tuples)
         assert any(
             [
                 level == logging.WARNING
@@ -88,6 +88,10 @@ def test_trainer_standard(
                 for (_, level, text) in caplog.record_tuples
             ]
         )
+
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
 
 
 @pytest.mark.parametrize(
@@ -117,6 +121,10 @@ def test_trainer_model_init(
     )
     assert isinstance(output, list)
 
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
+
 
 def test_trainer_compute_metrics(
     finetuned_conll_span_marker_model: SpanMarkerModel, conll_dataset_dict: DatasetDict
@@ -144,6 +152,10 @@ def test_trainer_incorrect_columns(finetuned_conll_span_marker_model: SpanMarker
     with pytest.raises(ValueError, match="The evaluation dataset must contain a '.*?' column."):
         trainer.evaluate()
 
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
+
 
 def test_trainer_entity_tracker_warning_entity_length(conll_dataset_dict: DatasetDict, caplog) -> None:
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, entity_max_length=1)
@@ -166,6 +178,10 @@ def test_trainer_entity_tracker_warning_entity_length(conll_dataset_dict: Datase
     )
     assert any([eval_pattern.search(record.msg) for record in caplog.records])
 
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
+
 
 def test_trainer_entity_tracker_warning_model_length(conll_dataset_dict: DatasetDict, caplog) -> None:
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, model_max_length=5)
@@ -187,6 +203,10 @@ def test_trainer_entity_tracker_warning_model_length(conll_dataset_dict: Dataset
         r"A total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
     )
     assert any([eval_pattern.match(record.msg) for record in caplog.records])
+
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
 
 
 def test_trainer_entity_tracker_warning_entity_and_model_length(conll_dataset_dict: DatasetDict, caplog) -> None:
@@ -213,3 +233,7 @@ def test_trainer_entity_tracker_warning_entity_and_model_length(conll_dataset_di
         r".*\nAdditionally, a total of \d+ \([\d\.]+%\) entities were missed due to the maximum input length\."
     )
     assert any([eval_pattern.match(record.msg) for record in caplog.records])
+
+    # Required due to strange bug introduced in transformers 4.31.0 for Windows
+    for cache_file in trainer.train_dataset.cache_files:
+        os.remove(cache_file["filename"])
