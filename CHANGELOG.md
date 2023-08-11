@@ -25,6 +25,7 @@ Types of changes
 
 - Added `overwrite_entities` parameter to allow for choosing overwriting spaCy entities.
 - Added `.pipe()` method to spaCy integration to allow for batched inference.
+- Resolved broken license information.
 
 ## [1.2.3]
 
