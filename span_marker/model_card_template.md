@@ -28,9 +28,8 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 ## Evaluation
 
 ### Metrics
-{{ metrics_table }}
 
-{% endif %}
+{{ metrics_table }}{% endif %}
 ## Uses
 
 ### Direct Use
@@ -71,12 +70,10 @@ trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}_finet
 ### Training hyperparameters
 
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}
-{% endfor %}
-{% endif %}{% if eval_lines %}
+{% endfor %}{% endif %}{% if eval_lines %}
 ### Training results
 
-{{ eval_lines }}
-{% endif %}
+{{ eval_lines }}{% endif %}
 ### Framework versions
 
 - SpanMarker: {{ version["span_marker"] }}

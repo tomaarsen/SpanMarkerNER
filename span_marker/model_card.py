@@ -30,12 +30,12 @@ if TYPE_CHECKING:
 class ModelCardCallback(TrainerCallback):
     """
     TODO:
-    - Label set with 3 examples of each label
-    - Training set metrics:
+    - 1. Label set with 3 examples of each label
+    - 2. Training set metrics:
       - Minimum, median, maximum number of words in the training set
       - Minimum, median, maximum number of entities in the training set
       - 3 short example sentences with their tags
-    - Generate good example sentences from the evaluation set
+    - 3. Ensure metadata is correct and complete
     """
 
     def __init__(self, trainer: "Trainer") -> None:
@@ -102,7 +102,17 @@ class ModelCardCallback(TrainerCallback):
             model.model_card_data.metric_lines = metric_lines
 
 
-YAML_FIELDS = ["language", "license", "library_name", "tags", "pipeline_tag", "eval_results", "model_name", "metrics"]
+YAML_FIELDS = [
+    "language",
+    "license",
+    "library_name",
+    "tags",
+    "pipeline_tag",
+    "eval_results",
+    "model_name",
+    "metrics",
+    "widget",
+]
 IGNORED_FIELDS = ["model"]
 
 
@@ -129,11 +139,12 @@ class SpanMarkerModelCardData(CardData):
     dataset_revision: Optional[str] = None
     task_name: str = "Named Entity Recognition"
 
-    # Automatically filled by `ModelCardCallback`
+    # Automatically filled by `ModelCardCallback` and the Trainer directly
     hyperparameters: Dict[str, Any] = field(default_factory=dict, init=False)
     eval_results_dict: Optional[Dict[str, Any]] = field(default_factory=dict, init=False)
     eval_lines_list: List[Dict[str, float]] = field(default_factory=list, init=False)
     metric_lines: List[Dict[str, float]] = field(default_factory=list, init=False)
+    widget: List[Dict[str, str]] = field(default_factory=list, init=False)
 
     # Computed once, always unchanged
     pipeline_tag: Optional[str] = field(default="token-classification", init=False)
