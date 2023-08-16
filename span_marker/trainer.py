@@ -183,7 +183,7 @@ class Trainer(TransformersTrainer):
         # Normalize the labels to a common format (list of label-start-end tuples)
         dataset = dataset.map(
             label_normalizer,
-            input_columns=("tokens", "ner_tags"),
+            input_columns="ner_tags",
             desc=f"Label normalizing the {dataset_name} dataset",
         )
         # Tokenize and add start/end markers
