@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
 from datasets import Dataset
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 from tqdm.autonotebook import tqdm
 from transformers import (
     EvalPrediction,
@@ -16,6 +16,7 @@ from transformers.trainer_utils import PredictionOutput
 
 from span_marker.evaluation import compute_f1_via_seqeval
 from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
+from span_marker.model_card import ModelCardCallback
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -112,11 +113,13 @@ class Trainer(TransformersTrainer):
         # Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics
         if compute_metrics is not None:
             compute_metrics_func = lambda eval_prediction: {
-                **compute_f1_via_seqeval(model.tokenizer, eval_prediction),
+                **compute_f1_via_seqeval(model.tokenizer, eval_prediction, self.is_in_train),
                 **compute_metrics(eval_prediction),
             }
         else:
-            compute_metrics_func = lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction)
+            compute_metrics_func = lambda eval_prediction: compute_f1_via_seqeval(
+                model.tokenizer, eval_prediction, self.is_in_train
+            )
 
         super().__init__(
             model=model,
@@ -139,6 +142,10 @@ class Trainer(TransformersTrainer):
 
         # Override the type hint
         self.model: SpanMarkerModel
+
+        # Add the callback for filling the model card data with hyperparameters
+        # and evaluation results
+        self.add_callback(ModelCardCallback(self))
 
     def preprocess_dataset(
         self,

@@ -15,7 +15,7 @@ from typing_extensions import Self
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
-from span_marker.model_card import generate_model_card
+from span_marker.model_card import SpanMarkerModelCardData, generate_model_card
 from span_marker.output import SpanMarkerOutput
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -50,7 +50,13 @@ class SpanMarkerModel(PreTrainedModel):
     base_model_prefix = "encoder"
     _no_split_modules = []  # To support `load_in_8bit=True`` and `device_map="auto"`
 
-    def __init__(self, config: SpanMarkerConfig, encoder: Optional[PreTrainedModel] = None, **kwargs) -> None:
+    def __init__(
+        self,
+        config: SpanMarkerConfig,
+        encoder: Optional[PreTrainedModel] = None,
+        model_card_data: Optional[SpanMarkerModelCardData] = None,
+        **kwargs,
+    ) -> None:
         """Initialize a SpanMarkerModel using configuration.
 
         Do not manually initialize a SpanMarkerModel this way! Use :meth:`~SpanMarkerModel.from_pretrained` instead.
@@ -88,6 +94,9 @@ class SpanMarkerModel(PreTrainedModel):
         # tokenizer and data collator are filled using set_tokenizer
         self.tokenizer = None
         self.data_collator = None
+
+        self.model_card_data = model_card_data or SpanMarkerModelCardData()
+        self.model_card_data.register_model(self)
 
         # Initialize weights and apply final processing
         self.post_init()
@@ -199,6 +208,8 @@ class SpanMarkerModel(PreTrainedModel):
         pretrained_model_name_or_path: Union[str, os.PathLike],
         *model_args,
         labels: Optional[List[str]] = None,
+        config: Optional[SpanMarkerConfig] = None,
+        model_card_data: Optional[SpanMarkerModelCardData] = None,
         **kwargs,
     ) -> T:
         """Instantiate a pretrained pytorch model from a pre-trained model configuration.
@@ -240,7 +251,9 @@ class SpanMarkerModel(PreTrainedModel):
         """
         # If loading a SpanMarkerConfig, then we don't want to override id2label and label2id
         # Create an encoder or SpanMarker config
-        config: PretrainedConfig = AutoConfig.from_pretrained(pretrained_model_name_or_path, *model_args, **kwargs)
+        config: PretrainedConfig = config or AutoConfig.from_pretrained(
+            pretrained_model_name_or_path, *model_args, **kwargs
+        )
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         loading_span_marker = isinstance(config, cls.config_class)
@@ -253,7 +266,11 @@ class SpanMarkerModel(PreTrainedModel):
                     " introduced in v1.0.0, this is not recommended. Either retrain your model for"
                     f" v{span_marker_version}, or install `span_marker < 1.0.0`."
                 )
-            model = super().from_pretrained(pretrained_model_name_or_path, *model_args, config=config, **kwargs)
+            model = super().from_pretrained(
+                pretrained_model_name_or_path, *model_args, config=config, **kwargs, model_card_data=model_card_data
+            )
+            # TODO:
+            # model.model_card_data = SpanMarkerModelCardData.from_pretrained(pretrained_model_name_or_path)
 
         # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.),
         # then initialize it and create the SpanMarker config and model using the encoder and its config.
@@ -280,7 +297,7 @@ class SpanMarkerModel(PreTrainedModel):
             config = cls.config_class(
                 encoder_config=config.to_dict(), span_marker_version=span_marker_version, **kwargs
             )
-            model = cls(config, encoder, *model_args, **kwargs)
+            model = cls(config, encoder, *model_args, **kwargs, model_card_data=model_card_data)
 
         # Pass the tokenizer directly to the model for convenience, this way the user doesn't have to
         # make it themselves.
@@ -585,7 +602,10 @@ class SpanMarkerModel(PreTrainedModel):
             **kwargs,
         )
         with open(os.path.join(save_directory, "README.md"), "w", encoding="utf-8") as f:
-            f.write(generate_model_card(save_directory, self.config))
+            f.write(self.generate_model_card())
+
+    def generate_model_card(self) -> str:
+        return generate_model_card(self)
 
     def try_cuda(self, device: Optional[Union[int, device]] = None) -> Self:
         """Try to moves all model parameters and buffers to the GPU, do nothing if failed.
