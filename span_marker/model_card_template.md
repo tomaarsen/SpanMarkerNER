@@ -17,7 +17,12 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 - **Maximum Sequence Length:** {{ model_max_length }} tokens
 - **Maximum Entity Length:** {{ entity_max_length }} words
 {% if dataset_id %}- **Training Dataset:** [{{ dataset_name if dataset_name else dataset_id }}](https://huggingface.co/datasets/{{ dataset_id }}){% endif %}
-{% if language %}- **Language{{"s" if language is not string and language | length > 1 else ""}}:** {{ language }}{% endif %}
+{% if language -%}
+- **Language{{"s" if language is not string and language | length > 1 else ""}}:**
+{%- if language is string %} {{ language }}
+{%- else %}{% for lang in language %} {{ lang }}{{ "," if not loop.last else "" }}{% endfor %}
+{%- endif %}
+{%- endif %}
 {% if license %}- **License:** {{ license }}{% endif %}
 
 ### Model Sources
