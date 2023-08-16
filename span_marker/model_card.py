@@ -8,7 +8,7 @@ import tokenizers
 import torch
 import transformers
 from huggingface_hub import CardData, ModelCard, dataset_info, model_info
-from huggingface_hub.repocard_data import EvalResult
+from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
 from transformers import TrainerCallback
 from transformers.modelcard import (
@@ -56,6 +56,9 @@ class ModelCardCallback(TrainerCallback):
         metrics: Dict[str, float],
         **kwargs,
     ):
+        # Set the most recent evaluation scores for the metadata
+        model.model_card_data.eval_results_dict = metrics
+
         if self.trainer.is_in_train:
             # Either set mid-training evaluation metrics
             if "eval_loss" in metrics:
@@ -107,11 +110,11 @@ YAML_FIELDS = [
     "license",
     "library_name",
     "tags",
-    "pipeline_tag",
-    "eval_results",
-    "model_name",
+    "datasets",
     "metrics",
+    "pipeline_tag",
     "widget",
+    "model-index",
 ]
 IGNORED_FIELDS = ["model"]
 
@@ -130,7 +133,7 @@ class SpanMarkerModelCardData(CardData):
             "generated_from_span_marker_trainer",
         ]
     )
-    model_name: Optional[str] = None
+    model_name: str = "SpanMarker"
     model_id: Optional[str] = None
     encoder_name: Optional[str] = None
     encoder_id: Optional[str] = None
@@ -187,10 +190,15 @@ class SpanMarkerModelCardData(CardData):
             )
             self.model_id = None
 
+        # TODO: Set model_id based on training args if possible?
+        # TODO: Set model_name based on encoder_id/encoder_name and dataset_id/dataset_name?
+
     def register_model(self, model: "SpanMarkerModel"):
         self.model = model
 
     def to_dict(self) -> Dict[str, Any]:
+        super_dict: dict = super().to_dict()
+
         # Compute required formats from the raw data
         if self.eval_results_dict:
             dataset_split = list(self.eval_results_dict.keys())[0].split("_")[0]
@@ -229,23 +237,18 @@ class SpanMarkerModelCardData(CardData):
                     metric_name="Recall",
                 ),
             ]
-        else:
-            eval_results = []
-        eval_lines = make_markdown_table(self.eval_lines_list)
+            super_dict["model-index"] = eval_results_to_model_index(self.model_name, eval_results)
+        super_dict["eval_lines"] = make_markdown_table(self.eval_lines_list)
         if self.metric_lines:
-            metrics_table = make_markdown_table(self.metric_lines)
-        else:
-            metrics_table = None
+            super_dict["metrics_table"] = make_markdown_table(self.metric_lines)
+        if self.dataset_id:
+            super_dict["datasets"] = [self.dataset_id]
 
-        super_dict: dict = super().to_dict()
         for key in IGNORED_FIELDS:
             super_dict.pop(key, None)
         return {
             **super_dict,
             **self.model.config.to_dict(),
-            "eval_results": eval_results,
-            "eval_lines": eval_lines,
-            "metrics_table": metrics_table,
         }
 
     def to_yaml(self, line_break=None) -> str:
