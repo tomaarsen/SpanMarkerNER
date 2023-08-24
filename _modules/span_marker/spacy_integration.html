@@ -116,11 +116,13 @@
           
   <h1>Source code for span_marker.spacy_integration</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">types</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
 <span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">spacy.tokens</span> <span class="kn">import</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">Span</span>
+<span class="kn">from</span> <span class="nn">spacy.util</span> <span class="kn">import</span> <span class="n">filter_spans</span><span class="p">,</span> <span class="n">minibatch</span>
 
 <span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
@@ -172,6 +174,7 @@
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">4</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">overwrite_entities</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a SpanMarker wrapper for spaCy.</span>
@@ -182,6 +185,8 @@
 <span class="sd">            batch_size (int): The number of samples to include per batch. Higher is faster, but requires more memory.</span>
 <span class="sd">                Defaults to 4.</span>
 <span class="sd">            device (Optional[Union[str, torch.device]]): The device to place the model on. Defaults to None.</span>
+<span class="sd">            overwrite_entities (bool): Whether to overwrite the existing entities in the `doc.ents` attribute.</span>
+<span class="sd">                Defaults to False.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">device</span><span class="p">:</span>
@@ -189,22 +194,41 @@
         <span class="k">elif</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">():</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span> <span class="o">=</span> <span class="n">batch_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_entities</span> <span class="o">=</span> <span class="n">overwrite_entities</span>
+
+<div class="viewcode-block" id="SpacySpanMarkerWrapper.convert_inputs_to_dataset">
+<a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.convert_inputs_to_dataset">[docs]</a>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+        <span class="n">inputs</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
+                <span class="s2">&quot;document_id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span>
+                <span class="s2">&quot;sentence_id&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)),</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">inputs</span></div>
+
+
+<div class="viewcode-block" id="SpacySpanMarkerWrapper.set_ents">
+<a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.set_ents">[docs]</a>
+    <span class="k">def</span> <span class="nf">set_ents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Span</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_entities</span><span class="p">:</span>
+            <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">ents</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">filter_spans</span><span class="p">(</span><span class="n">ents</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">)))</span></div>
+
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Doc</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill `doc.ents` and `span.label_` using the chosen SpanMarker model.&quot;&quot;&quot;</span>
         <span class="n">sents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">)</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_space</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">]</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sents</span><span class="p">]</span>
+
         <span class="c1"># use document-level context in the inference if the model was also trained that way</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
-                    <span class="s2">&quot;document_id&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">),</span>
-                    <span class="s2">&quot;sentence_id&quot;</span><span class="p">:</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">inputs</span><span class="p">)),</span>
-                <span class="p">}</span>
-            <span class="p">)</span>
-        <span class="n">outputs</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
 
+        <span class="n">ents</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">entities_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">sentence</span><span class="p">,</span> <span class="n">entities</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">sents</span><span class="p">,</span> <span class="n">entities_list</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
@@ -212,10 +236,43 @@
                 <span class="n">end</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span>
                 <span class="n">span</span> <span class="o">=</span> <span class="n">sentence</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
                 <span class="n">span</span><span class="o">.</span><span class="n">label_</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
-                <span class="n">outputs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+                <span class="n">ents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
 
-        <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">outputs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">doc</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">doc</span>
+
+<div class="viewcode-block" id="SpacySpanMarkerWrapper.pipe">
+<a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.pipe">[docs]</a>
+    <span class="k">def</span> <span class="nf">pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill `doc.ents` and `span.label_` using the chosen SpanMarker model.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="p">[</span><span class="n">stream</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">types</span><span class="o">.</span><span class="n">GeneratorType</span><span class="p">):</span>
+            <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">docs</span> <span class="ow">in</span> <span class="n">minibatch</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_space</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+
+            <span class="c1"># use document-level context in the inference if the model was also trained that way</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+
+            <span class="n">entities_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">doc</span><span class="p">,</span> <span class="n">entities</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">entities_list</span><span class="p">):</span>
+                <span class="n">ents</span> <span class="o">=</span> <span class="p">[]</span>
+                <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">]</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span>
+                    <span class="n">span</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                    <span class="n">span</span><span class="o">.</span><span class="n">label_</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
+                    <span class="n">ents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">)</span>
+
+                <span class="k">yield</span> <span class="n">doc</span></div>
+</div>
 
 </pre></div>
 
