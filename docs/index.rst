@@ -188,3 +188,5 @@ To the 🤗 Hub
    news
    Open Issues <https://github.com/tomaarsen/SpanMarkerNER/issues>
    SpanMarker on GitHub <https://github.com/tomaarsen/SpanMarkerNER>
+   SpanMarker on the 🤗 Hub <https://huggingface.co/models?library=span-marker>
+   SpanMarker on spaCy <https://spacy.io/universe/project/span_marker>
