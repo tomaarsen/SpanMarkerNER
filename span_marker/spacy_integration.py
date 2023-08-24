@@ -92,7 +92,7 @@ class SpacySpanMarkerWrapper:
         if self.overwrite_entities:
             doc.set_ents(ents)
         else:
-            doc.set_ents(filter_spans(list(doc.ents) + ents))
+            doc.set_ents(filter_spans(ents + list(doc.ents)))
 
     def __call__(self, doc: Doc) -> Doc:
         """Fill `doc.ents` and `span.label_` using the chosen SpanMarker model."""
