@@ -16,14 +16,43 @@ accessibility and ease of use. Crucially, SpanMarker works out of the box with m
 `bert-base-cased` and `roberta-large`, and automatically works with datasets using the `IOB`, `IOB2`, `BIOES`, `BILOU`
 or no label annotation scheme.
 
-.. raw:: html
+Check out all publicly available SpanMarker models on the Hugging Face Hub `here <https://huggingface.co/models?library=span-marker>`_.
+Alternatively, check out any model from this list of particularly useful models:
 
-   <iframe
-      src="https://tomaarsen-span-marker-bert-base-fewnerd-fine-super.hf.space"
-      frameborder="0"
-      width="850"
-      height="650"
-   ></iframe>
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| Model ID                                                                                                                                            | Domain   | Label Count | Language     |
++=====================================================================================================================================================+==========+=============+==============+
+| `tomaarsen/span-marker-mbert-base-multinerd <https://huggingface.co/tomaarsen/span-marker-mbert-base-multinerd>`_                                   | General  | 15          | Multilingual |
+|                                                                                                                                                     |          |             |              |
+| `lxyuan/span-marker-bert-base-multilingual-uncased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-uncased-multinerd>`_ |          |             |              |
+|                                                                                                                                                     |          |             |              |
+| `lxyuan/span-marker-bert-base-multilingual-cased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-cased-multinerd>`_     |          |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super>`_                   | General  | 66          | English      |
+|                                                                                                                                                     |          |             |              |
+| `tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super>`_     |          |             | Multilingual |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-cross-ner>`_                                     | General  | 39          | English      |
+|                                                                                                                                                     |          |             |              |
+| `tomaarsen/span-marker-bert-base-uncased-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-cross-ner>`_                     |          |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `tomaarsen/span-marker-roberta-large-ontonotes5 <https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5>`_                           | General  | 18          | English      |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms>`_                                       | Acronyms | 2           | English      |
+|                                                                                                                                                     |          |             |              |
+| `tomaarsen/span-marker-bert-base-uncased-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-acronyms>`_                       |          |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-ncbi-disease <https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease>`_                               | Diseases | 1           | English      |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+| `stefan-it/span-marker-gelectra-large-germeval14 <https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14>`_                         | General  | 12          | German       |
+|                                                                                                                                                     |          |             |              |
+| `gwlms/span-marker-teams-germeval14 <https://huggingface.co/gwlms/span-marker-teams-germeval14>`_                                                   |          |             |              |
+|                                                                                                                                                     |          |             |              |
+| `gwlms/span-marker-token-dropping-bert-germeval14 <https://huggingface.co/gwlms/span-marker-token-dropping-bert-germeval14>`_                       |          |             |              |
+|                                                                                                                                                     |          |             |              |
+| `gwlms/span-marker-bert-germeval14 <https://huggingface.co/gwlms/span-marker-bert-germeval14>`_                                                     |          |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
+
 
 Context
 =======
