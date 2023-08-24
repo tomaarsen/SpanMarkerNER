@@ -101,6 +101,8 @@
 <li class="toctree-l1"><a class="reference internal" href="news.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
 <li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://huggingface.co/models?library=span-marker">SpanMarker on the 🤗 Hub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://spacy.io/universe/project/span_marker">SpanMarker on spaCy</a></li>
 </ul>
 
   
@@ -122,12 +124,70 @@ library, SpanMarker can take advantage of its valuable functionality.</p>
 accessibility and ease of use. Crucially, SpanMarker works out of the box with many common encoders such as
 <cite>bert-base-cased</cite> and <cite>roberta-large</cite>, and automatically works with datasets using the <cite>IOB</cite>, <cite>IOB2</cite>, <cite>BIOES</cite>, <cite>BILOU</cite>
 or no label annotation scheme.</p>
-<iframe
-   src="https://tomaarsen-span-marker-bert-base-fewnerd-fine-super.hf.space"
-   frameborder="0"
-   width="850"
-   height="650"
-></iframe><section id="context">
+<p>Check out all publicly available SpanMarker models on the Hugging Face Hub <a class="reference external" href="https://huggingface.co/models?library=span-marker">here</a>.
+Alternatively, check out any model from this list of particularly useful models:</p>
+<table class="docutils align-default">
+<thead>
+<tr class="row-odd"><th class="head"><p>Model ID</p></th>
+<th class="head"><p>Domain</p></th>
+<th class="head"><p>Label Count</p></th>
+<th class="head"><p>Language</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-mbert-base-multinerd">tomaarsen/span-marker-mbert-base-multinerd</a></p>
+<p><a class="reference external" href="https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-uncased-multinerd">lxyuan/span-marker-bert-base-multilingual-uncased-multinerd</a></p>
+<p><a class="reference external" href="https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-cased-multinerd">lxyuan/span-marker-bert-base-multilingual-cased-multinerd</a></p>
+</td>
+<td><p>General</p></td>
+<td><p>15</p></td>
+<td><p>Multilingual</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super">tomaarsen/span-marker-bert-base-fewnerd-fine-super</a></p>
+<p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super">tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super</a></p>
+</td>
+<td><p>General</p></td>
+<td><p>66</p></td>
+<td><p>English</p>
+<p>Multilingual</p>
+</td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-cross-ner">tomaarsen/span-marker-bert-base-cross-ner</a></p>
+<p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-cross-ner">tomaarsen/span-marker-bert-base-uncased-cross-ner</a></p>
+</td>
+<td><p>General</p></td>
+<td><p>39</p></td>
+<td><p>English</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5">tomaarsen/span-marker-roberta-large-ontonotes5</a></p></td>
+<td><p>General</p></td>
+<td><p>18</p></td>
+<td><p>English</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms">tomaarsen/span-marker-bert-base-acronyms</a></p>
+<p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-acronyms">tomaarsen/span-marker-bert-base-uncased-acronyms</a></p>
+</td>
+<td><p>Acronyms</p></td>
+<td><p>2</p></td>
+<td><p>English</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease">tomaarsen/span-marker-bert-base-ncbi-disease</a></p></td>
+<td><p>Diseases</p></td>
+<td><p>1</p></td>
+<td><p>English</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14">stefan-it/span-marker-gelectra-large-germeval14</a></p>
+<p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-teams-germeval14">gwlms/span-marker-teams-germeval14</a></p>
+<p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-token-dropping-bert-germeval14">gwlms/span-marker-token-dropping-bert-germeval14</a></p>
+<p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-bert-germeval14">gwlms/span-marker-bert-germeval14</a></p>
+</td>
+<td><p>General</p></td>
+<td><p>12</p></td>
+<td><p>German</p></td>
+</tr>
+</tbody>
+</table>
+<section id="context">
 <h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
 <h1 align="center">
    <a href="https://github.com/argilla-io/argilla">
