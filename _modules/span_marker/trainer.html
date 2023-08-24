@@ -113,7 +113,8 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
@@ -222,9 +223,11 @@
 
         <span class="c1"># Set some Training arguments that must be set for SpanMarker</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/my_span_marker_model&quot;</span><span class="p">)</span>
-        <span class="n">args</span><span class="o">.</span><span class="n">include_inputs_for_metrics</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="n">args</span><span class="o">.</span><span class="n">remove_unused_columns</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+                <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/my_span_marker_model&quot;</span><span class="p">,</span> <span class="n">include_inputs_for_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">args</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">include_inputs_for_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
 
         <span class="c1"># Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics</span>
         <span class="k">if</span> <span class="n">compute_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
