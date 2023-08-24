@@ -36,6 +36,9 @@ class ModelCardCallback(TrainerCallback):
       - Minimum, median, maximum number of entities in the training set
       - 3 short example sentences with their tags
     - 3. Ensure metadata is correct and complete
+    - 4. Tokenizer warning?
+    - 5. Automatically set `model_name` using 'SpanMarker with {{ encoder_name or encoder_id }} on {{ dataset_name or dataset_id }}'
+    - 6. model.predict text as the first example sentence instead of Amelia Earthart
     """
 
     def __init__(self, trainer: "Trainer") -> None:
