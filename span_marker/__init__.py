@@ -26,7 +26,7 @@ else:
         "model": "tomaarsen/span-marker-roberta-large-ontonotes5",
         "batch_size": 4,
         "device": None,
-        "overwrite_entities": False
+        "overwrite_entities": False,
     }
 
     @Language.factory(
@@ -40,7 +40,7 @@ else:
         model: str,
         batch_size: int,
         device: Optional[Union[str, torch.device]],
-        overwrite_entities: Optional[bool]
+        overwrite_entities: bool,
     ) -> SpacySpanMarkerWrapper:
         if overwrite_entities:
             # Remove the existing NER component, if it exists,
