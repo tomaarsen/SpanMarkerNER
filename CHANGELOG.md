@@ -34,6 +34,8 @@ Types of changes
 
 ## [1.2.4]
 
+### Fixed
+
 - Resolved broken license information.
 
 ## [1.2.3]
