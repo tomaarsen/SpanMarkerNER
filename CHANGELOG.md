@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.2.5]
+
+### Fixed
+
+- Allow for immutable `TrainingArguments` from newer `transformers` release.
+
 ## [1.2.4]
 
 ### Fixed

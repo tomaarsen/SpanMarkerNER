@@ -66,7 +66,6 @@ def test_trainer_standard(
         # If there's document context, let's evaluate the doc-context model again, but with just tokens
         caplog.clear()
         trainer.evaluate(dataset["test"].remove_columns(("document_id", "sentence_id")))
-        print(caplog.record_tuples)
         assert any(
             [
                 level == logging.WARNING
