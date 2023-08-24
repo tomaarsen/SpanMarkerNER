@@ -67,7 +67,7 @@ trainer = Trainer(
     eval_dataset=dataset["validation"],
 )
 trainer.train()
-trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}_finetuned")
+trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finetuned")
 ```
 
 ## Training Details
