@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -118,11 +118,11 @@
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
 </div><section id="Loading-&amp;-Inferencing-with-SpanMarker">
-<h1>Loading &amp; Inferencing with SpanMarker<a class="headerlink" href="#Loading-&-Inferencing-with-SpanMarker" title="Permalink to this heading">¶</a></h1>
+<h1>Loading &amp; Inferencing with SpanMarker<a class="headerlink" href="#Loading-&-Inferencing-with-SpanMarker" title="Link to this heading">¶</a></h1>
 <p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
 <p>In this short notebook, we’ll have a look at how to load a SpanMarker model from the hub for inference. For a larger and more general tutorial on how to use SpanMarker, please have a look at the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook.</p>
 <section id="Setup">
-<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
+<h2>Setup<a class="headerlink" href="#Setup" title="Link to this heading">¶</a></h2>
 <p>First of all, the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module needs to be installed.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -134,7 +134,7 @@
 </div>
 </section>
 <section id="Loading-the-Model">
-<h2>Loading the Model<a class="headerlink" href="#Loading-the-Model" title="Permalink to this heading">¶</a></h2>
+<h2>Loading the Model<a class="headerlink" href="#Loading-the-Model" title="Link to this heading">¶</a></h2>
 <p>We’re going to load the <a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super">tomaarsen/span-marker-bert-base-fewnerd-fine-super</a> model from the hub, which has previously been trained to 0.7020 Test F1 on the finegrained supervised <a class="reference external" href="https://huggingface.co/datasets/DFKI-SLT/few-nerd">FewNERD</a> dataset. We use <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a>
 for this. Note that we place it on the GPU with <code class="docutils literal notranslate"><span class="pre">.cuda()</span></code>. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
 <div class="nbinput nblast docutils container">

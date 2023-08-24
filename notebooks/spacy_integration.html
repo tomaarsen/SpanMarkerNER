@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -118,11 +118,11 @@
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
 </div><section id="Using-SpanMarker-with-spaCy">
-<h1>Using SpanMarker with spaCy<a class="headerlink" href="#Using-SpanMarker-with-spaCy" title="Permalink to this heading">¶</a></h1>
+<h1>Using SpanMarker with spaCy<a class="headerlink" href="#Using-SpanMarker-with-spaCy" title="Link to this heading">¶</a></h1>
 <p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
 <p>In this short notebook, we’ll have a look at using pretrained SpanMarker models with spaCy.</p>
 <section id="Setup">
-<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
+<h2>Setup<a class="headerlink" href="#Setup" title="Link to this heading">¶</a></h2>
 <p>First of all, both <code class="docutils literal notranslate"><span class="pre">spacy</span></code> and the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module need to be installed. Afterwards, we need to install a <code class="docutils literal notranslate"><span class="pre">spacy</span></code> model, too. We’ll choose the simplest one for now: <code class="docutils literal notranslate"><span class="pre">en_core_web_sm</span></code></p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -135,7 +135,7 @@
 </div>
 </section>
 <section id="Using-spaCy-for-Named-Entity-Recognition">
-<h2>Using spaCy for Named Entity Recognition<a class="headerlink" href="#Using-spaCy-for-Named-Entity-Recognition" title="Permalink to this heading">¶</a></h2>
+<h2>Using spaCy for Named Entity Recognition<a class="headerlink" href="#Using-spaCy-for-Named-Entity-Recognition" title="Link to this heading">¶</a></h2>
 <p>We’ll start off by using purely spaCy for NER, to help give an indication of the changes that need to be made to use SpanMarker models for NER instead.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
@@ -239,7 +239,7 @@
 <p>Not quite ideal. This spaCy model misses <code class="docutils literal notranslate"><span class="pre">Cleopatra</span> <span class="pre">VII</span></code>, considers <code class="docutils literal notranslate"><span class="pre">Cleopatra</span> <span class="pre">the</span> <span class="pre">Great</span></code> a work of art, and thinks all dates are cardinals and organisations.</p>
 </section>
 <section id="Using-SpanMarker-models-for-Named-Entity-Recognition-with-spaCy">
-<h2>Using SpanMarker models for Named Entity Recognition with spaCy<a class="headerlink" href="#Using-SpanMarker-models-for-Named-Entity-Recognition-with-spaCy" title="Permalink to this heading">¶</a></h2>
+<h2>Using SpanMarker models for Named Entity Recognition with spaCy<a class="headerlink" href="#Using-SpanMarker-models-for-Named-Entity-Recognition-with-spaCy" title="Link to this heading">¶</a></h2>
 <p>We can easily add a SpanMarker model as a drop-in replacement of the original spaCy NER pipeline. It’s as simple as one line of code.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -377,7 +377,7 @@ SpanMarker model predictions are being computed on the CPU while CUDA is availab
 </div>
 </section>
 <section id="Summary">
-<h2>Summary<a class="headerlink" href="#Summary" title="Permalink to this heading">¶</a></h2>
+<h2>Summary<a class="headerlink" href="#Summary" title="Link to this heading">¶</a></h2>
 <p>To summarize, using SpanMarker with spaCy is as simple as this:</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:

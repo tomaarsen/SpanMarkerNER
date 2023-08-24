@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -118,15 +118,15 @@
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
 </div><section id="Document-level-context">
-<h1>Document-level context<a class="headerlink" href="#Document-level-context" title="Permalink to this heading">¶</a></h1>
+<h1>Document-level context<a class="headerlink" href="#Document-level-context" title="Link to this heading">¶</a></h1>
 <p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
 <p>In this tutorial, I’ll show you how to perform training and inference of SpanMarker models using document-level context to improve performance.</p>
 <p>Many approaches to NER process individual sentences completely independently of another, even if the sentences originate from the same document. Although this works fine, research has shown that including additional contextual information (i.e. the previous and next sentence(s)) improves the performance of the model. In my own experiments of SpanMarker with CoNLL03, including this document-level contextual information improves the model from a mean F1 of 92.9±0.0 to a mean F1 of 94.1±0.1.</p>
 <section id="Document-level-context-in-SpanMarker">
-<h2>Document-level context in SpanMarker<a class="headerlink" href="#Document-level-context-in-SpanMarker" title="Permalink to this heading">¶</a></h2>
+<h2>Document-level context in SpanMarker<a class="headerlink" href="#Document-level-context-in-SpanMarker" title="Link to this heading">¶</a></h2>
 <p>SpanMarker is designed to require only slight changes in the input data to allow for document-level context during training, evaluating and inference. In particular, the only required change is that the input must now be a <a class="reference external" href="https://huggingface.co/docs/datasets/package_reference/main_classes#datasets.Dataset">Dataset</a> with <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns.</p>
 <section id="Training-and-evaluating">
-<h3>Training and evaluating<a class="headerlink" href="#Training-and-evaluating" title="Permalink to this heading">¶</a></h3>
+<h3>Training and evaluating<a class="headerlink" href="#Training-and-evaluating" title="Link to this heading">¶</a></h3>
 <p>For training and evaluation, the dataset must now contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code>, <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code>, <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns. I’ve prepared two datasets (<a class="reference external" href="https://huggingface.co/datasets/tomaarsen/conll2003">tomaarsen/conll2003</a>, <a class="reference external" href="https://huggingface.co/datasets/tomaarsen/conllpp">tomaarsen/conllpp</a>) that I’ve used to train some models. We will have a look at the former to get a feel for how these values are used.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
@@ -430,7 +430,7 @@ as context. By default, these are set to <code class="docutils literal notransla
 <p>Training using this dataset works equivalently as if the <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns did not exist. See the <a class="reference internal" href="model_training.html"><span class="doc">Model Training</span></a> tutorial for more information on how to do that. See also the <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.trainer.html">Trainer</a> documentation.</p>
 </section>
 <section id="Inference">
-<h3>Inference<a class="headerlink" href="#Inference" title="Permalink to this heading">¶</a></h3>
+<h3>Inference<a class="headerlink" href="#Inference" title="Link to this heading">¶</a></h3>
 <p>For inference, the inputs to <code class="docutils literal notranslate"><span class="pre">model.predict</span></code> must also contain <code class="docutils literal notranslate"><span class="pre">document_id</span></code> and <code class="docutils literal notranslate"><span class="pre">sentence_id</span></code> columns, alongside a <code class="docutils literal notranslate"><span class="pre">tokens</span></code> column that includes either string sentences or lists of tokens. Let’s consider some sample data:</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:

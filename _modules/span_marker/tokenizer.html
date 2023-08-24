@@ -16,7 +16,7 @@
       <script type="text/javascript" src="../../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
       <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -127,7 +127,9 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="EntityTracker"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="EntityTracker">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker">[docs]</a>
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">EntityTracker</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    For giving a warning about what percentage of entities are ignored/skipped.</span>
@@ -230,7 +232,9 @@
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 
-<div class="viewcode-block" id="EntityTracker.add"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.add">[docs]</a>    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_entities</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="EntityTracker.add">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.add">[docs]</a>
+    <span class="k">def</span> <span class="nf">add</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_entities</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add to the counter of total number of entities.</span>
 
 <span class="sd">        Args:</span>
@@ -238,7 +242,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span> <span class="o">+=</span> <span class="n">num_entities</span></div>
 
-<div class="viewcode-block" id="EntityTracker.missed"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.missed">[docs]</a>    <span class="k">def</span> <span class="nf">missed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="EntityTracker.missed">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.missed">[docs]</a>
+    <span class="k">def</span> <span class="nf">missed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Add to the counter of missed/ignored/skipped entities.</span>
 
 <span class="sd">        Args:</span>
@@ -246,14 +253,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span><span class="p">[</span><span class="n">length</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span></div>
 
-<div class="viewcode-block" id="EntityTracker.reset"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+
+<div class="viewcode-block" id="EntityTracker.reset">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.reset">[docs]</a>
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Reset to defaults, stops tracking.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">total_num_entities</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">skipped_entities</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">enabled</span> <span class="o">=</span> <span class="kc">False</span></div>
+</div>
 
 
-<div class="viewcode-block" id="SpanMarkerTokenizer"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer">[docs]</a><span class="k">class</span> <span class="nc">SpanMarkerTokenizer</span><span class="p">:</span>
+
+<div class="viewcode-block" id="SpanMarkerTokenizer">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer">[docs]</a>
+<span class="k">class</span> <span class="nc">SpanMarkerTokenizer</span><span class="p">:</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokenizer</span><span class="p">:</span> <span class="n">PreTrainedTokenizer</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="n">tokenizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
@@ -272,16 +286,22 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">entity_tracker</span> <span class="o">=</span> <span class="n">EntityTracker</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">entity_max_length</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_max_length</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
+<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_all_valid_spans</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">start_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_words</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">end_idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">start_idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">min</span><span class="p">(</span><span class="n">num_words</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">start_idx</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">entity_max_length</span><span class="p">)):</span>
                 <span class="k">yield</span> <span class="p">(</span><span class="n">start_idx</span><span class="p">,</span> <span class="n">end_idx</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans_and_labels"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans_and_labels">[docs]</a>    <span class="k">def</span> <span class="nf">get_all_valid_spans_and_labels</span><span class="p">(</span>
+
+<div class="viewcode-block" id="SpanMarkerTokenizer.get_all_valid_spans_and_labels">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans_and_labels">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_all_valid_spans_and_labels</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">num_words</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">span_to_label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">],</span> <span class="n">entity_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">int</span><span class="p">]]:</span>
         <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_all_valid_spans</span><span class="p">(</span><span class="n">num_words</span><span class="p">,</span> <span class="n">entity_max_length</span><span class="p">):</span>
             <span class="k">yield</span> <span class="n">span</span><span class="p">,</span> <span class="n">span_to_label</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">span</span><span class="p">,</span> <span class="n">outside_id</span><span class="p">)</span></div>
+
 
     <span class="k">def</span> <span class="fm">__getattribute__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
@@ -379,12 +399,16 @@
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
 
-<div class="viewcode-block" id="SpanMarkerTokenizer.from_pretrained"><a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained">[docs]</a>    <span class="nd">@classmethod</span>
+<div class="viewcode-block" id="SpanMarkerTokenizer.from_pretrained">
+<a class="viewcode-back" href="../../api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.from_pretrained">[docs]</a>
+    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_pretrained</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="n">tokenizer</span> <span class="o">=</span> <span class="n">AutoTokenizer</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">inputs</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">add_prefix_space</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+</div>
+
 </pre></div>
 
         </div>

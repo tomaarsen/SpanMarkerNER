@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -113,11 +113,11 @@
       <div id="main-content-container">
         <div id="main-content" role="main">
           
-  <section id="module-span_marker.data_collator">
-<span id="span-marker-data-collator-module"></span><h1>span_marker.data_collator module<a class="headerlink" href="#module-span_marker.data_collator" title="Permalink to this heading">¶</a></h1>
-<dl class="py class">
+  <section id="span-marker-data-collator-module">
+<h1>span_marker.data_collator module<a class="headerlink" href="#span-marker-data-collator-module" title="Link to this heading">¶</a></h1>
+<dl class="py class" id="module-span_marker.data_collator">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.data_collator.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerDataCollator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.data_collator.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerDataCollator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Data Collator class responsible for converting the minimal outputs from the tokenizer into
 complete and meaningful inputs to the model. In particular, the <code class="docutils literal notranslate"><span class="pre">input_ids</span></code> from the tokenizer
@@ -142,17 +142,17 @@ features are padded, and the correct amount of start and end markers (with paddi
 </dl>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator.tokenizer">
-<span class="sig-name descname"><span class="pre">tokenizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><span class="pre">SpanMarkerTokenizer</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.tokenizer" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">tokenizer</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><span class="pre">SpanMarkerTokenizer</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.tokenizer" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator.marker_max_length">
-<span class="sig-name descname"><span class="pre">marker_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">marker_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator.__call__">
-<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.__call__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__call__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">features</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator.__call__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.__call__" title="Link to this definition">¶</a></dt>
 <dd><p>Convert the minimal tokenizer outputs into inputs ready for <a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward" title="span_marker.modeling.SpanMarkerModel.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>

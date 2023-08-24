@@ -16,7 +16,7 @@
       <script type="text/javascript" src="../../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
       <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -120,7 +120,9 @@
 <span class="kn">from</span> <span class="nn">transformers.modeling_outputs</span> <span class="kn">import</span> <span class="n">TokenClassifierOutput</span>
 
 
-<div class="viewcode-block" id="SpanMarkerOutput"><a class="viewcode-back" href="../../api/span_marker.output.html#span_marker.output.SpanMarkerOutput">[docs]</a><span class="nd">@dataclass</span>
+<div class="viewcode-block" id="SpanMarkerOutput">
+<a class="viewcode-back" href="../../api/span_marker.output.html#span_marker.output.SpanMarkerOutput">[docs]</a>
+<span class="nd">@dataclass</span>
 <span class="k">class</span> <span class="nc">SpanMarkerOutput</span><span class="p">(</span><span class="n">TokenClassifierOutput</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Class for outputs of :class:`~span_marker.modeling.SpanMarkerModel`.</span>
@@ -155,6 +157,7 @@
     <span class="n">num_words</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">document_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="n">sentence_ids</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
+
 </pre></div>
 
         </div>

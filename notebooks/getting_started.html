@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -118,11 +118,11 @@
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
 </div><section id="Getting-Started-with-SpanMarker">
-<h1>Getting Started with SpanMarker<a class="headerlink" href="#Getting-Started-with-SpanMarker" title="Permalink to this heading">¶</a></h1>
+<h1>Getting Started with SpanMarker<a class="headerlink" href="#Getting-Started-with-SpanMarker" title="Link to this heading">¶</a></h1>
 <p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
 <p>In this notebook, we’ll have a look at how to train an NER model using SpanMarker.</p>
 <section id="Setup">
-<h2>Setup<a class="headerlink" href="#Setup" title="Permalink to this heading">¶</a></h2>
+<h2>Setup<a class="headerlink" href="#Setup" title="Link to this heading">¶</a></h2>
 <p>First of all, the <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> Python module needs to be installed. If we want to use <a class="reference external" href="https://wandb.ai/">Weights and Biases</a> for logging, we can install <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> using the <code class="docutils literal notranslate"><span class="pre">[wandb]</span></code> extra.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
@@ -135,7 +135,7 @@
 </div>
 </section>
 <section id="Loading-the-dataset">
-<h2>Loading the dataset<a class="headerlink" href="#Loading-the-dataset" title="Permalink to this heading">¶</a></h2>
+<h2>Loading the dataset<a class="headerlink" href="#Loading-the-dataset" title="Link to this heading">¶</a></h2>
 <p>For this example, we’ll load the challenging <a class="reference external" href="https://huggingface.co/datasets/DFKI-SLT/few-nerd">FewNERD supervised dataset</a> from the Hugging Face hub using 🤗 Datasets.</p>
 <div class="nbinput docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
@@ -231,7 +231,7 @@ DatasetDict({
 <p>For the purposes of this tutorial, let’s stick with the <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> coarse-grained labels, but I challenge you to modify this Notebook to train for the fine labels. For the SpanMarker model, any dataset can be used as long as it has a <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and a <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> column. The <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> can be annotated using the IOB, IOB2, BIOES or BILOU labeling scheme, but also regular unschemed labels like in this FewNERD example can be used.</p>
 </section>
 <section id="Initializing-a-SpanMarkerModel">
-<h2>Initializing a <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code><a class="headerlink" href="#Initializing-a-SpanMarkerModel" title="Permalink to this heading">¶</a></h2>
+<h2>Initializing a <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code><a class="headerlink" href="#Initializing-a-SpanMarkerModel" title="Link to this heading">¶</a></h2>
 <p>A SpanMarker model is initialized via <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a>. This method will be familiar to those who know 🤗 Transformers. It accepts either a path to a local model or the name of a model on the <a class="reference external" href="https://huggingface.co/models">Hugging Face Hub</a>.</p>
 <p>Importantly, the model can <em>either</em> be an encoder or an already trained and saved SpanMarker model. As we haven’t trained anything yet, we will use an encoder. To learn how to load and use a saved SpanMarker model, please have a look at the <a class="reference internal" href="model_loading.html"><span class="doc">Loading &amp; Inferencing</span></a> notebook.</p>
 <p>Reasonable options for encoders include BERT, RoBERTa, etc., which means that the following are all good options: <code class="docutils literal notranslate"><span class="pre">&quot;bert-base-cased&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;bert-large-cased&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;roberta-base&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;roberta-large&quot;</span></code>. Not all encoders work though, they <strong>must</strong> allow for <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> as an input argument, which disqualifies DistilBERT, T5, DistilRoBERTa, ALBERT &amp; BART. Furthermore, using uncased models is generally not recommended, as the capitalisation can be very useful to find named entities.</p>
@@ -265,7 +265,7 @@ Some weights of the model checkpoint at bert-base-cased were not used when initi
 </ul>
 </section>
 <section id="Training">
-<h2>Training<a class="headerlink" href="#Training" title="Permalink to this heading">¶</a></h2>
+<h2>Training<a class="headerlink" href="#Training" title="Link to this heading">¶</a></h2>
 <p>At this point, our model is already ready for training! We can import <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">TrainingArguments</a> directly from 🤗 Transformers as well as the SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. The <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> is a subclass of the 🤗 Transformers <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer">Trainer</a> that simplifies some tasks for you, but otherwise it works just like the regular <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>.</p>
 <p>This next snippet shows some reasonable defaults. Feel free to adjust the batch size to a lower value if you experience out of memory exceptions.</p>
 <div class="nbinput nblast docutils container">
