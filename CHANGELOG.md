@@ -15,6 +15,17 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Added
+
+- Added an `overwrite_entities` parameter to the spaCy pipeline component to allow for overwriting spaCy entities.
+- Added `.pipe()` method to spaCy integration to allow for batched inference.
+
+### Changed
+
+- Stop overwriting spaCy entities by default.
+
 ## [1.2.5]
 
 ### Fixed
@@ -23,14 +34,6 @@ Types of changes
 
 ## [1.2.4]
 
-### Fixed
-
-- Fix overwriting spaCy entities by default
-
-### Added
-
-- Added `overwrite_entities` parameter to allow for choosing overwriting spaCy entities.
-- Added `.pipe()` method to spaCy integration to allow for batched inference.
 - Resolved broken license information.
 
 ## [1.2.3]
