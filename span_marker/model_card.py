@@ -1,4 +1,5 @@
 import logging
+import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
@@ -38,7 +39,6 @@ class ModelCardCallback(TrainerCallback):
       - 3 short example sentences with their tags
     - 3. Ensure metadata is correct and complete
     - 4. Tokenizer warning?
-    - 5. Automatically set `model_name` using 'SpanMarker with {{ encoder_name or encoder_id }} on {{ dataset_name or dataset_id }}'
     """
 
     def __init__(self, trainer: "Trainer") -> None:
@@ -136,7 +136,7 @@ class SpanMarkerModelCardData(CardData):
             "generated_from_span_marker_trainer",
         ]
     )
-    model_name: str = "SpanMarker"
+    model_name: Optional[str] = None
     model_id: Optional[str] = None
     encoder_name: Optional[str] = None
     encoder_id: Optional[str] = None
@@ -195,7 +195,6 @@ class SpanMarkerModelCardData(CardData):
             self.model_id = None
 
         # TODO: Set model_id based on training args if possible?
-        # TODO: Set model_name based on encoder_id/encoder_name and dataset_id/dataset_name?
 
     def set_examples(self, dataset: Dataset) -> None:
         # Out of the first `N=100` samples, select `M=5` good examples
@@ -224,8 +223,21 @@ class SpanMarkerModelCardData(CardData):
         shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
         self.example = shortest_example
 
-    def register_model(self, model: "SpanMarkerModel"):
+    def register_model(self, model: "SpanMarkerModel") -> None:
         self.model = model
+
+        if self.encoder_id is None:
+            encoder_id_or_path = self.model.config.get("_name_or_path")
+            if not os.path.exists(encoder_id_or_path):
+                self.encoder_id = encoder_id_or_path
+
+        if not self.model_name:
+            if self.encoder_id:
+                self.model_name = f"SpanMarker with {self.encoder_name or self.encoder_id}"
+                if self.dataset_name or self.dataset_id:
+                    self.model_name += f" on {self.dataset_name or self.dataset_id}"
+            else:
+                self.model_name = "SpanMarker"
 
     def to_dict(self) -> Dict[str, Any]:
         super_dict: dict = super().to_dict()
