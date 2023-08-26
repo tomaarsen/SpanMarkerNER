@@ -190,23 +190,7 @@ class Trainer(TransformersTrainer):
         # If there are no example sentences in the model card data, find M=5 interesting sentences
         # in the first N=100 evaluation samples
         if is_evaluate and not self.model.model_card_data.widget:
-            N = 100
-            M = 5
-            if len(dataset) > N:
-                example_dataset = dataset.select(range(N))
-            else:
-                example_dataset = dataset
-
-            def count_entities(ner_tags):
-                unique_count = {reduced_label_id for reduced_label_id, _, _ in ner_tags}
-                return {"unique_count": len(unique_count), "count": len(ner_tags)}
-
-            example_dataset = (
-                example_dataset.map(count_entities, input_columns="ner_tags")
-                .sort(("unique_count", "count"), reverse=True)
-                .select(range(M))
-            )
-            self.model.model_card_data.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
+            self.model.model_card_data.set_examples(dataset)
 
         # Tokenize and add start/end markers
         with tokenizer.entity_tracker(split=dataset_name):

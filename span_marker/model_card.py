@@ -7,6 +7,7 @@ import datasets
 import tokenizers
 import torch
 import transformers
+from datasets import Dataset
 from huggingface_hub import CardData, ModelCard, dataset_info, model_info
 from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
@@ -38,7 +39,6 @@ class ModelCardCallback(TrainerCallback):
     - 3. Ensure metadata is correct and complete
     - 4. Tokenizer warning?
     - 5. Automatically set `model_name` using 'SpanMarker with {{ encoder_name or encoder_id }} on {{ dataset_name or dataset_id }}'
-    - 6. model.predict text as the first example sentence instead of Amelia Earthart
     """
 
     def __init__(self, trainer: "Trainer") -> None:
@@ -151,6 +151,7 @@ class SpanMarkerModelCardData(CardData):
     eval_lines_list: List[Dict[str, float]] = field(default_factory=list, init=False)
     metric_lines: List[Dict[str, float]] = field(default_factory=list, init=False)
     widget: List[Dict[str, str]] = field(default_factory=list, init=False)
+    example: Optional[str] = field(default=None, init=False)
 
     # Computed once, always unchanged
     pipeline_tag: Optional[str] = field(default="token-classification", init=False)
@@ -195,6 +196,33 @@ class SpanMarkerModelCardData(CardData):
 
         # TODO: Set model_id based on training args if possible?
         # TODO: Set model_name based on encoder_id/encoder_name and dataset_id/dataset_name?
+
+    def set_examples(self, dataset: Dataset) -> None:
+        # Out of the first `N=100` samples, select `M=5` good examples
+        # based on the number of unique entity classes
+        # The shortest example is used in the inference example
+        N = 100
+        M = 5
+        if len(dataset) > N:
+            example_dataset = dataset.select(range(N))
+        else:
+            example_dataset = dataset
+
+        def count_entities(sample: Dict[str, Any]) -> Dict[str, int]:
+            unique_count = {reduced_label_id for reduced_label_id, _, _ in sample["ner_tags"]}
+            return {
+                "unique_count": len(unique_count),
+                "count": len(sample["ner_tags"]),
+                "word_count": len(sample["tokens"]),
+            }
+
+        example_dataset = (
+            example_dataset.map(count_entities).sort(("unique_count", "count"), reverse=True).select(range(M))
+        )
+        self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
+
+        shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
+        self.example = shortest_example
 
     def register_model(self, model: "SpanMarkerModel"):
         self.model = model
