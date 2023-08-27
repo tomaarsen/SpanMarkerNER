@@ -233,7 +233,7 @@ class SpanMarkerModelCardData(CardData):
                 if entity_id in unfinished_entity_ids:
                     entity = id2label[entity_id]
                     example = " ".join(sample["tokens"][start:end])
-                    examples[entity].add(example)
+                    examples[entity].add(f'"{example}"')
                     if len(examples[entity]) >= num_examples_per_label:
                         unfinished_entity_ids.remove(entity_id)
             if not unfinished_entity_ids:
