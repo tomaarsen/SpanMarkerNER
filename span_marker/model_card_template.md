@@ -29,6 +29,9 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 
 - **Repository:** [SpanMarker on GitHub](https://github.com/tomaarsen/SpanMarkerNER)
 - **Thesis:** [SpanMarker For Named Entity Recognition](https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf)
+{% if label_examples %}
+### Model Labels
+{{ label_examples }}{% endif -%}
 {% if metrics_table %}
 ## Evaluation
 

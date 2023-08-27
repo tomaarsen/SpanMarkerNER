@@ -186,9 +186,13 @@ class Trainer(TransformersTrainer):
             input_columns="ner_tags",
             desc=f"Label normalizing the {dataset_name} dataset",
         )
+        # Pick some example entities from each entity class for the model card.
+        if not is_evaluate and not self.model.model_card_data.label_example_list:
+            self.model.model_card_data.set_label_examples(
+                dataset, self.model.config.id2label, self.model.config.outside_id
+            )
 
-        # If there are no example sentences in the model card data, find M=5 interesting sentences
-        # in the first N=100 evaluation samples
+        # Set some example sentences for the model card widget
         if is_evaluate and not self.model.model_card_data.widget:
             self.model.model_card_data.set_widget_examples(dataset)
 

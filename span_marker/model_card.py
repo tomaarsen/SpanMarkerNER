@@ -1,6 +1,6 @@
 import logging
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
@@ -32,13 +32,12 @@ if TYPE_CHECKING:
 class ModelCardCallback(TrainerCallback):
     """
     TODO:
-    - 1. Label set with 3 examples of each label
-    - 2. Training set metrics:
+    - 1. Training set metrics:
       - Minimum, median, maximum number of words in the training set
       - Minimum, median, maximum number of entities in the training set
       - 3 short example sentences with their tags
-    - 3. Ensure metadata is correct and complete
-    - 4. Tokenizer warning?
+    - 2. Ensure metadata is correct and complete
+    - 3. Tokenizer warning?
     """
 
     def __init__(self, trainer: "Trainer") -> None:
@@ -152,10 +151,11 @@ class SpanMarkerModelCardData(CardData):
     metric_lines: List[Dict[str, float]] = field(default_factory=list, init=False)
     widget: List[Dict[str, str]] = field(default_factory=list, init=False)
     predict_example: Optional[str] = field(default=None, init=False)
+    label_example_list: Optional[List[Dict[str, str]]] = field(default_factory=list, init=False)
 
     # Computed once, always unchanged
-    pipeline_tag: Optional[str] = field(default="token-classification", init=False)
-    library_name: Optional[str] = field(default="span-marker", init=False)
+    pipeline_tag: str = field(default="token-classification", init=False)
+    library_name: str = field(default="span-marker", init=False)
     version: Dict[str, str] = field(
         default_factory=lambda: {
             "span_marker": span_marker.__version__,
@@ -223,6 +223,24 @@ class SpanMarkerModelCardData(CardData):
         shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
         self.predict_example = shortest_example
 
+    def set_label_examples(self, dataset: Dataset, id2label: Dict[int, str], outside_id: int) -> None:
+        num_examples_per_label = 3
+        examples = {label: set() for label_id, label in id2label.items() if label_id != outside_id}
+        unfinished_entity_ids = set(id2label.keys()) - {outside_id}
+        for sample in dataset:
+            for entity_id, start, end in sample["ner_tags"]:
+                if entity_id in unfinished_entity_ids:
+                    entity = id2label[entity_id]
+                    example = " ".join(sample["tokens"][start:end])
+                    examples[entity].add(example)
+                    if len(examples[entity]) >= num_examples_per_label:
+                        unfinished_entity_ids.remove(entity_id)
+            if not unfinished_entity_ids:
+                break
+        self.label_example_list = [
+            {"Label": label, "Examples": ", ".join(example_set)} for label, example_set in examples.items()
+        ]
+
     def register_model(self, model: "SpanMarkerModel") -> None:
         self.model = model
 
@@ -240,7 +258,7 @@ class SpanMarkerModelCardData(CardData):
                 self.model_name = "SpanMarker"
 
     def to_dict(self) -> Dict[str, Any]:
-        super_dict: dict = super().to_dict()
+        super_dict = {field.name: getattr(self, field.name) for field in fields(self)}
 
         # Compute required formats from the raw data
         if self.eval_results_dict:
@@ -282,8 +300,10 @@ class SpanMarkerModelCardData(CardData):
             ]
             super_dict["model-index"] = eval_results_to_model_index(self.model_name, eval_results)
         super_dict["eval_lines"] = make_markdown_table(self.eval_lines_list)
+        # Replace |:---:| with |:---| for left alignment
+        super_dict["label_examples"] = make_markdown_table(self.label_example_list).replace("-:|", "--|")
         if self.metric_lines:
-            super_dict["metrics_table"] = make_markdown_table(self.metric_lines)
+            super_dict["metrics_table"] = make_markdown_table(self.metric_lines).replace("-:|", "--|")
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
 
