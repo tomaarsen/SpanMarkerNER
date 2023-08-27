@@ -45,7 +45,7 @@ from span_marker import SpanMarkerModel
 # Download from the {{ hf_emoji }} Hub
 model = SpanMarkerModel.from_pretrained("{{ model_id | default('span_marker_model_id', true) }}")
 # Run inference
-entities = model.predict("{{ example | default("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.", true)}}")
+entities = model.predict("{{ predict_example | default("Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.", true)}}")
 ```
 
 ### Downstream Use

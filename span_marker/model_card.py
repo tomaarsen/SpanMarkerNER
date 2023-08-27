@@ -151,7 +151,7 @@ class SpanMarkerModelCardData(CardData):
     eval_lines_list: List[Dict[str, float]] = field(default_factory=list, init=False)
     metric_lines: List[Dict[str, float]] = field(default_factory=list, init=False)
     widget: List[Dict[str, str]] = field(default_factory=list, init=False)
-    example: Optional[str] = field(default=None, init=False)
+    predict_example: Optional[str] = field(default=None, init=False)
 
     # Computed once, always unchanged
     pipeline_tag: Optional[str] = field(default="token-classification", init=False)
@@ -196,7 +196,7 @@ class SpanMarkerModelCardData(CardData):
 
         # TODO: Set model_id based on training args if possible?
 
-    def set_examples(self, dataset: Dataset) -> None:
+    def set_widget_examples(self, dataset: Dataset) -> None:
         # Out of the first `N=100` samples, select `M=5` good examples
         # based on the number of unique entity classes
         # The shortest example is used in the inference example
@@ -221,7 +221,7 @@ class SpanMarkerModelCardData(CardData):
         self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
 
         shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
-        self.example = shortest_example
+        self.predict_example = shortest_example
 
     def register_model(self, model: "SpanMarkerModel") -> None:
         self.model = model

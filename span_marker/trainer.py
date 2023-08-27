@@ -190,7 +190,7 @@ class Trainer(TransformersTrainer):
         # If there are no example sentences in the model card data, find M=5 interesting sentences
         # in the first N=100 evaluation samples
         if is_evaluate and not self.model.model_card_data.widget:
-            self.model.model_card_data.set_examples(dataset)
+            self.model.model_card_data.set_widget_examples(dataset)
 
         # Tokenize and add start/end markers
         with tokenizer.entity_tracker(split=dataset_name):
