@@ -36,8 +36,7 @@ class ModelCardCallback(TrainerCallback):
       - Minimum, median, maximum number of words in the training set
       - Minimum, median, maximum number of entities in the training set
       - 3 short example sentences with their tags
-    - 2. Ensure metadata is correct and complete
-    - 3. Tokenizer warning?
+    - 2. Tokenizer warning?
     """
 
     def __init__(self, trainer: "Trainer") -> None:
