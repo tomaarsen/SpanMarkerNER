@@ -196,13 +196,13 @@ class SpanMarkerModelCardData(CardData):
         # TODO: Set model_id based on training args if possible?
 
     def set_widget_examples(self, dataset: Dataset) -> None:
-        # Out of the first `N=100` samples, select `M=5` good examples
-        # based on the number of unique entity classes
+        # Out of the first `sample_subset_size=100` samples, select `example_count=5` good examples
+        # based on the number of unique entity classes.
         # The shortest example is used in the inference example
-        N = 100
-        M = 5
-        if len(dataset) > N:
-            example_dataset = dataset.select(range(N))
+        sample_subset_size = 100
+        example_count = 5
+        if len(dataset) > sample_subset_size:
+            example_dataset = dataset.select(range(sample_subset_size))
         else:
             example_dataset = dataset
 
@@ -215,7 +215,9 @@ class SpanMarkerModelCardData(CardData):
             }
 
         example_dataset = (
-            example_dataset.map(count_entities).sort(("unique_count", "count"), reverse=True).select(range(M))
+            example_dataset.map(count_entities)
+            .sort(("unique_count", "count"), reverse=True)
+            .select(range(example_count))
         )
         self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
 
