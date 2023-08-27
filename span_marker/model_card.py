@@ -36,7 +36,6 @@ class ModelCardCallback(TrainerCallback):
       - Minimum, median, maximum number of words in the training set
       - Minimum, median, maximum number of entities in the training set
       - 3 short example sentences with their tags
-    - 2. Tokenizer warning?
     """
 
     def __init__(self, trainer: "Trainer") -> None:
@@ -344,17 +343,3 @@ def generate_model_card(model: "SpanMarkerModel") -> str:
         card_data=model.model_card_data, template_path=template_path, hf_emoji="🤗", warn_emoji="⚠️"
     )
     return model_card.content
-
-    """
-    template = jinja2.Environment().from_string(MODEL_CARD_TEMPLATE)
-    save_directory = Path(save_directory)
-    context = {}
-
-    context["model_name_or_path"] = "span_marker_model_name"
-
-    if "_name_or_path" in config.encoder:
-        context["encoder_name_or_path"] = config.encoder["_name_or_path"]
-        context["is_public_model"] = is_public_model(context["encoder_name_or_path"])
-
-    return template.render(context)
-    """
