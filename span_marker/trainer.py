@@ -4,7 +4,7 @@ from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
 from datasets import Dataset
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader
 from tqdm.autonotebook import tqdm
 from transformers import (
     EvalPrediction,
@@ -177,7 +177,7 @@ class Trainer(TransformersTrainer):
                 raise ValueError(f"The {dataset_name} dataset must contain a {column!r} column.")
 
         # Drop all unused columns, only keep "tokens", "ner_tags", "document_id", "sentence_id"
-        dataset: Dataset = dataset.remove_columns(
+        dataset = dataset.remove_columns(
             set(dataset.column_names) - set(self.OPTIONAL_COLUMNS) - set(self.REQUIRED_COLUMNS)
         )
         # Normalize the labels to a common format (list of label-start-end tuples)
