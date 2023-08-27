@@ -193,8 +193,6 @@ class SpanMarkerModelCardData(CardData):
             )
             self.model_id = None
 
-        # TODO: Set model_id based on training args if possible?
-
     def set_widget_examples(self, dataset: Dataset) -> None:
         # Out of the first `sample_subset_size=100` samples, select `example_count=5` good examples
         # based on the number of unique entity classes.
