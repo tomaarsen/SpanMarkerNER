@@ -72,7 +72,12 @@ trainer = Trainer(
 trainer.train()
 trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finetuned")
 ```
+{% if tokenizer_warning %}
+### {{ warn_emoji }} Tokenizer Warning
+The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
 
+In short, it is recommended to preprocess your inference text such that all words and punctuation are separated by a space. Some potential approaches to convert regular text into this format are NLTK [`word_tokenize`](https://www.nltk.org/api/nltk.tokenize.word_tokenize.html) or spaCy [`Doc`](https://spacy.io/api/doc#iter) and join the resulting words with a space.
+{% endif %}
 ## Training Details
 {% if hyperparameters %}
 ### Training hyperparameters
