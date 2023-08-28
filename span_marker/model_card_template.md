@@ -12,7 +12,7 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 
 ### Model Description
 
-- **Model type:** SpanMarker
+- **Model Type:** SpanMarker
 {% if encoder_id %}- **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}){% endif %}
 - **Maximum Sequence Length:** {{ model_max_length }} tokens
 - **Maximum Entity Length:** {{ entity_max_length }} words
@@ -79,16 +79,16 @@ In short, it is recommended to preprocess your inference text such that all word
 {% endif %}
 ## Training Details
 {% if train_set_metrics %}
-### Training set metrics
+### Training Set metrics
 {{ train_set_metrics }}{% endif %}{% if hyperparameters %}
-### Training hyperparameters
+### Training Hyperparameters
 
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}
 {% endfor %}{% endif %}{% if eval_lines %}
-### Training results
+### Training Results
 
 {{ eval_lines }}{% endif %}
-### Framework versions
+### Framework Versions
 
 - SpanMarker: {{ version["span_marker"] }}
 - Transformers : {{ version["transformers"] }}
