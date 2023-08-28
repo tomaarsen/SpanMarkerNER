@@ -202,9 +202,7 @@ class SpanMarkerModelCardData(CardData):
         sample_subset_size = 100
         example_count = 5
         if len(dataset) > sample_subset_size:
-            example_dataset = dataset.select(
-                [random.randrange(start=0, stop=len(dataset)) for _ in range(sample_subset_size)]
-            )
+            example_dataset = dataset.select(random.sample(range(len(dataset)), k=sample_subset_size))
         else:
             example_dataset = dataset
 
