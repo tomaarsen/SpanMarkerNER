@@ -31,14 +31,6 @@ if TYPE_CHECKING:
 
 
 class ModelCardCallback(TrainerCallback):
-    """
-    TODO:
-    - 1. Training set metrics:
-      - Minimum, median, maximum number of words in the training set
-      - Minimum, median, maximum number of entities in the training set
-      - 3 short example sentences with their tags
-    """
-
     def __init__(self, trainer: "Trainer") -> None:
         super().__init__()
         self.trainer = trainer
