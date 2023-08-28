@@ -1,5 +1,6 @@
 import logging
 import os
+import random
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
@@ -195,13 +196,15 @@ class SpanMarkerModelCardData(CardData):
             self.model_id = None
 
     def set_widget_examples(self, dataset: Dataset) -> None:
-        # Out of the first `sample_subset_size=100` samples, select `example_count=5` good examples
+        # Out of `sample_subset_size=100` random samples, select `example_count=5` good examples
         # based on the number of unique entity classes.
         # The shortest example is used in the inference example
         sample_subset_size = 100
         example_count = 5
         if len(dataset) > sample_subset_size:
-            example_dataset = dataset.select(range(sample_subset_size))
+            example_dataset = dataset.select(
+                [random.randrange(start=0, stop=len(dataset)) for _ in range(sample_subset_size)]
+            )
         else:
             example_dataset = dataset
 
