@@ -13,17 +13,33 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 ### Model Description
 
 - **Model Type:** SpanMarker
-{% if encoder_id %}- **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}){% endif %}
+{% if encoder_id -%}
+    - **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }})
+{%- else -%}
+    <!-- - **Encoder:** [Unknown](https://huggingface.co/models/unknown) -->
+{%- endif %}
 - **Maximum Sequence Length:** {{ model_max_length }} tokens
 - **Maximum Entity Length:** {{ entity_max_length }} words
-{% if dataset_id %}- **Training Dataset:** [{{ dataset_name if dataset_name else dataset_id }}](https://huggingface.co/datasets/{{ dataset_id }}){% endif %}
+{% if dataset_id -%}
+    - **Training Dataset:** [{{ dataset_name if dataset_name else dataset_id }}](https://huggingface.co/datasets/{{ dataset_id }})
+{%- else -%}
+    <!-- - **Training Dataset:** [Unknown](https://huggingface.co/datasets/unknown) -->
+{%- endif %}
 {% if language -%}
-- **Language{{"s" if language is not string and language | length > 1 else ""}}:**
-{%- if language is string %} {{ language }}
-{%- else %}{% for lang in language %} {{ lang }}{{ "," if not loop.last else "" }}{% endfor %}
+    - **Language{{"s" if language is not string and language | length > 1 else ""}}:**
+    {%- if language is string %} {{ language }}
+    {%- else %} {% for lang in language -%}
+            {{ lang }}{{ ", " if not loop.last else "" }}
+        {%- endfor %}
+    {%- endif %}
+{%- else -%}
+    <!-- - **Language:** Unknown -->
 {%- endif %}
+{% if license -%}
+    - **License:** {{ license }}
+{%- else -%}
+    <!-- - **License:** Unknown -->
 {%- endif %}
-{% if license %}- **License:** {{ license }}{% endif %}
 
 ### Model Sources
 
@@ -82,11 +98,9 @@ In short, it is recommended to preprocess your inference text such that all word
 ### Training Set metrics
 {{ train_set_metrics }}{% endif %}{% if hyperparameters %}
 ### Training Hyperparameters
-
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}
 {% endfor %}{% endif %}{% if eval_lines %}
 ### Training Results
-
 {{ eval_lines }}{% endif %}
 ### Framework Versions
 

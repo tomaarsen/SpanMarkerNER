@@ -268,11 +268,13 @@ class SpanMarkerModelCardData(CardData):
         # Compute required formats from the raw data
         if self.eval_results_dict:
             dataset_split = list(self.eval_results_dict.keys())[0].split("_")[0]
+            dataset_id = self.dataset_id or "unknown"
+            dataset_name = self.dataset_name or "Unknown"
             eval_results = [
                 EvalResult(
                     task_type="token-classification",
-                    dataset_type=self.dataset_id,
-                    dataset_name=self.dataset_name,
+                    dataset_type=dataset_id,
+                    dataset_name=dataset_name,
                     metric_type="f1",
                     metric_value=self.eval_results_dict[f"{dataset_split}_overall_f1"],
                     task_name="Named Entity Recognition",
@@ -282,8 +284,8 @@ class SpanMarkerModelCardData(CardData):
                 ),
                 EvalResult(
                     task_type="token-classification",
-                    dataset_type=self.dataset_id,
-                    dataset_name=self.dataset_name,
+                    dataset_type=dataset_id,
+                    dataset_name=dataset_name,
                     metric_type="precision",
                     metric_value=self.eval_results_dict[f"{dataset_split}_overall_precision"],
                     task_name="Named Entity Recognition",
@@ -293,8 +295,8 @@ class SpanMarkerModelCardData(CardData):
                 ),
                 EvalResult(
                     task_type="token-classification",
-                    dataset_type=self.dataset_id,
-                    dataset_name=self.dataset_name,
+                    dataset_type=dataset_id,
+                    dataset_name=dataset_name,
                     metric_type="recall",
                     metric_value=self.eval_results_dict[f"{dataset_split}_overall_recall"],
                     task_name="Named Entity Recognition",
