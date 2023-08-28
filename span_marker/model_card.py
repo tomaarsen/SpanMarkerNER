@@ -14,6 +14,7 @@ from huggingface_hub import CardData, ModelCard, dataset_info, model_info
 from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
 from transformers import TrainerCallback
+from transformers.integrations import CodeCarbonCallback
 from transformers.modelcard import (
     extract_hyperparameters_from_trainer,
     make_markdown_table,
@@ -34,6 +35,12 @@ class ModelCardCallback(TrainerCallback):
     def __init__(self, trainer: "Trainer") -> None:
         super().__init__()
         self.trainer = trainer
+
+        callbacks = [
+            callback for callback in self.trainer.callback_handler.callbacks if isinstance(callback, CodeCarbonCallback)
+        ]
+        if callbacks:
+            trainer.model.model_card_data.code_carbon_callback = callbacks[0]
 
     def on_train_begin(
         self, args: TrainingArguments, state: TrainerState, control: TrainerControl, model: "SpanMarkerModel", **kwargs
@@ -108,6 +115,7 @@ YAML_FIELDS = [
     "pipeline_tag",
     "widget",
     "model-index",
+    "co2_eq_emissions",
 ]
 IGNORED_FIELDS = ["model"]
 
@@ -145,6 +153,7 @@ class SpanMarkerModelCardData(CardData):
     label_example_list: List[Dict[str, str]] = field(default_factory=list, init=False)
     tokenizer_warning: bool = field(default=False, init=False)
     train_set_metrics_list: List[Dict[str, str]] = field(default_factory=list, init=False)
+    code_carbon_callback: Optional[CodeCarbonCallback] = field(default=None, init=False)
 
     # Computed once, always unchanged
     pipeline_tag: str = field(default="token-classification", init=False)
@@ -311,6 +320,16 @@ class SpanMarkerModelCardData(CardData):
         super_dict["label_examples"] = make_markdown_table(self.label_example_list).replace("-:|", "--|")
         super_dict["train_set_metrics"] = make_markdown_table(self.train_set_metrics_list).replace("-:|", "--|")
         super_dict["metrics_table"] = make_markdown_table(self.metric_lines).replace("-:|", "--|")
+        if self.code_carbon_callback and self.code_carbon_callback.tracker:
+            emissions_data = self.code_carbon_callback.tracker._prepare_emissions_data()
+            super_dict["co2_eq_emissions"] = {
+                # * 1000 to convert kg to g
+                "emissions": round(emissions_data.emissions * 1000, 3),
+                "source": "codecarbon",
+                "training_type": "fine-tuning",
+            }
+            # / 3600 to convert seconds to hours
+            super_dict["hours_used"] = round(emissions_data.duration / 3600, 3)
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
 

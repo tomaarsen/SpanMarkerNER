@@ -69,6 +69,8 @@ entities = model.predict("{{ predict_example | default("Amelia Earhart flew her 
 ### Downstream Use
 You can finetune this model on your own dataset.
 
+<details><summary>Click to expand</summary>
+
 ```python
 from span_marker import SpanMarkerModel, Trainer
 
@@ -87,6 +89,7 @@ trainer = Trainer(
 trainer.train()
 trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finetuned")
 ```
+</details>
 {% if tokenizer_warning %}
 ### {{ warn_emoji }} Tokenizer Warning
 The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
@@ -101,7 +104,12 @@ In short, it is recommended to preprocess your inference text such that all word
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}
 {% endfor %}{% endif %}{% if eval_lines %}
 ### Training Results
-{{ eval_lines }}{% endif %}
+{{ eval_lines }}{% endif %}{% if co2_eq_emissions %}
+### Environmental Impact
+Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codecarbon).
+- **Carbon Emitted**: {{ "%.3f"|format(co2_eq_emissions["emissions"] / 1000) }} kg of CO2
+- **Hours Used**: {{ hours_used }} hours
+{% endif %}
 ### Framework Versions
 
 - SpanMarker: {{ version["span_marker"] }}
