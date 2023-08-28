@@ -207,20 +207,30 @@ class Trainer(TransformersTrainer):
             set(dataset.column_names) - set(self.OPTIONAL_COLUMNS) - set(self.REQUIRED_COLUMNS)
         )
         # Normalize the labels to a common format (list of label-start-end tuples)
+        # Also add "entity_count" and "word_count" labels
         dataset = dataset.map(
             label_normalizer,
-            input_columns="ner_tags",
+            input_columns=("tokens", "ner_tags"),
             desc=f"Label normalizing the {dataset_name} dataset",
+            batched=True,
         )
-        # Pick some example entities from each entity class for the model card.
-        if not is_evaluate and not self.model.model_card_data.label_example_list:
-            self.model.model_card_data.set_label_examples(
-                dataset, self.model.config.id2label, self.model.config.outside_id
-            )
+
+        # Setting model card data based on training data
+        if not is_evaluate:
+            # Pick some example entities from each entity class for the model card.
+            if not self.model.model_card_data.label_example_list:
+                self.model.model_card_data.set_label_examples(
+                    dataset, self.model.config.id2label, self.model.config.outside_id
+                )
+            if not self.model.model_card_data.train_set_metrics_list:
+                self.model.model_card_data.set_train_set_metrics(dataset)
 
         # Set some example sentences for the model card widget
         if is_evaluate and not self.model.model_card_data.widget:
             self.model.model_card_data.set_widget_examples(dataset)
+
+        # Remove dataset columns that are only used for model card
+        dataset = dataset.remove_columns(("entity_count", "word_count"))
 
         # Tokenize and add start/end markers
         with tokenizer.entity_tracker(split=dataset_name):

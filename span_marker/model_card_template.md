@@ -36,7 +36,6 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 ## Evaluation
 
 ### Metrics
-
 {{ metrics_table }}{% endif %}
 ## Uses
 
@@ -79,7 +78,9 @@ The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/
 In short, it is recommended to preprocess your inference text such that all words and punctuation are separated by a space. Some potential approaches to convert regular text into this format are NLTK [`word_tokenize`](https://www.nltk.org/api/nltk.tokenize.word_tokenize.html) or spaCy [`Doc`](https://spacy.io/api/doc#iter) and join the resulting words with a space.
 {% endif %}
 ## Training Details
-{% if hyperparameters %}
+{% if train_set_metrics %}
+### Training set metrics
+{{ train_set_metrics }}{% endif %}{% if hyperparameters %}
 ### Training hyperparameters
 
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}

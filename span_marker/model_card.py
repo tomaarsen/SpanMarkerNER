@@ -149,8 +149,9 @@ class SpanMarkerModelCardData(CardData):
     metric_lines: List[Dict[str, float]] = field(default_factory=list, init=False)
     widget: List[Dict[str, str]] = field(default_factory=list, init=False)
     predict_example: Optional[str] = field(default=None, init=False)
-    label_example_list: Optional[List[Dict[str, str]]] = field(default_factory=list, init=False)
+    label_example_list: List[Dict[str, str]] = field(default_factory=list, init=False)
     tokenizer_warning: bool = field(default=False, init=False)
+    train_set_metrics_list: List[Dict[str, str]] = field(default_factory=list, init=False)
 
     # Computed once, always unchanged
     pipeline_tag: str = field(default="token-classification", init=False)
@@ -206,21 +207,33 @@ class SpanMarkerModelCardData(CardData):
 
         def count_entities(sample: Dict[str, Any]) -> Dict[str, int]:
             unique_count = {reduced_label_id for reduced_label_id, _, _ in sample["ner_tags"]}
-            return {
-                "unique_count": len(unique_count),
-                "count": len(sample["ner_tags"]),
-                "word_count": len(sample["tokens"]),
-            }
+            return {"unique_entity_count": len(unique_count)}
 
         example_dataset = (
             example_dataset.map(count_entities)
-            .sort(("unique_count", "count"), reverse=True)
+            .sort(("unique_entity_count", "entity_count"), reverse=True)
             .select(range(example_count))
         )
         self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
 
         shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
         self.predict_example = shortest_example
+
+    def set_train_set_metrics(self, dataset: Dataset) -> None:
+        self.train_set_metrics_list = [
+            {
+                "Training set": "Sentence length",
+                "Min": min(dataset["word_count"]),
+                "Median": sum(dataset["word_count"]) / len(dataset),
+                "Max": max(dataset["word_count"]),
+            },
+            {
+                "Training set": "Entities per sentence",
+                "Min": min(dataset["entity_count"]),
+                "Median": sum(dataset["entity_count"]) / len(dataset),
+                "Max": max(dataset["entity_count"]),
+            },
+        ]
 
     def set_label_examples(self, dataset: Dataset, id2label: Dict[int, str], outside_id: int) -> None:
         num_examples_per_label = 3
@@ -301,8 +314,8 @@ class SpanMarkerModelCardData(CardData):
         super_dict["eval_lines"] = make_markdown_table(self.eval_lines_list)
         # Replace |:---:| with |:---| for left alignment
         super_dict["label_examples"] = make_markdown_table(self.label_example_list).replace("-:|", "--|")
-        if self.metric_lines:
-            super_dict["metrics_table"] = make_markdown_table(self.metric_lines).replace("-:|", "--|")
+        super_dict["train_set_metrics"] = make_markdown_table(self.train_set_metrics_list).replace("-:|", "--|")
+        super_dict["metrics_table"] = make_markdown_table(self.metric_lines).replace("-:|", "--|")
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
 
