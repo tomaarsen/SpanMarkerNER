@@ -1,3 +1,4 @@
+import dataclasses
 import logging
 import math
 from typing import Any, Callable, Dict, List, Optional, Tuple
@@ -106,9 +107,11 @@ class Trainer(TransformersTrainer):
 
         # Set some Training arguments that must be set for SpanMarker
         if args is None:
-            args = TrainingArguments(output_dir="models/my_span_marker_model")
-        args.include_inputs_for_metrics = True
-        args.remove_unused_columns = False
+            args = TrainingArguments(
+                output_dir="models/my_span_marker_model", include_inputs_for_metrics=True, remove_unused_columns=True
+            )
+        else:
+            args = dataclasses.replace(args, include_inputs_for_metrics=True, remove_unused_columns=False)
 
         # Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics
         if compute_metrics is not None:

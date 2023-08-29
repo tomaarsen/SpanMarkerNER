@@ -15,6 +15,23 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.3.0]
+
+### Added
+
+- Added an `overwrite_entities` parameter to the spaCy pipeline component to allow for overwriting spaCy entities.
+- Added `.pipe()` method to spaCy integration to allow for batched inference.
+
+### Changed
+
+- Stop overwriting spaCy entities by default.
+
+## [1.2.5]
+
+### Fixed
+
+- Allow for immutable `TrainingArguments` from newer `transformers` release.
+
 ## [1.2.4]
 
 ### Fixed
