@@ -98,7 +98,7 @@ In short, it is recommended to preprocess your inference text such that all word
 {% endif %}
 ## Training Details
 {% if train_set_metrics %}
-### Training Set metrics
+### Training Set Metrics
 {{ train_set_metrics }}{% endif %}{% if hyperparameters %}
 ### Training Hyperparameters
 {% for name, value in hyperparameters.items() %}- {{ name }}: {{ value }}
