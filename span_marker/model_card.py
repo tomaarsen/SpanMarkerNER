@@ -3,6 +3,7 @@ import os
 import random
 from dataclasses import dataclass, field, fields
 from pathlib import Path
+from platform import python_version
 from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
 
 import datasets
@@ -160,6 +161,7 @@ class SpanMarkerModelCardData(CardData):
     library_name: str = field(default="span-marker", init=False)
     version: Dict[str, str] = field(
         default_factory=lambda: {
+            "python": python_version(),
             "span_marker": span_marker.__version__,
             "transformers": transformers.__version__,
             "torch": torch.__version__,

@@ -118,6 +118,7 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 {% endif %}
 ### Framework Versions
 
+- Python: {{ version["python"] }}
 - SpanMarker: {{ version["span_marker"] }}
 - Transformers : {{ version["transformers"] }}
 - PyTorch: {{ version["torch"] }}
