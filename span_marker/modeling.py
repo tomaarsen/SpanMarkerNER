@@ -269,8 +269,6 @@ class SpanMarkerModel(PreTrainedModel):
             model = super().from_pretrained(
                 pretrained_model_name_or_path, *model_args, config=config, **kwargs, model_card_data=model_card_data
             )
-            # TODO:
-            # model.model_card_data = SpanMarkerModelCardData.from_pretrained(pretrained_model_name_or_path)
 
         # If 'pretrained_model_name_or_path' refers to an encoder (roberta, bert, distilbert, electra, etc.),
         # then initialize it and create the SpanMarker config and model using the encoder and its config.
@@ -605,6 +603,11 @@ class SpanMarkerModel(PreTrainedModel):
             f.write(self.generate_model_card())
 
     def generate_model_card(self) -> str:
+        """Generate and return a model card string based on the model card data.
+
+        Returns:
+            str: The model card string.
+        """
         return generate_model_card(self)
 
     def try_cuda(self, device: Optional[Union[int, device]] = None) -> Self:
