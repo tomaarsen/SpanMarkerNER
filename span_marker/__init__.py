@@ -7,6 +7,7 @@ import torch
 from transformers import AutoConfig, AutoModel, TrainingArguments
 
 from span_marker.configuration import SpanMarkerConfig
+from span_marker.model_card import SpanMarkerModelCardData
 from span_marker.modeling import SpanMarkerModel
 from span_marker.trainer import Trainer
 
