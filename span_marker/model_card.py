@@ -123,6 +123,44 @@ IGNORED_FIELDS = ["model"]
 
 @dataclass
 class SpanMarkerModelCardData(CardData):
+    """A dataclass storing data used in the model card.
+
+    Args:
+        language (Optional[Union[str, List[str]]]): The model language, either a string or a list,
+            e.g. "en" or ["en", "de", "nl"]
+        license: (Optional[str]): The license of the model, e.g. "apache-2.0", "mit"
+            or "cc-by-nc-sa-4.0"
+        model_name: (Optional[str]): The pretty name of the model, e.g. "SpanMarker with mBERT-base on CoNLL03".
+            If not defined, uses encoder_name/encoder_id and dataset_name/dataset_id to generate a model name.
+        model_id: (Optional[str]): The model ID when pushing the model to the Hub,
+            e.g. "tomaarsen/span-marker-mbert-base-multinerd".
+        encoder_name: (Optional[str]): The pretty name of the encoder, e.g. "mBERT-base".
+        encoder_id: (Optional[str]): The model ID of the encoder, e.g. "bert-base-multilingual-cased".
+        dataset_name: (Optional[str]): The pretty name of the dataset, e.g. "CoNLL03".
+        dataset_id: (Optional[str]): The dataset ID of the dataset, e.g. "tner/bionlp2004".
+        dataset_revision: (Optional[str]): The dataset revision/commit that was for training/evaluation.
+
+    Example::
+
+        >>> model = SpanMarkerModel.from_pretrained(
+        ...     "bert-base-uncased",
+        ...     labels=["O", "B-DNA", "I-DNA", "B-protein", ...],
+        ...     # SpanMarker hyperparameters:
+        ...     model_max_length=256,
+        ...     marker_max_length=128,
+        ...     entity_max_length=8,
+        ...     # Model card variables
+        ...     model_card_data=SpanMarkerModelCardData(
+        ...         model_id="tomaarsen/span-marker-bbu-bionlp",
+        ...         encoder_id="bert-base-uncased",
+        ...         dataset_name="BioNLP2004,
+        ...         dataset_id="tner/bionlp2004",
+        ...         license="apache-2.0",
+        ...         language="en",
+        ...     ),
+        ... )
+    """
+
     # Potentially provided by the user
     language: Optional[Union[str, List[str]]] = None
     license: Optional[str] = None
