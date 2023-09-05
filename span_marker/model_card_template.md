@@ -108,7 +108,13 @@ In short, it is recommended to preprocess your inference text such that all word
 ### Environmental Impact
 Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codecarbon).
 - **Carbon Emitted**: {{ "%.3f"|format(co2_eq_emissions["emissions"] / 1000) }} kg of CO2
-- **Hours Used**: {{ hours_used }} hours
+- **Hours Used**: {{ co2_eq_emissions["hours_used"] }} hours
+
+### Training Hardware
+- **On Cloud**: {{ "Yes" if co2_eq_emissions["on_cloud"] else "No" }}
+- **GPU Model**: {{ co2_eq_emissions["gpu_model"] }}
+- **CPU Model**: {{ co2_eq_emissions["cpu_model"] }}
+- **RAM Size**: {{ "%.2f"|format(co2_eq_emissions["ram_total_size"]) }} GB
 {% endif %}
 ### Framework Versions
 

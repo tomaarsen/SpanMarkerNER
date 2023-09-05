@@ -327,9 +327,12 @@ class SpanMarkerModelCardData(CardData):
                 "emissions": round(emissions_data.emissions * 1000, 3),
                 "source": "codecarbon",
                 "training_type": "fine-tuning",
+                "on_cloud": emissions_data.on_cloud == "Y",
+                "gpu_model": emissions_data.gpu_model,
+                "cpu_model": emissions_data.cpu_model,
+                "ram_total_size": emissions_data.ram_total_size,
+                "hours_used": round(emissions_data.duration / 3600, 3),
             }
-            # / 3600 to convert seconds to hours
-            super_dict["hours_used"] = round(emissions_data.duration / 3600, 3)
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
 
