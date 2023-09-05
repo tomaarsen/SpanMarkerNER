@@ -147,8 +147,8 @@ class Trainer(TransformersTrainer):
 
         # If the model ID is set via the TrainingArguments, but not via the SpanMarkerModelCardData,
         # then we can set it here for the model card regardless
-        if args.hub_model_id and not self.model.model_card_data.model_id:
-            self.model.model_card_data.model_id = args.hub_model_id
+        if args.hub_model_id and not model.model_card_data.model_id:
+            model.model_card_data.model_id = args.hub_model_id
 
         super().__init__(
             model=model,
