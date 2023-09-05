@@ -1,12 +1,14 @@
 from datasets import load_dataset
 from transformers import TrainingArguments
 
-from span_marker import SpanMarkerModel, Trainer
+from span_marker import SpanMarkerModel, SpanMarkerModelCardData, Trainer
 
 
 def main() -> None:
     # Load the dataset, ensure "tokens" and "ner_tags" columns, and get a list of labels
-    dataset = load_dataset("tner/ontonotes5")
+    dataset_id = "tner/ontonotes5"
+    dataset_name = "OntoNotes v5"
+    dataset = load_dataset(dataset_id)
     dataset = dataset.rename_column("tags", "ner_tags")
     labels = [
         "O",
@@ -49,14 +51,23 @@ def main() -> None:
     ]
 
     # Initialize a SpanMarker model using a pretrained BERT-style encoder
-    model_name = "roberta-large"
+    encoder_id = "roberta-large"
     model = SpanMarkerModel.from_pretrained(
-        model_name,
+        encoder_id,
         labels=labels,
         # SpanMarker hyperparameters:
         model_max_length=256,
         marker_max_length=128,
         entity_max_length=10,
+        # Model card arguments
+        model_card_data=SpanMarkerModelCardData(
+            model_id=f"tomaarsen/span-marker-{encoder_id}-ontonotes5",
+            encoder_id=encoder_id,
+            dataset_name=dataset_name,
+            dataset_id=dataset_id,
+            license="other",
+            language="en",
+        ),
     )
 
     # Prepare the 🤗 transformers training arguments

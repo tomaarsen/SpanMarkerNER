@@ -46,25 +46,36 @@ Please have a look at our [Getting Started](notebooks/getting_started.ipynb) not
 ```python
 from datasets import load_dataset
 from transformers import TrainingArguments
-from span_marker import SpanMarkerModel, Trainer
+from span_marker import SpanMarkerModel, Trainer, SpanMarkerModelCardData
 
 
 def main() -> None:
     # Load the dataset, ensure "tokens" and "ner_tags" columns, and get a list of labels
-    dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
+    dataset_id = "DFKI-SLT/few-nerd"
+    dataset_name = "FewNERD"
+    dataset = load_dataset(dataset_id, "supervised")
     dataset = dataset.remove_columns("ner_tags")
     dataset = dataset.rename_column("fine_ner_tags", "ner_tags")
     labels = dataset["train"].features["ner_tags"].feature.names
 
     # Initialize a SpanMarker model using a pretrained BERT-style encoder
-    model_name = "bert-base-cased"
+    encoder_id = "bert-base-cased"
     model = SpanMarkerModel.from_pretrained(
-        model_name,
+        encoder_id,
         labels=labels,
         # SpanMarker hyperparameters:
         model_max_length=256,
         marker_max_length=128,
         entity_max_length=8,
+        # Model card arguments
+        model_card_data=SpanMarkerModelCardData(
+            model_id="tomaarsen/span-marker-bert-base-fewnerd-fine-super",
+            encoder_id=encoder_id,
+            dataset_name=dataset_name,
+            dataset_id=dataset_id,
+            license="cc-by-sa-4.0",
+            language="en",
+        ),
     )
 
     # Prepare the 🤗 transformers training arguments
@@ -120,8 +131,6 @@ entities = model.predict("Amelia Earhart flew her single engine Lockheed Vega 5B
  {'span': 'Atlantic', 'label': 'location-bodiesofwater', 'score': 0.7587679028511047, 'char_start_index': 66, 'char_end_index': 74},
  {'span': 'Paris', 'label': 'location-GPE', 'score': 0.9892390966415405, 'char_start_index': 78, 'char_end_index': 83}]
 ```
-
-<!-- Because this work is based on [PL-Marker](https://arxiv.org/pdf/2109.06067v5.pdf), you may expect similar results to its [Papers with Code Leaderboard](https://paperswithcode.com/paper/pack-together-entity-and-relation-extraction) results. -->
 
 ## Pretrained Models
 

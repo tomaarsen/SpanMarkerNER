@@ -1,23 +1,34 @@
 from datasets import load_dataset
 from transformers import TrainingArguments
 
-from span_marker import SpanMarkerModel, Trainer
+from span_marker import SpanMarkerModel, SpanMarkerModelCardData, Trainer
 
 
 def main() -> None:
     # Load the dataset, ensure "tokens" and "ner_tags" columns, and get a list of labels
-    dataset = load_dataset("conll2003")
+    dataset_id = "conll2003"
+    dataset_name = "CoNLL 2003"
+    dataset = load_dataset(dataset_id)
     labels = dataset["train"].features["ner_tags"].feature.names
 
     # Initialize a SpanMarker model using a pretrained BERT-style encoder
-    model_name = "xlm-roberta-large"
+    encoder_id = "xlm-roberta-large"
     model = SpanMarkerModel.from_pretrained(
-        model_name,
+        encoder_id,
         labels=labels,
         # SpanMarker hyperparameters:
         model_max_length=128,
         marker_max_length=64,
         entity_max_length=6,
+        # Model card arguments
+        model_card_data=SpanMarkerModelCardData(
+            model_id="tomaarsen/span-marker-xlm-roberta-large-conll03",
+            encoder_id=encoder_id,
+            dataset_name=dataset_name,
+            dataset_id=dataset_id,
+            license="other",
+            language="en",
+        ),
     )
 
     # Prepare the 🤗 transformers training arguments
