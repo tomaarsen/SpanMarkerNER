@@ -41,7 +41,9 @@ def test_trainer_standard(
         assert model.config.trained_with_document_context
     metrics = trainer.evaluate()
     assert isinstance(metrics, dict)
-    assert set(metrics.keys()) == {
+    labels = {label for label, _id in model.config.label2id.items() if _id != model.config.outside_id}
+    keys = {f"eval_{label}" for label in labels}
+    assert set(metrics.keys()) <= {
         "eval_loss",
         "eval_overall_f1",
         "eval_overall_recall",
@@ -51,7 +53,11 @@ def test_trainer_standard(
         "eval_samples_per_second",
         "eval_steps_per_second",
         "epoch",
+        *keys,
     }
+    for key in keys:
+        if key in metrics:
+            assert metrics[key].keys() == {"f1", "number", "precision", "recall"}
 
     # Try saving and loading the model
     model_path = tmp_path / model_fixture / dataset_fixture
