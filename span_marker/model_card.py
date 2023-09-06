@@ -255,7 +255,7 @@ class SpanMarkerModelCardData(CardData):
         example_dataset = (
             example_dataset.map(count_entities)
             .sort(("unique_entity_count", "entity_count"), reverse=True)
-            .select(range(example_count))
+            .select(range(min(len(example_dataset), example_count)))
         )
         self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
 
