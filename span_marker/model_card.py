@@ -117,6 +117,7 @@ YAML_FIELDS = [
     "widget",
     "model-index",
     "co2_eq_emissions",
+    "base_model",
 ]
 IGNORED_FIELDS = ["model"]
 
@@ -375,6 +376,8 @@ class SpanMarkerModelCardData(CardData):
             }
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
+        if self.encoder_id:
+            super_dict["base_model"] = self.encoder_id
 
         for key in IGNORED_FIELDS:
             super_dict.pop(key, None)
