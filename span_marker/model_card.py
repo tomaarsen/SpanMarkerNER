@@ -368,7 +368,7 @@ class SpanMarkerModelCardData(CardData):
                 "source": "codecarbon",
                 "training_type": "fine-tuning",
                 "on_cloud": emissions_data.on_cloud == "Y",
-                "gpu_model": emissions_data.gpu_model,
+                "hardware_used": emissions_data.gpu_model,
                 "cpu_model": emissions_data.cpu_model,
                 "ram_total_size": emissions_data.ram_total_size,
                 "hours_used": round(emissions_data.duration / 3600, 3),
