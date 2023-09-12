@@ -90,12 +90,29 @@ trainer.train()
 trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finetuned")
 ```
 </details>
+
+<!--
+### Out-of-Scope Use
+
+*List how the model may foreseeably be misused and address what users ought not do with the model.*
+-->
 {% if tokenizer_warning %}
 ### {{ warn_emoji }} Tokenizer Warning
 The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
 
 In short, it is recommended to preprocess your inference text such that all words and punctuation are separated by a space. Some potential approaches to convert regular text into this format are NLTK [`word_tokenize`](https://www.nltk.org/api/nltk.tokenize.word_tokenize.html) or spaCy [`Doc`](https://spacy.io/api/doc#iter) and join the resulting words with a space.
 {% endif %}
+<!--
+## Bias, Risks and Limitations
+
+*What are the known or foreseeable issues stemming from this model?*
+-->
+<!--
+### Recommendations
+
+*What are recommendations with respect to the foreseeable issues? For example, filtering explicit content.*
+-->
+
 ## Training Details
 {% if train_set_metrics %}
 ### Training Set Metrics
@@ -124,3 +141,30 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 - PyTorch: {{ version["torch"] }}
 - Datasets: {{ version["datasets"] }}
 - Tokenizers: {{ version["tokenizers"] }}
+
+## Citation
+### BibTeX
+```
+@software{Aarsen_SpanMarker,
+    author = {Aarsen, Tom},
+    license = {Apache-2.0},
+    title = {{"{{SpanMarker for Named Entity Recognition}}"}},
+    url = {https://github.com/tomaarsen/SpanMarkerNER}
+}
+```
+
+<!--
+## Glossary
+
+*Clearly define terms in order to be accessible across audiences.*
+-->
+<!--
+## Model Card Authors
+
+*Lists the people who create the model card, providing recognition and accountability for the detailed work that goes into its construction.*
+-->
+<!--
+## Model Card Contact
+
+*Provides a way for people who have updates to the Model Card, suggestions, or questions, to contact the Model Card authors.*
+-->
