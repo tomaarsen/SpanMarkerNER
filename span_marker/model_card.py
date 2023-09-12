@@ -216,7 +216,8 @@ class SpanMarkerModelCardData(CardData):
 
     def __post_init__(self):
         # We don't want to save "ignore_metadata_errors" in our Model Card
-        if self.dataset_id and not is_on_huggingface(self.dataset_id, is_model=False):
+        dataset_on_hub = is_on_huggingface(self.dataset_id, is_model=False)
+        if self.dataset_id and not dataset_on_hub:
             logger.warning(
                 f"The provided {self.dataset_id!r} dataset could not be found on the Hugging Face Hub."
                 " Setting `dataset_id` to None."
@@ -236,6 +237,15 @@ class SpanMarkerModelCardData(CardData):
                 ' such as "tomaarsen/span-marker-mbert-base-multinerd". Setting `model_id` to None.'
             )
             self.model_id = None
+
+        # if languages are not set, try to determine the language from the dataset on the Hub
+        if dataset_on_hub and self.dataset_id:
+            try:
+                info = dataset_info(self.dataset_id)
+            except:
+                pass
+            else:
+                self.language = info.cardData.get("language", self.language)
 
     def set_widget_examples(self, dataset: Dataset) -> None:
         # Out of `sample_subset_size=100` random samples, select `example_count=5` good examples
