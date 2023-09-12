@@ -6,7 +6,7 @@ from span_marker.model_card import generate_model_card
 from span_marker.modeling import SpanMarkerModel
 
 
-@pytest.skip(reason="Model card generation has changed significantly.")
+@pytest.mark.skip(reason="Model card generation has changed significantly.")
 def test_model_card(finetuned_fewnerd_span_marker_model: SpanMarkerModel, tmp_path: Path) -> None:
     config = finetuned_fewnerd_span_marker_model.config
     model_card = generate_model_card(tmp_path, config)
