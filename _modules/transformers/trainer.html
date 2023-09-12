@@ -175,9 +175,9 @@
 <span class="kn">from</span> <span class="nn">.configuration_utils</span> <span class="kn">import</span> <span class="n">PretrainedConfig</span>
 <span class="kn">from</span> <span class="nn">.data.data_collator</span> <span class="kn">import</span> <span class="n">DataCollator</span><span class="p">,</span> <span class="n">DataCollatorWithPadding</span><span class="p">,</span> <span class="n">default_data_collator</span>
 <span class="kn">from</span> <span class="nn">.debug_utils</span> <span class="kn">import</span> <span class="n">DebugOption</span><span class="p">,</span> <span class="n">DebugUnderflowOverflow</span>
-<span class="kn">from</span> <span class="nn">.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span>
 <span class="kn">from</span> <span class="nn">.dependency_versions_check</span> <span class="kn">import</span> <span class="n">dep_version_check</span>
 <span class="kn">from</span> <span class="nn">.hyperparameter_search</span> <span class="kn">import</span> <span class="n">ALL_HYPERPARAMETER_SEARCH_BACKENDS</span><span class="p">,</span> <span class="n">default_hp_search_backend</span>
+<span class="kn">from</span> <span class="nn">.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span>
 <span class="kn">from</span> <span class="nn">.modelcard</span> <span class="kn">import</span> <span class="n">TrainingSummary</span>
 <span class="kn">from</span> <span class="nn">.modeling_utils</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">load_sharded_checkpoint</span><span class="p">,</span> <span class="n">unwrap_model</span>
 <span class="kn">from</span> <span class="nn">.models.auto.modeling_auto</span> <span class="kn">import</span> <span class="n">MODEL_FOR_CAUSAL_LM_MAPPING_NAMES</span><span class="p">,</span> <span class="n">MODEL_MAPPING_NAMES</span>
@@ -210,6 +210,7 @@
     <span class="n">nested_numpify</span><span class="p">,</span>
     <span class="n">nested_xla_mesh_reduce</span><span class="p">,</span>
     <span class="n">reissue_pt_warnings</span><span class="p">,</span>
+    <span class="n">remove_dummy_checkpoint</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">.trainer_utils</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">PREFIX_CHECKPOINT_DIR</span><span class="p">,</span>
@@ -339,6 +340,7 @@
 <span class="n">TRAINING_ARGS_NAME</span> <span class="o">=</span> <span class="s2">&quot;training_args.bin&quot;</span>
 <span class="n">TRAINER_STATE_NAME</span> <span class="o">=</span> <span class="s2">&quot;trainer_state.json&quot;</span>
 <span class="n">OPTIMIZER_NAME</span> <span class="o">=</span> <span class="s2">&quot;optimizer.pt&quot;</span>
+<span class="n">OPTIMIZER_NAME_BIN</span> <span class="o">=</span> <span class="s2">&quot;optimizer.bin&quot;</span>
 <span class="n">SCHEDULER_NAME</span> <span class="o">=</span> <span class="s2">&quot;scheduler.pt&quot;</span>
 <span class="n">SCALER_NAME</span> <span class="o">=</span> <span class="s2">&quot;scaler.pt&quot;</span>
 
@@ -513,7 +515,7 @@
                 <span class="p">)</span>
 
         <span class="c1"># At this stage the model is already loaded</span>
-        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_quantized&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;is_quantized&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;_hf_peft_config_loaded&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;_is_quantized_training_enabled&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s2">&quot;The model is quantized. To train this model you need to add additional modules&quot;</span>
@@ -1287,8 +1289,6 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">hp_search_backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">WANDB</span><span class="p">:</span>
             <span class="n">params</span> <span class="o">=</span> <span class="n">trial</span>
 
-        <span class="c1"># Unfreeze args for hyperparameter search</span>
-        <span class="nb">delattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;_frozen&quot;</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -1314,14 +1314,12 @@
             <span class="c1"># Rebuild the deepspeed config to reflect the updated training parameters</span>
             <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="n">DeepSpeedPlugin</span>
 
-            <span class="kn">from</span> <span class="nn">transformers.deepspeed</span> <span class="kn">import</span> <span class="n">HfTrainerDeepSpeedConfig</span>
+            <span class="kn">from</span> <span class="nn">transformers.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">HfTrainerDeepSpeedConfig</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">hf_deepspeed_config</span> <span class="o">=</span> <span class="n">HfTrainerDeepSpeedConfig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">hf_deepspeed_config</span><span class="o">.</span><span class="n">trainer_config_process</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed_plugin</span> <span class="o">=</span> <span class="n">DeepSpeedPlugin</span><span class="p">(</span><span class="n">hf_ds_config</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">hf_deepspeed_config</span><span class="p">)</span>
 
-        <span class="c1"># Re-freeze them</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;_frozen&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">create_accelerator_and_postprocess</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="nf">_report_to_hp_search</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;optuna.Trial&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]],</span> <span class="n">step</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]):</span>
@@ -2479,16 +2477,12 @@
                     <span class="n">partial</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">v3</span><span class="o">=</span><span class="n">smp</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">cfg</span><span class="o">.</span><span class="n">shard_optimizer_state</span><span class="p">,</span>
                 <span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught_warnings</span><span class="p">:</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SCHEDULER_NAME</span><span class="p">))</span>
-                <span class="n">reissue_pt_warnings</span><span class="p">(</span><span class="n">caught_warnings</span><span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">do_grad_scaling</span><span class="p">:</span>
-                    <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scaler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SCALER_NAME</span><span class="p">))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fsdp</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">):</span>
             <span class="c1"># deepspeed.save_checkpoint above saves model/optim/sched</span>
             <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
 
+        <span class="c1"># Save SCHEDULER &amp; SCALER</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught_warnings</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SCHEDULER_NAME</span><span class="p">))</span>
             <span class="n">reissue_pt_warnings</span><span class="p">(</span><span class="n">caught_warnings</span><span class="p">)</span>
@@ -2559,7 +2553,10 @@
         <span class="n">checkpoint_file_exists</span> <span class="o">=</span> <span class="p">(</span>
             <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;_*&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span>
-            <span class="k">else</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
+            <span class="k">else</span> <span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
+                <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME_BIN</span><span class="p">))</span>
+            <span class="p">)</span>
         <span class="p">)</span>
         <span class="k">if</span> <span class="n">checkpoint_file_exists</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">SCHEDULER_NAME</span><span class="p">)):</span>
             <span class="c1"># Load in optimizer and scheduler states</span>
@@ -2903,12 +2900,8 @@
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="n">state_dict</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
-                <span class="c1"># remove the dummy state_dict saved above</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-                    <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="p">[</span><span class="n">WEIGHTS_NAME</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">]:</span>
-                        <span class="n">file</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">file</span><span class="p">):</span>
-                            <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+                <span class="c1"># remove the dummy state_dict</span>
+                <span class="n">remove_dummy_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="p">[</span><span class="n">WEIGHTS_NAME</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">])</span>
                 <span class="n">save_fsdp_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">fsdp_plugin</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
@@ -2924,6 +2917,9 @@
                     <span class="s2">&quot; stage3_gather_16bit_weights_on_model_save=false. Saving the full checkpoint instead, use&quot;</span>
                     <span class="s2">&quot; zero_to_fp32.py to recover weights&quot;</span>
                 <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_save</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">state_dict</span><span class="o">=</span><span class="p">{})</span>
+                <span class="c1"># remove the dummy state_dict</span>
+                <span class="n">remove_dummy_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">,</span> <span class="n">output_dir</span><span class="p">,</span> <span class="p">[</span><span class="n">WEIGHTS_NAME</span><span class="p">,</span> <span class="n">SAFE_WEIGHTS_NAME</span><span class="p">])</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model_wrapped</span><span class="o">.</span><span class="n">save_checkpoint</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
 
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
@@ -3319,7 +3315,11 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_prediction_step</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
 
             <span class="c1"># Gather all tensors and put them back on the CPU if we have done enough accumulation steps.</span>
-            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">sync_gradients</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">(</span>
+                <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span>
+                <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">sync_gradients</span>
+            <span class="p">):</span>
                 <span class="k">if</span> <span class="n">losses_host</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="n">losses</span> <span class="o">=</span> <span class="n">nested_numpify</span><span class="p">(</span><span class="n">losses_host</span><span class="p">)</span>
                     <span class="n">all_losses</span> <span class="o">=</span> <span class="n">losses</span> <span class="k">if</span> <span class="n">all_losses</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">((</span><span class="n">all_losses</span><span class="p">,</span> <span class="n">losses</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
@@ -4025,10 +4025,19 @@
             <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">limit_all_gathers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
                 <span class="s2">&quot;limit_all_gathers&quot;</span><span class="p">,</span> <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">limit_all_gathers</span>
             <span class="p">)</span>
+            <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">activation_checkpointing</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">fsdp_config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="s2">&quot;activation_checkpointing&quot;</span><span class="p">,</span> <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">activation_checkpointing</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">fsdp_plugin</span><span class="o">.</span><span class="n">activation_checkpointing</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">gradient_checkpointing</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;The activation_checkpointing in FSDP config and the gradient_checkpointing in training arg &quot;</span>
+                    <span class="s2">&quot;can&#39;t be set to True simultaneously. Please use FSDP&#39;s activation_checkpointing logic &quot;</span>
+                    <span class="s2">&quot;when using FSDP.&quot;</span>
+                <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="s2">&quot;hf_deepspeed_config&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="kn">from</span> <span class="nn">transformers.deepspeed</span> <span class="kn">import</span> <span class="n">HfTrainerDeepSpeedConfig</span>
+                <span class="kn">from</span> <span class="nn">transformers.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">HfTrainerDeepSpeedConfig</span>
 
                 <span class="n">ds_plugin</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">deepspeed_plugin</span>
 
