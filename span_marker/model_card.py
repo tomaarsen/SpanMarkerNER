@@ -387,12 +387,13 @@ class SpanMarkerModelCardData(CardData):
             super_dict["datasets"] = [self.dataset_id]
         if self.encoder_id:
             super_dict["base_model"] = self.encoder_id
+        super_dict["model_max_length"] = self.model.tokenizer.model_max_length
 
         for key in IGNORED_FIELDS:
             super_dict.pop(key, None)
         return {
-            **super_dict,
             **self.model.config.to_dict(),
+            **super_dict,
         }
 
     def to_yaml(self, line_break=None) -> str:

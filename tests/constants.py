@@ -124,4 +124,4 @@ FABNER_LABELS = [
 ]
 TINY_BERT = "prajjwal1/bert-tiny"
 
-DEFAULT_ARGS = TrainingArguments(output_dir="models/my_span_marker_model", report_to="none")
+DEFAULT_ARGS = TrainingArguments(output_dir="models/my_span_marker_model", report_to="none", num_train_epochs=1)
