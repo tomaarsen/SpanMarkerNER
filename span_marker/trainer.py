@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import math
+import os
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
@@ -446,3 +447,11 @@ class Trainer(TransformersTrainer):
             f"Consider using `{self.model.__class__.__name__}.predict` instead."
         )
         return super().predict(test_dataset, ignore_keys, metric_key_prefix)
+
+    def create_model_card(self, *_args, **_kwargs) -> None:
+        """
+        Creates a draft of a model card using the information available to the `Trainer`,
+        the `SetFitModel` and the `SpanMarkerModelCardData`.
+        """
+        with open(os.path.join(self.args.output_dir, "README.md"), "w") as f:
+            f.write(self.model.generate_model_card())
