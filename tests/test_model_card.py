@@ -41,7 +41,6 @@ def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -
         evaluation_strategy="steps",
         num_train_epochs=1,
     )
-    # breakpoint()
     trainer = Trainer(
         model=model,
         args=args,
