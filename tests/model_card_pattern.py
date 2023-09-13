@@ -27,8 +27,8 @@ co2_eq_emissions:
   source: codecarbon
   training_type: fine-tuning
   on_cloud: (false|true)
-  hardware_used: .+
-  cpu_model: .+
+(  hardware_used: .+
+)?  cpu_model: .+
   ram_total_size: [\d\.]+
   hours_used: [\d\.]+
 base_model: prajjwal1/bert-tiny
@@ -215,5 +215,5 @@ Carbon emissions were measured using \[CodeCarbon\]\(https://github.com/mlco2/co
 
 \*Provides a way for people who have updates to the Model Card, suggestions, or questions, to contact the Model Card authors\.\*
 -->""",
-    flags=re.IGNORECASE | re.DOTALL,
+    flags=re.DOTALL,
 )
