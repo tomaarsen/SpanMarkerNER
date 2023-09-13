@@ -109,7 +109,7 @@ class Trainer(TransformersTrainer):
         # Set some Training arguments that must be set for SpanMarker
         if args is None:
             args = TrainingArguments(
-                output_dir="models/my_span_marker_model", include_inputs_for_metrics=True, remove_unused_columns=True
+                output_dir="models/my_span_marker_model", include_inputs_for_metrics=True, remove_unused_columns=False
             )
         else:
             args = dataclasses.replace(args, include_inputs_for_metrics=True, remove_unused_columns=False)
@@ -453,5 +453,5 @@ class Trainer(TransformersTrainer):
         Creates a draft of a model card using the information available to the `Trainer`,
         the `SetFitModel` and the `SpanMarkerModelCardData`.
         """
-        with open(os.path.join(self.args.output_dir, "README.md"), "w") as f:
+        with open(os.path.join(self.args.output_dir, "README.md"), "w", encoding="utf8") as f:
             f.write(self.model.generate_model_card())
