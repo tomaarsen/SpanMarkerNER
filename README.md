@@ -189,4 +189,4 @@ I have developed this library as a part of my thesis work at [Argilla](https://g
 See [CHANGELOG.md](CHANGELOG.md) for news on all SpanMarker versions.
 
 ## License
-See [LICENSE](LICENSE.md) for the current license.
+See [LICENSE](LICENSE) for the current license.
