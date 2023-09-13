@@ -144,6 +144,7 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 - Tokenizers: {{ version["tokenizers"] }}
 
 ## Citation
+
 ### BibTeX
 ```
 @software{Aarsen_SpanMarker,
