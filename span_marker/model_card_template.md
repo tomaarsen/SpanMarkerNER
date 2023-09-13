@@ -107,6 +107,7 @@ In short, it is recommended to preprocess your inference text such that all word
 
 *What are the known or foreseeable issues stemming from this model?*
 -->
+
 <!--
 ### Recommendations
 
@@ -158,11 +159,13 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 
 *Clearly define terms in order to be accessible across audiences.*
 -->
+
 <!--
 ## Model Card Authors
 
 *Lists the people who create the model card, providing recognition and accountability for the detailed work that goes into its construction.*
 -->
+
 <!--
 ## Model Card Contact
 
