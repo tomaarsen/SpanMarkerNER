@@ -23,7 +23,7 @@ widget:
 - text: .*
 pipeline_tag: token-classification
 co2_eq_emissions:
-  emissions: [\d\.]+
+  emissions: [\d\.\-e]+
   source: codecarbon
   training_type: fine-tuning
   on_cloud: (false|true)
