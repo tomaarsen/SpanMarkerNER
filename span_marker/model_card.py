@@ -399,7 +399,7 @@ class SpanMarkerModelCardData(CardData):
 
     def to_yaml(self, line_break=None) -> str:
         return yaml_dump(
-            {key: value for key, value in self.to_dict().items() if key in YAML_FIELDS},
+            {key: value for key, value in self.to_dict().items() if key in YAML_FIELDS and value is not None},
             sort_keys=False,
             line_break=line_break,
         ).strip()
