@@ -374,7 +374,7 @@ class SpanMarkerModelCardData(CardData):
             emissions_data = self.code_carbon_callback.tracker._prepare_emissions_data()
             super_dict["co2_eq_emissions"] = {
                 # * 1000 to convert kg to g
-                "emissions": round(emissions_data.emissions * 1000, 3),
+                "emissions": float(emissions_data.emissions),
                 "source": "codecarbon",
                 "training_type": "fine-tuning",
                 "on_cloud": emissions_data.on_cloud == "Y",
