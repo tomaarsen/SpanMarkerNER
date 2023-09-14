@@ -254,7 +254,7 @@ def test_trainer_tokenizer_warning(
             "text is in the former style.\nIn short, please recognize that your inference text should be "
             "preprocessed so that all words and punctuation are separated by a space. Some potential "
             "approaches to convert regular text into this format are NLTK `word_tokenize` or spaCy `Doc`"
-            " and join the resulting words with a space."
+            " and joining the resulting words with a space."
             for (_, level, text) in caplog.record_tuples
         ]
     )
