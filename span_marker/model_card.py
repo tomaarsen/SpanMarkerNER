@@ -378,11 +378,12 @@ class SpanMarkerModelCardData(CardData):
                 "source": "codecarbon",
                 "training_type": "fine-tuning",
                 "on_cloud": emissions_data.on_cloud == "Y",
-                "hardware_used": emissions_data.gpu_model,
                 "cpu_model": emissions_data.cpu_model,
                 "ram_total_size": emissions_data.ram_total_size,
                 "hours_used": round(emissions_data.duration / 3600, 3),
             }
+            if emissions_data.gpu_model:
+                super_dict["co2_eq_emissions"]["hardware_used"] = emissions_data.gpu_model
         if self.dataset_id:
             super_dict["datasets"] = [self.dataset_id]
         if self.encoder_id:
