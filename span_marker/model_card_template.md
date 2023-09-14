@@ -55,7 +55,7 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 {{ metrics_table }}{% endif %}
 ## Uses
 
-### Direct Use
+### Direct Use for Inference
 
 ```python
 from span_marker import SpanMarkerModel
@@ -94,7 +94,7 @@ trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finet
 <!--
 ### Out-of-Scope Use
 
-*List how the model may foreseeably be misused and address what users ought not do with the model.*
+*List how the model may foreseeably be misused and address what users ought not to do with the model.*
 -->
 {% if tokenizer_warning %}
 ### {{ warn_emoji }} Tokenizer Warning
@@ -105,7 +105,7 @@ In short, it is recommended to preprocess your inference text such that all word
 <!--
 ## Bias, Risks and Limitations
 
-*What are the known or foreseeable issues stemming from this model?*
+*What are the known or foreseeable issues stemming from this model? You could also flag here known failure cases or weaknesses of the model.*
 -->
 
 <!--
