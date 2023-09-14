@@ -30,8 +30,8 @@ co2_eq_emissions:
   cpu_model: .+
   ram_total_size: [\d\.]+
   hours_used: [\d\.]+
-(  hardware_used: .+)?
-base_model: prajjwal1/bert-tiny
+(  hardware_used: .+
+)?base_model: prajjwal1/bert-tiny
 model-index:
 - name: SpanMarker with prajjwal1/bert-tiny on CoNLL 2003
   results:

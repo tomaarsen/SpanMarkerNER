@@ -130,7 +130,7 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 
 ### Training Hardware
 - **On Cloud**: {{ "Yes" if co2_eq_emissions["on_cloud"] else "No" }}
-- **GPU Model**: {{ co2_eq_emissions["hardware_used"] }}
+- **GPU Model**: {{ co2_eq_emissions["hardware_used"] or "No GPU used" }}
 - **CPU Model**: {{ co2_eq_emissions["cpu_model"] }}
 - **RAM Size**: {{ "%.2f"|format(co2_eq_emissions["ram_total_size"]) }} GB
 {% endif %}
