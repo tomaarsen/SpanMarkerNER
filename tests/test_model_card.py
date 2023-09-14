@@ -101,3 +101,4 @@ def test_model_card_warnings(caplog: pytest.LogCaptureFixture):
 
 def test_is_on_huggingface_edge_case() -> None:
     assert not is_on_huggingface("test_value")
+    assert not is_on_huggingface("a/test/value")
