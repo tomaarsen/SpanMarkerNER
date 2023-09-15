@@ -44,6 +44,7 @@ Please have a look at our [Getting Started](notebooks/getting_started.ipynb) not
 | [![Open In Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Kaggle](https://kaggle.com/static/images/open-in-kaggle.svg)](https://kaggle.com/kernels/welcome?src=https://github.com/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Gradient](https://assets.paperspace.io/img/gradient-badge.svg)](https://console.paperspace.com/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       | [![Open In SageMaker Studio Lab](https://studiolab.sagemaker.aws/studiolab.svg)](https://studiolab.sagemaker.aws/import/github/tomaarsen/SpanMarkerNER/blob/main/notebooks/getting_started.ipynb)                       |
 
 ```python
+from pathlib import Path
 from datasets import load_dataset
 from transformers import TrainingArguments
 from span_marker import SpanMarkerModel, Trainer, SpanMarkerModelCardData
@@ -57,9 +58,11 @@ def main() -> None:
     dataset = dataset.remove_columns("ner_tags")
     dataset = dataset.rename_column("fine_ner_tags", "ner_tags")
     labels = dataset["train"].features["ner_tags"].feature.names
+    # ['O', 'art-broadcastprogram', 'art-film', 'art-music', 'art-other', ...
 
     # Initialize a SpanMarker model using a pretrained BERT-style encoder
     encoder_id = "bert-base-cased"
+    model_id = f"tomaarsen/span-marker-{encoder_id}-fewnerd-fine-super"
     model = SpanMarkerModel.from_pretrained(
         encoder_id,
         labels=labels,
@@ -69,7 +72,7 @@ def main() -> None:
         entity_max_length=8,
         # Model card arguments
         model_card_data=SpanMarkerModelCardData(
-            model_id="tomaarsen/span-marker-bert-base-fewnerd-fine-super",
+            model_id=model_id,
             encoder_id=encoder_id,
             dataset_name=dataset_name,
             dataset_id=dataset_id,
@@ -79,8 +82,9 @@ def main() -> None:
     )
 
     # Prepare the 🤗 transformers training arguments
+    output_dir = Path("models") / model_id
     args = TrainingArguments(
-        output_dir="models/span_marker_bert_base_cased_fewnerd_fine_super",
+        output_dir=output_dir,
         # Training Hyperparameters:
         learning_rate=5e-5,
         per_device_train_batch_size=32,
@@ -107,12 +111,13 @@ def main() -> None:
         eval_dataset=dataset["validation"],
     )
     trainer.train()
-    trainer.save_model("models/span_marker_bert_base_cased_fewnerd_fine_super/checkpoint-final")
 
     # Compute & save the metrics on the test set
     metrics = trainer.evaluate(dataset["test"], metric_key_prefix="test")
     trainer.save_metrics("test", metrics)
 
+    # Save the final checkpoint
+    trainer.save_model(output_dir / "checkpoint-final")
 
 if __name__ == "__main__":
     main()
