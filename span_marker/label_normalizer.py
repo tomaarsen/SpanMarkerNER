@@ -84,7 +84,7 @@ class LabelNormalizerBILOU(LabelNormalizerScheme):
         # Support for BILOU and BILO:
         logger.info("Detected the BILOU or BILO labeling scheme.")
         self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag.get("U", set())
-        self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["U"]
+        self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag.get("U", set())
 
 
 class LabelNormalizerNoScheme(LabelNormalizer):
