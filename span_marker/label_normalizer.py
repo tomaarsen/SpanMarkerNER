@@ -125,7 +125,7 @@ class AutoLabelNormalizer:
             return LabelNormalizerIOB(config)
         if tags == set("BIOES"):
             return LabelNormalizerBIOES(config)
-        if tags == set("BILOU"):
+        if tags == set("BILOU") or tags == set("BILO"):
             return LabelNormalizerBILOU(config)
         raise ValueError(
             "Data labeling scheme not recognized. Expected either IOB, IOB2, BIOES, BILOU "
