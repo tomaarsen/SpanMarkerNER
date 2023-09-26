@@ -6,7 +6,7 @@
 
 # {{ model_name | default("SpanMarker for Named Entity Recognition", true) }}
 
-This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if dataset_id %} trained on the [{{ dataset_name if dataset_name else dataset_id }}](https://huggingface.co/datasets/{{ dataset_id }}) dataset{% endif %} that can be used for {{ task_name | default("Named Entity Recognition", true) }}.{% if encoder_id %} This SpanMarker model uses [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}) as the underlying encoder.{% endif %}
+This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if dataset_id %} trained on the [{{ dataset_name if dataset_name else dataset_id }}](https://huggingface.co/datasets/{{ dataset_id }}) dataset{% endif %} that can be used for {{ task_name | default("Named Entity Recognition", true) }}.{% if encoder_id %} This SpanMarker model uses [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/{{ encoder_id }}) as the underlying encoder.{% endif %}
 
 ## Model Details
 
@@ -14,9 +14,9 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 
 - **Model Type:** SpanMarker
 {% if encoder_id -%}
-    - **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }})
+    - **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/{{ encoder_id }})
 {%- else -%}
-    <!-- - **Encoder:** [Unknown](https://huggingface.co/models/unknown) -->
+    <!-- - **Encoder:** [Unknown](https://huggingface.co/unknown) -->
 {%- endif %}
 - **Maximum Sequence Length:** {{ model_max_length }} tokens
 - **Maximum Entity Length:** {{ entity_max_length }} words
@@ -98,7 +98,7 @@ trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finet
 -->
 {% if tokenizer_warning %}
 ### {{ warn_emoji }} Tokenizer Warning
-The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/models/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
+The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
 
 In short, it is recommended to preprocess your inference text such that all words and punctuation are separated by a space. One approach is to use the [spaCy integration](https://tomaarsen.github.io/SpanMarkerNER/notebooks/spacy_integration.html) which automatically separates all words and punctuation. Alternatively, some potential approaches to convert regular text into this format are NLTK [`word_tokenize`](https://www.nltk.org/api/nltk.tokenize.word_tokenize.html) or spaCy [`Doc`](https://spacy.io/api/doc#iter) and joining the resulting words with a space.
 {% endif %}
