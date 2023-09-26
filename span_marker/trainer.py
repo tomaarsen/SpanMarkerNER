@@ -125,27 +125,6 @@ class Trainer(TransformersTrainer):
                 model.tokenizer, eval_prediction, self.is_in_train
             )
 
-        # Warn if the tokenizer requires punctuation to be separated from the words,
-        # e.g. "Paris ." instead of "Paris."
-        if model.tokenizer.vocab:
-            first_token = next(iter(model.tokenizer.vocab))
-            tokenized_no_space = model.tokenizer.tokenizer(first_token)
-            tokenized_space = model.tokenizer.tokenizer(first_token + " ")
-            if tokenized_no_space != tokenized_space:
-                model.model_card_data.tokenizer_warning = True
-                encoder_name = model.model_card_data.encoder_name
-                logger.warning(
-                    f"The {encoder_name if encoder_name else ('`' + model.model_card_data.encoder_id + '`')} "
-                    "tokenizer distinguishes between punctuation directly attached to a word and punctuation "
-                    "separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into "
-                    "different tokens. During training, this model is only exposed to the latter style, i.e. all "
-                    "words are separated by a space. Consequently, the model may perform worse when the inference "
-                    "text is in the former style.\nIn short, please recognize that your inference text should be "
-                    "preprocessed so that all words and punctuation are separated by a space. Some potential "
-                    "approaches to convert regular text into this format are NLTK `word_tokenize` or spaCy `Doc`"
-                    " and joining the resulting words with a space."
-                )
-
         # If the model ID is set via the TrainingArguments, but not via the SpanMarkerModelCardData,
         # then we can set it here for the model card regardless
         if args.hub_model_id and not model.model_card_data.model_id:

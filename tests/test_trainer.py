@@ -235,31 +235,6 @@ def test_trainer_no_args(finetuned_conll_span_marker_model: SpanMarkerModel) -> 
     assert trainer.args.remove_unused_columns == False
 
 
-def test_trainer_tokenizer_warning(
-    finetuned_conll_span_marker_model: SpanMarkerModel, caplog: LogCaptureFixture
-) -> None:
-    model = finetuned_conll_span_marker_model
-    tokenizer = AutoTokenizer.from_pretrained("roberta-base", add_prefix_space=True)
-    model.set_tokenizer(SpanMarkerTokenizer(tokenizer, model.config))
-    caplog.clear()
-    Trainer(model=model)
-    assert any(
-        [
-            level == logging.WARNING
-            and text == f"The `tomaarsen/span-marker-bert-tiny-conll03` "
-            "tokenizer distinguishes between punctuation directly attached to a word and punctuation "
-            "separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into "
-            "different tokens. During training, this model is only exposed to the latter style, i.e. all "
-            "words are separated by a space. Consequently, the model may perform worse when the inference "
-            "text is in the former style.\nIn short, please recognize that your inference text should be "
-            "preprocessed so that all words and punctuation are separated by a space. Some potential "
-            "approaches to convert regular text into this format are NLTK `word_tokenize` or spaCy `Doc`"
-            " and joining the resulting words with a space."
-            for (_, level, text) in caplog.record_tuples
-        ]
-    )
-
-
 def test_trainer_set_model_id_via_hub(finetuned_conll_span_marker_model: SpanMarkerModel, tmp_path: Path) -> None:
     model = finetuned_conll_span_marker_model
     model_id = "test_value"

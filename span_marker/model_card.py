@@ -423,7 +423,5 @@ def is_on_huggingface(repo_id: str, is_model: bool = True) -> bool:
 
 def generate_model_card(model: "SpanMarkerModel") -> str:
     template_path = Path(__file__).parent / "model_card_template.md"
-    model_card = ModelCard.from_template(
-        card_data=model.model_card_data, template_path=template_path, hf_emoji="🤗", warn_emoji="⚠️"
-    )
+    model_card = ModelCard.from_template(card_data=model.model_card_data, template_path=template_path, hf_emoji="🤗")
     return model_card.content

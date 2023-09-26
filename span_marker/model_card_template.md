@@ -96,12 +96,7 @@ trainer.save_model("{{ model_id | default('span_marker_model_id', true) }}-finet
 
 *List how the model may foreseeably be misused and address what users ought not to do with the model.*
 -->
-{% if tokenizer_warning %}
-### {{ warn_emoji }} Tokenizer Warning
-The [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/{{ encoder_id }}) tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space. For example, `Paris.` and `Paris .` are tokenized into different tokens. During training, this model is only exposed to the latter style, i.e. all words are separated by a space. Consequently, the model may perform worse when the inference text is in the former style.
 
-In short, it is recommended to preprocess your inference text such that all words and punctuation are separated by a space. One approach is to use the [spaCy integration](https://tomaarsen.github.io/SpanMarkerNER/notebooks/spacy_integration.html) which automatically separates all words and punctuation. Alternatively, some potential approaches to convert regular text into this format are NLTK [`word_tokenize`](https://www.nltk.org/api/nltk.tokenize.word_tokenize.html) or spaCy [`Doc`](https://spacy.io/api/doc#iter) and joining the resulting words with a space.
-{% endif %}
 <!--
 ## Bias, Risks and Limitations
 
