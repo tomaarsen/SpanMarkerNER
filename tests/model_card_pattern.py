@@ -56,14 +56,14 @@ model-index:
 
 # SpanMarker with prajjwal1/bert-tiny on CoNLL 2003
 
-This is a \[SpanMarker\]\(https://github.com/tomaarsen/SpanMarkerNER\) model trained on the \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\) dataset that can be used for Named Entity Recognition. This SpanMarker model uses \[prajjwal1/bert-tiny\]\(https://huggingface.co/models/prajjwal1/bert-tiny\) as the underlying encoder.
+This is a \[SpanMarker\]\(https://github.com/tomaarsen/SpanMarkerNER\) model trained on the \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\) dataset that can be used for Named Entity Recognition. This SpanMarker model uses \[prajjwal1/bert-tiny\]\(https://huggingface.co/prajjwal1/bert-tiny\) as the underlying encoder.
 
 ## Model Details
 
 ### Model Description
 
 - \*\*Model Type:\*\* SpanMarker
-- \*\*Encoder:\*\* \[prajjwal1/bert-tiny\]\(https://huggingface.co/models/prajjwal1/bert-tiny\)
+- \*\*Encoder:\*\* \[prajjwal1/bert-tiny\]\(https://huggingface.co/prajjwal1/bert-tiny\)
 - \*\*Maximum Sequence Length:\*\* 512 tokens
 - \*\*Maximum Entity Length:\*\* 8 words
 - \*\*Training Dataset:\*\* \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\)
