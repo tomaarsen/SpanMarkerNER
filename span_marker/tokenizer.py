@@ -5,7 +5,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
-from transformers import AutoTokenizer, PreTrainedTokenizer
+from tokenizers.pre_tokenizers import Punctuation, Sequence
+from transformers import AutoTokenizer, PreTrainedTokenizer, XLMRobertaTokenizerFast
 
 from span_marker.configuration import SpanMarkerConfig
 
@@ -269,4 +270,9 @@ class SpanMarkerTokenizer:
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path, *inputs, **kwargs, add_prefix_space=True
         )
+        # XLM-R is known to have some tokenization issues, so be sure to also split on punctuation.
+        # Strictly required for inference, shouldn't affect training.
+        if isinstance(tokenizer, XLMRobertaTokenizerFast):
+            tokenizer._tokenizer.pre_tokenizer = Sequence([Punctuation(), tokenizer._tokenizer.pre_tokenizer])
+
         return cls(tokenizer, config=config, **kwargs)
