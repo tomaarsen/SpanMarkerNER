@@ -303,7 +303,12 @@ class SpanMarkerModel(PreTrainedModel):
             config.encoder.get("_name_or_path", pretrained_model_name_or_path), config=config, **kwargs
         )
         model.set_tokenizer(tokenizer)
-        model.resize_token_embeddings(len(tokenizer))
+        # Since transformers 4.32.0 we should use `pad_to_multiple_of=8`.
+        # That'll fail for earlier versions, so we try-except it.
+        try:
+            model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+        except TypeError:
+            model.resize_token_embeddings(len(tokenizer))
         return model
 
     @classmethod
