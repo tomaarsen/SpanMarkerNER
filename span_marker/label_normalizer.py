@@ -30,7 +30,7 @@ class LabelNormalizer(ABC):
     def ner_tags_to_entities(self, ner_tags: List[int]) -> Iterator[Entity]:
         pass
 
-    def __call__(self, tokens: List[str], ner_tags: List[int]) -> Dict[str, List[Any]]:
+    def __call__(self, tokens: List[List[str]], ner_tags: List[List[int]]) -> Dict[str, List[Any]]:
         output = {"ner_tags": [], "entity_count": [], "word_count": []}
         for tokens, ner_tags in zip(tokens, ner_tags):
             ner_tags = list(self.ner_tags_to_entities(ner_tags))
