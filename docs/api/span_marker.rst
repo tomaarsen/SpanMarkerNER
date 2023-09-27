@@ -19,6 +19,7 @@ span_marker package
        span_marker.modeling
        span_marker.trainer
        span_marker.configuration
+       span_marker.model_card
        span_marker.data_collator
        span_marker.tokenizer
        span_marker.evaluation
