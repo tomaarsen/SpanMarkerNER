@@ -144,6 +144,7 @@ class SpanMarkerModelCardData(CardData):
     Note:
 
         Install ``nltk`` to detokenize the examples used in the model card, i.e. attach punctuation and brackets.
+        Additionally, ``codecarbon`` can be installed to automatically track carbon emission usage.
 
     Example::
 
