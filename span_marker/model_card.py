@@ -224,7 +224,8 @@ class SpanMarkerModelCardData(CardData):
                 except:
                     pass
                 else:
-                    self.language = info.cardData.get("language", self.language)
+                    if info.cardData:
+                        self.language = info.cardData.get("language", self.language)
             else:
                 logger.warning(
                     f"The provided {self.dataset_id!r} dataset could not be found on the Hugging Face Hub."
