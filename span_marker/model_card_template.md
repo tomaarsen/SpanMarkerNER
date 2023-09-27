@@ -11,7 +11,6 @@ This is a [SpanMarker](https://github.com/tomaarsen/SpanMarkerNER) model{% if da
 ## Model Details
 
 ### Model Description
-
 - **Model Type:** SpanMarker
 {% if encoder_id -%}
     - **Encoder:** [{{ encoder_name if encoder_name else encoder_id }}](https://huggingface.co/{{ encoder_id }})
@@ -130,7 +129,6 @@ Carbon emissions were measured using [CodeCarbon](https://github.com/mlco2/codec
 - **RAM Size**: {{ "%.2f"|format(co2_eq_emissions["ram_total_size"]) }} GB
 {% endif %}
 ### Framework Versions
-
 - Python: {{ version["python"] }}
 - SpanMarker: {{ version["span_marker"] }}
 - Transformers: {{ version["transformers"] }}

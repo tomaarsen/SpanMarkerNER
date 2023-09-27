@@ -61,7 +61,6 @@ This is a \[SpanMarker\]\(https://github.com/tomaarsen/SpanMarkerNER\) model tra
 ## Model Details
 
 ### Model Description
-
 - \*\*Model Type:\*\* SpanMarker
 - \*\*Encoder:\*\* \[prajjwal1/bert-tiny\]\(https://huggingface.co/prajjwal1/bert-tiny\)
 - \*\*Maximum Sequence Length:\*\* 512 tokens
@@ -178,7 +177,6 @@ Carbon emissions were measured using \[CodeCarbon\]\(https://github.com/mlco2/co
 - \*\*RAM Size\*\*: [\d\.]+ GB
 
 ### Framework Versions
-
 - Python: [^\n]+
 - SpanMarker: [^\n]+
 - Transformers: [^\n]+
