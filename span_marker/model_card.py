@@ -141,6 +141,10 @@ class SpanMarkerModelCardData(CardData):
         dataset_id: (Optional[str]): The dataset ID of the dataset, e.g. "tner/bionlp2004".
         dataset_revision: (Optional[str]): The dataset revision/commit that was for training/evaluation.
 
+    Note:
+
+        Install ``nltk`` to detokenize the examples used in the model card, i.e. attach punctuation and brackets.
+
     Example::
 
         >>> model = SpanMarkerModel.from_pretrained(
@@ -248,6 +252,20 @@ class SpanMarkerModelCardData(CardData):
             self.model_id = None
 
     def set_widget_examples(self, dataset: Dataset) -> None:
+        # If NLTK is installed, use its detokenization. Otherwise, join by spaces.
+        try:
+            from nltk.tokenize.treebank import TreebankWordDetokenizer
+
+            detokenize = TreebankWordDetokenizer().detokenize
+
+            def map_detokenize(tokens) -> Dict[str, str]:
+                return {"text": detokenize(tokens)}
+
+        except ImportError:
+
+            def map_detokenize(tokens) -> Dict[str, str]:
+                return {"text": " ".join(tokens)}
+
         # Out of `sample_subset_size=100` random samples, select `example_count=5` good examples
         # based on the number of unique entity classes.
         # The shortest example is used in the inference example
@@ -266,10 +284,11 @@ class SpanMarkerModelCardData(CardData):
             example_dataset.map(count_entities)
             .sort(("unique_entity_count", "entity_count"), reverse=True)
             .select(range(min(len(example_dataset), example_count)))
+            .map(map_detokenize, input_columns="tokens")
         )
-        self.widget = [{"text": " ".join(sample["tokens"])} for sample in example_dataset]
+        self.widget = [{"text": sample["text"]} for sample in example_dataset]
 
-        shortest_example = " ".join(example_dataset.sort("word_count")[0]["tokens"])
+        shortest_example = example_dataset.sort("word_count")[0]["text"]
         self.predict_example = shortest_example
 
     def set_train_set_metrics(self, dataset: Dataset) -> None:
