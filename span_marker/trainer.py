@@ -130,6 +130,13 @@ class Trainer(TransformersTrainer):
         if args.hub_model_id and not model.model_card_data.model_id:
             model.model_card_data.model_id = args.hub_model_id
 
+        if not model.model_card_data.dataset_id:
+            # Inferring is hacky - it may break in the future, so let's be safe
+            try:
+                model.model_card_data.infer_dataset_id(train_dataset)
+            except Exception:
+                pass
+
         super().__init__(
             model=model,
             args=args,

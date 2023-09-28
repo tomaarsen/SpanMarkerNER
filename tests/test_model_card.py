@@ -2,7 +2,7 @@ import logging
 from pathlib import Path
 
 import pytest
-from datasets import DatasetDict
+from datasets import DatasetDict, load_dataset
 
 from span_marker import (
     SpanMarkerModel,
@@ -12,12 +12,12 @@ from span_marker import (
 )
 from span_marker.model_card import generate_model_card, is_on_huggingface
 
-from .constants import FEWNERD_COARSE_LABELS
+from .constants import CONLL_LABELS, FEWNERD_COARSE_LABELS, TINY_BERT
 from .model_card_pattern import MODEL_CARD_PATTERN
 
 
 def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -> None:
-    base_encoder_id = "prajjwal1/bert-tiny"
+    base_encoder_id = TINY_BERT
     model = SpanMarkerModel.from_pretrained(
         base_encoder_id,
         labels=FEWNERD_COARSE_LABELS,
@@ -53,9 +53,8 @@ def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -
 
 
 def test_model_card_languages() -> None:
-    base_encoder_id = "prajjwal1/bert-tiny"
     model = SpanMarkerModel.from_pretrained(
-        base_encoder_id,
+        TINY_BERT,
         labels=FEWNERD_COARSE_LABELS,
         model_card_data=SpanMarkerModelCardData(
             language=["en", "nl", "de"],
@@ -102,3 +101,22 @@ def test_model_card_warnings(caplog: pytest.LogCaptureFixture):
 def test_is_on_huggingface_edge_case() -> None:
     assert not is_on_huggingface("test_value")
     assert not is_on_huggingface("a/test/value")
+
+
+@pytest.mark.parametrize("dataset_id", ("conll2003", "tomaarsen/conll2003"))
+def test_infer_dataset_id(dataset_id: str) -> None:
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)
+    train_dataset = load_dataset(dataset_id, split="train")
+
+    # This triggers inferring the dataset_id from train_dataset
+    Trainer(model=model, train_dataset=train_dataset)
+    assert model.model_card_data.dataset_id == dataset_id
+
+
+def test_cant_infer_dataset_id(conll_dataset_dict: DatasetDict):
+    model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)
+    train_dataset = conll_dataset_dict["train"]
+
+    # This triggers inferring the dataset_id from train_dataset
+    Trainer(model=model, train_dataset=train_dataset)
+    assert model.model_card_data.dataset_id == None

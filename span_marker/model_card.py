@@ -4,14 +4,21 @@ import random
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from platform import python_version
-from typing import TYPE_CHECKING, Any, Dict, List, Optional, Union
+from typing import TYPE_CHECKING, Any, Dict, List, Optional, Tuple, Union
 
 import datasets
 import tokenizers
 import torch
 import transformers
 from datasets import Dataset
-from huggingface_hub import CardData, ModelCard, dataset_info, model_info
+from huggingface_hub import (
+    CardData,
+    DatasetFilter,
+    ModelCard,
+    dataset_info,
+    list_datasets,
+    model_info,
+)
 from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
 from transformers import TrainerCallback
@@ -325,6 +332,45 @@ class SpanMarkerModelCardData(CardData):
         self.label_example_list = [
             {"Label": label, "Examples": ", ".join(example_set)} for label, example_set in examples.items()
         ]
+
+    def infer_dataset_id(self, dataset: Dataset) -> None:
+        def subtuple_finder(tuple: Tuple[str], subtuple: Tuple[str]) -> int:
+            for i, element in enumerate(tuple):
+                if element == subtuple[0] and tuple[i : i + len(subtuple)] == subtuple:
+                    return i
+            return -1
+
+        def normalize(dataset_id: str) -> str:
+            for token in "/\\_-":
+                dataset_id = dataset_id.replace(token, "")
+            return dataset_id.lower()
+
+        if (cache_files := dataset.cache_files) and "filename" in cache_files[0]:
+            cache_path_parts = Path(cache_files[0]["filename"]).parts
+            # Check if the cachefile is under "huggingface/datasets"
+            subtuple = ("huggingface", "datasets")
+            index = subtuple_finder(cache_path_parts, subtuple)
+            if index == -1:
+                return
+
+            # Get the folder after "huggingface/datasets"
+            cache_dataset_name = cache_path_parts[index + len(subtuple)]
+            # If the dataset has an author:
+            if "___" in cache_dataset_name:
+                author, dataset_name = cache_dataset_name.split("___")
+            else:
+                author = None
+                dataset_name = cache_dataset_name
+
+            # Make sure the normalized dataset IDs match
+            dataset_list = [
+                dataset
+                for dataset in list_datasets(filter=DatasetFilter(author=author, dataset_name=dataset_name))
+                if normalize(dataset.id) == normalize(cache_dataset_name)
+            ]
+            # If there's only one match, get the ID from it
+            if len(dataset_list) == 1:
+                self.dataset_id = dataset_list[0].id
 
     def register_model(self, model: "SpanMarkerModel") -> None:
         self.model = model
