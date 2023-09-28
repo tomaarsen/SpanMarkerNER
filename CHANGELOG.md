@@ -31,6 +31,10 @@ Types of changes
   - If so, then inference of that model will require the punctuation to be split from the words.
 - Improve label normalization speed.
 
+### Fixed
+
+- Fixed tokenization mismatch between training and inference for XLM-RoBERTa models: allows for normal inference of those models.
+
 ## [1.3.0]
 
 ### Added
