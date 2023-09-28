@@ -96,7 +96,7 @@ from span_marker import SpanMarkerModel
 # Download from the [^H]+ Hub
 model = SpanMarkerModel.from_pretrained\("tomaarsen/span-marker-test-model-card"\)
 # Run inference
-entities = model.predict\("[^\"]+"\)
+entities = model.predict\(".+"\)
 ```
 
 ### Downstream Use
