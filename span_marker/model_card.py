@@ -217,7 +217,7 @@ class SpanMarkerModelCardData(CardData):
     metrics: List[str] = field(default_factory=lambda: ["precision", "recall", "f1"], init=False)
 
     # Passed via `register_model` only
-    model: Optional["SpanMarkerModel"] = field(default=None, init=False)
+    model: Optional["SpanMarkerModel"] = field(default=None, init=False, repr=False)
 
     def __post_init__(self):
         # We don't want to save "ignore_metadata_errors" in our Model Card
