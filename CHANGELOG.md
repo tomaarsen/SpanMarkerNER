@@ -30,10 +30,12 @@ Types of changes
 - Warn if the used tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space.
   - If so, then inference of that model will require the punctuation to be split from the words.
 - Improve label normalization speed.
+- Allow you to call SpanMarkerModel.from_pretrained with a pre-initialized SpanMarkerConfig.
 
 ### Fixed
 
 - Fixed tokenization mismatch between training and inference for XLM-RoBERTa models: allows for normal inference of those models.
+- Resolve niche bug when TrainingArguments are not provided.
 
 ## [1.3.0]
 
