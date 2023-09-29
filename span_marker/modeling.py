@@ -399,7 +399,7 @@ class SpanMarkerModel(PreTrainedModel):
         from span_marker.trainer import Trainer
 
         if torch.cuda.is_available() and self.device == torch.device("cpu"):
-            logger.warn(
+            logger.warning(
                 "SpanMarker model predictions are being computed on the CPU while CUDA is available."
                 " Moving the model to CUDA using `model.cuda()` before performing predictions is heavily"
                 " recommended to significantly boost prediction speeds.",
