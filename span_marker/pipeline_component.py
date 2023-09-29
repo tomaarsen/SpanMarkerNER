@@ -9,6 +9,10 @@ OUTPUT_TYPES = Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str
 class SpanMarkerPipeline(Pipeline):
     """A Pipeline component for SpanMarker.
 
+    The `pipeline` function is :func:`~transformers.pipeline`, which you can also import with
+    ``from transformers import pipeline``, but you must also import ``span_marker`` to register the
+    ``"span-marker"`` pipeline task.
+
     Example::
 
         >>> from span_marker import pipeline
