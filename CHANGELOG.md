@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Added
+
+- Added `transformers` `pipeline` support, e.g. `pipeline(task="span-marker", model="tomaarsen/span-marker-mbert-base-multinerd")`.
+
 ## [1.3.0]
 
 ### Added
