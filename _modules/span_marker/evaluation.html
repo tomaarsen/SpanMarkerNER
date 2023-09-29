@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -129,7 +130,9 @@
 
 <div class="viewcode-block" id="compute_f1_via_seqeval">
 <a class="viewcode-back" href="../../api/span_marker.evaluation.html#span_marker.evaluation.compute_f1_via_seqeval">[docs]</a>
-<span class="k">def</span> <span class="nf">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">EvalPrediction</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+<span class="k">def</span> <span class="nf">compute_f1_via_seqeval</span><span class="p">(</span>
+    <span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">EvalPrediction</span><span class="p">,</span> <span class="n">is_in_train</span><span class="p">:</span> <span class="nb">bool</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute micro-F1, recall, precision and accuracy scores using ``seqeval`` for the evaluation predictions.</span>
 
 <span class="sd">    Note:</span>
@@ -218,10 +221,10 @@
     <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">():</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">simplefilter</span><span class="p">(</span><span class="s2">&quot;ignore&quot;</span><span class="p">,</span> <span class="n">UndefinedMetricWarning</span><span class="p">)</span>
         <span class="n">results</span> <span class="o">=</span> <span class="n">seqeval</span><span class="o">.</span><span class="n">compute</span><span class="p">()</span>
-    <span class="c1"># `results` also contains e.g. &quot;person-athlete&quot;: {&#39;precision&#39;: 0.5982658959537572, &#39;recall&#39;: 0.9, &#39;f1&#39;: 0.71875, &#39;number&#39;: 230}</span>
-    <span class="c1"># logging this all is overkill. Tensorboard doesn&#39;t even support it, WandB does, but it&#39;s not very useful generally.</span>
-    <span class="c1"># I&#39;d like to revisit this to expose this information somehow still</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)}</span></div>
+
+    <span class="k">if</span> <span class="n">is_in_train</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">results</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">)}</span>
+    <span class="k">return</span> <span class="n">results</span></div>
 
 </pre></div>
 

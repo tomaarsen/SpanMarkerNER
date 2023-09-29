@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -173,6 +174,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.cpu">cpu() (span_marker.modeling.SpanMarkerModel method)</a>
 </li>
+      <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer.create_model_card">create_model_card() (span_marker.trainer.Trainer method)</a>
+</li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.cuda">cuda() (span_marker.modeling.SpanMarkerModel method)</a>
 </li>
   </ul></td>
@@ -181,10 +184,16 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.device">device (span_marker.modeling.SpanMarkerModel property)</a>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.dataset_id">dataset_id (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.dataset_name">dataset_name (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.dataset_revision">dataset_revision (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.device">device (span_marker.modeling.SpanMarkerModel property)</a>
+</li>
       <li><a href="api/span_marker.output.html#span_marker.output.SpanMarkerOutput.document_ids">document_ids (span_marker.output.SpanMarkerOutput attribute)</a>
 </li>
   </ul></td>
@@ -195,12 +204,16 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.enabled">enabled (span_marker.tokenizer.EntityTracker attribute)</a>
 </li>
-      <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.Entity">Entity (in module span_marker.label_normalizer)</a>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.encoder_id">encoder_id (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
 </li>
-      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.entity_max_length">entity_max_length (span_marker.tokenizer.EntityTracker attribute)</a>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.encoder_name">encoder_name (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.Entity">Entity (in module span_marker.label_normalizer)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.entity_max_length">entity_max_length (span_marker.tokenizer.EntityTracker attribute)</a>
+</li>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker">EntityTracker (class in span_marker.tokenizer)</a>
 </li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.eval">eval() (span_marker.modeling.SpanMarkerModel method)</a>
@@ -231,6 +244,8 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.generate_model_card">generate_model_card() (span_marker.modeling.SpanMarkerModel method)</a>
+</li>
       <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.get">get() (span_marker.configuration.SpanMarkerConfig method)</a>
 </li>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer.get_all_valid_spans">get_all_valid_spans() (span_marker.tokenizer.SpanMarkerTokenizer method)</a>
@@ -257,6 +272,10 @@
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.infer_dataset_id">infer_dataset_id() (span_marker.model_card.SpanMarkerModelCardData method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.is_composition">is_composition (span_marker.configuration.SpanMarkerConfig attribute)</a>
 </li>
   </ul></td>
@@ -271,13 +290,17 @@
 </li>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBIOES">LabelNormalizerBIOES (class in span_marker.label_normalizer)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerIOB">LabelNormalizerIOB (class in span_marker.label_normalizer)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme">LabelNormalizerNoScheme (class in span_marker.label_normalizer)</a>
 </li>
       <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme">LabelNormalizerScheme (class in span_marker.label_normalizer)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.language">language (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.license">license (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -289,9 +312,15 @@
 </li>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.missed">missed() (span_marker.tokenizer.EntityTracker method)</a>
 </li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.model_id">model_id (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.model_max_length">model_max_length (span_marker.tokenizer.EntityTracker attribute)</a>
 </li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.model_name">model_name (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
       <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.model_type">model_type (span_marker.configuration.SpanMarkerConfig attribute)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback">ModelCardCallback (class in span_marker.model_card)</a>
 </li>
       <li>
     module
@@ -306,6 +335,8 @@
         <li><a href="api/span_marker.evaluation.html#module-span_marker.evaluation">span_marker.evaluation</a>
 </li>
         <li><a href="api/span_marker.label_normalizer.html#module-span_marker.label_normalizer">span_marker.label_normalizer</a>
+</li>
+        <li><a href="api/span_marker.model_card.html#module-span_marker.model_card">span_marker.model_card</a>
 </li>
         <li><a href="api/span_marker.modeling.html#module-span_marker.modeling">span_marker.modeling</a>
 </li>
@@ -326,9 +357,11 @@
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme.ner_tags_to_entities">ner_tags_to_entities() (span_marker.label_normalizer.LabelNormalizerNoScheme method)</a>
+      <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer.ner_tags_to_entities">ner_tags_to_entities() (span_marker.label_normalizer.LabelNormalizer method)</a>
 
       <ul>
+        <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme.ner_tags_to_entities">(span_marker.label_normalizer.LabelNormalizerNoScheme method)</a>
+</li>
         <li><a href="api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme.ner_tags_to_entities">(span_marker.label_normalizer.LabelNormalizerScheme method)</a>
 </li>
       </ul></li>
@@ -344,6 +377,12 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback.on_evaluate">on_evaluate() (span_marker.model_card.ModelCardCallback method)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback.on_train_begin">on_train_begin() (span_marker.model_card.ModelCardCallback method)</a>
+</li>
       <li><a href="api/span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig.outside_id">outside_id (span_marker.configuration.SpanMarkerConfig property)</a>
 </li>
   </ul></td>
@@ -426,6 +465,13 @@
 </li>
       </ul></li>
       <li>
+    span_marker.model_card
+
+      <ul>
+        <li><a href="api/span_marker.model_card.html#module-span_marker.model_card">module</a>
+</li>
+      </ul></li>
+      <li>
     span_marker.modeling
 
       <ul>
@@ -475,6 +521,8 @@
 </li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel">SpanMarkerModel (class in span_marker.modeling)</a>
 </li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData">SpanMarkerModelCardData (class in span_marker.model_card)</a>
+</li>
       <li><a href="api/span_marker.output.html#span_marker.output.SpanMarkerOutput">SpanMarkerOutput (class in span_marker.output)</a>
 </li>
       <li><a href="api/span_marker.pipeline_component.html#span_marker.pipeline_component.SpanMarkerPipeline">SpanMarkerPipeline (class in span_marker.pipeline_component)</a>
@@ -491,8 +539,18 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.tags">tags (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.task_name">task_name (span_marker.model_card.SpanMarkerModelCardData attribute)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.to_dict">to_dict() (span_marker.model_card.SpanMarkerModelCardData method)</a>
+</li>
+      <li><a href="api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.to_yaml">to_yaml() (span_marker.model_card.SpanMarkerModelCardData method)</a>
+</li>
       <li><a href="api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.tokenizer">tokenizer (span_marker.data_collator.SpanMarkerDataCollator attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.tokenizer.html#span_marker.tokenizer.EntityTracker.total_num_entities">total_num_entities (span_marker.tokenizer.EntityTracker attribute)</a>
 </li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.train">train() (span_marker.modeling.SpanMarkerModel method)</a>
@@ -501,8 +559,6 @@
         <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer.train">(span_marker.trainer.Trainer method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/span_marker.trainer.html#span_marker.trainer.Trainer">Trainer (class in span_marker.trainer)</a>
 </li>
       <li><a href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.try_cuda">try_cuda() (span_marker.modeling.SpanMarkerModel method)</a>

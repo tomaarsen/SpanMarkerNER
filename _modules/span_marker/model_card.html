@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#2D2D2D" />
+  
+  <title>SpanMarker :: span_marker.model_card</title>
+  
+  <link rel="index" title="Index" href="../../genindex.html"/>
+
+  <link rel="stylesheet" href="../../_static/css/nltk_theme.css"/>
+  <link rel="stylesheet" href="../../_static/css/custom.css"/>
+
+  <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/documentation_options.js"></script>
+      <script type="text/javascript" src="../../_static/doctools.js"></script>
+      <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
+      <script type="text/javascript" src="../../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+  
+
+  <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
+</head>
+
+<body>
+  <div id="nltk-theme-container">
+    <header>
+      <div id="logo-container">
+          
+          <h1>
+            <a href="../../index.html">SpanMarker</a>
+          </h1>
+          
+      </div>
+      <div id="project-container">
+        
+        <h1>Documentation</h1>
+        
+      </div>
+
+      <a id="menu-toggle" class="fa fa-bars" aria-hidden="true"></a>
+
+      <script type="text/javascript">
+        $("#menu-toggle").click(function() {
+          $("#menu-toggle").toggleClass("toggled");
+          $("#side-menu-container").slideToggle(300);
+        });
+      </script>
+    </header>
+
+    <div id="content-container">
+
+      <div id="side-menu-container">
+
+        <div id="search" role="search">
+        <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+            <input type="text" name="q" placeholder="Search" />
+            <input type="hidden" name="check_keywords" value="yes" />
+            <input type="hidden" name="area" value="default" />
+        </form>
+</div>
+
+        <div id="side-menu" role="navigation">
+          
+  
+    
+  
+  
+    <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../notebooks/index.html">Notebooks</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/getting_started.html">Getting Started</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_training.html">Initializing &amp; Training</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_loading.html">Loading &amp; Inferencing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/model_configuration.html">Configuring</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/spacy_integration.html">SpanMarker with spaCy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../notebooks/document_level_context.html">Document-level context</a></li>
+<li class="toctree-l2"><a class="reference external" href="https://raw.githubusercontent.com/tomaarsen/SpanMarkerNER/main/thesis.pdf">SpanMarker Thesis</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../api/span_marker.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.model_card.html">span_marker.model_card module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.label_normalizer.html">span_marker.label_normalizer module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.output.html">span_marker.output module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.spacy_integration.html">span_marker.spacy_integration module</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Installation</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../install.html">Installing SpanMarker</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">More</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../news.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER/issues">Open Issues</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker on GitHub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://huggingface.co/models?library=span-marker">SpanMarker on the 🤗 Hub</a></li>
+<li class="toctree-l1"><a class="reference external" href="https://spacy.io/universe/project/span_marker">SpanMarker on spaCy</a></li>
+</ul>
+
+  
+
+        </div>
+
+        
+      </div>
+
+      <div id="main-content-container">
+        <div id="main-content" role="main">
+          
+  <h1>Source code for span_marker.model_card</h1><div class="highlight"><pre>
+<span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">fields</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">platform</span> <span class="kn">import</span> <span class="n">python_version</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">datasets</span>
+<span class="kn">import</span> <span class="nn">tokenizers</span>
+<span class="kn">import</span> <span class="nn">torch</span>
+<span class="kn">import</span> <span class="nn">transformers</span>
+<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">huggingface_hub</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CardData</span><span class="p">,</span>
+    <span class="n">DatasetFilter</span><span class="p">,</span>
+    <span class="n">ModelCard</span><span class="p">,</span>
+    <span class="n">dataset_info</span><span class="p">,</span>
+    <span class="n">list_datasets</span><span class="p">,</span>
+    <span class="n">model_info</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">huggingface_hub.repocard_data</span> <span class="kn">import</span> <span class="n">EvalResult</span><span class="p">,</span> <span class="n">eval_results_to_model_index</span>
+<span class="kn">from</span> <span class="nn">huggingface_hub.utils</span> <span class="kn">import</span> <span class="n">yaml_dump</span>
+<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainerCallback</span>
+<span class="kn">from</span> <span class="nn">transformers.integrations</span> <span class="kn">import</span> <span class="n">CodeCarbonCallback</span>
+<span class="kn">from</span> <span class="nn">transformers.modelcard</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">extract_hyperparameters_from_trainer</span><span class="p">,</span>
+    <span class="n">make_markdown_table</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">transformers.trainer_callback</span> <span class="kn">import</span> <span class="n">TrainerControl</span><span class="p">,</span> <span class="n">TrainerState</span>
+<span class="kn">from</span> <span class="nn">transformers.training_args</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
+
+<span class="kn">import</span> <span class="nn">span_marker</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+    <span class="kn">from</span> <span class="nn">span_marker.trainer</span> <span class="kn">import</span> <span class="n">Trainer</span>
+
+
+<div class="viewcode-block" id="ModelCardCallback">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback">[docs]</a>
+<span class="k">class</span> <span class="nc">ModelCardCallback</span><span class="p">(</span><span class="n">TrainerCallback</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trainer</span><span class="p">:</span> <span class="s2">&quot;Trainer&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span> <span class="o">=</span> <span class="n">trainer</span>
+
+        <span class="n">callbacks</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">callback</span> <span class="k">for</span> <span class="n">callback</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">callbacks</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">callback</span><span class="p">,</span> <span class="n">CodeCarbonCallback</span><span class="p">)</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="n">callbacks</span><span class="p">:</span>
+            <span class="n">trainer</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">code_carbon_callback</span> <span class="o">=</span> <span class="n">callbacks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+<div class="viewcode-block" id="ModelCardCallback.on_train_begin">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback.on_train_begin">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_train_begin</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">:</span> <span class="n">TrainingArguments</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">TrainerState</span><span class="p">,</span> <span class="n">control</span><span class="p">:</span> <span class="n">TrainerControl</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">hyperparameters</span> <span class="o">=</span> <span class="n">extract_hyperparameters_from_trainer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="ModelCardCallback.on_evaluate">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.ModelCardCallback.on_evaluate">[docs]</a>
+    <span class="k">def</span> <span class="nf">on_evaluate</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">TrainingArguments</span><span class="p">,</span>
+        <span class="n">state</span><span class="p">:</span> <span class="n">TrainerState</span><span class="p">,</span>
+        <span class="n">control</span><span class="p">:</span> <span class="n">TrainerControl</span><span class="p">,</span>
+        <span class="n">model</span><span class="p">:</span> <span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">,</span>
+        <span class="n">metrics</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="c1"># Set the most recent evaluation scores for the metadata</span>
+        <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">eval_results_dict</span> <span class="o">=</span> <span class="n">metrics</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">is_in_train</span><span class="p">:</span>
+            <span class="c1"># Either set mid-training evaluation metrics</span>
+            <span class="k">if</span> <span class="s2">&quot;eval_loss&quot;</span> <span class="ow">in</span> <span class="n">metrics</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">eval_lines_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="c1"># &quot;Training Loss&quot;: self.state.log_history[-1][&quot;loss&quot;] if &quot;loss&quot; in self.state.log_history[-1] else &quot;-&quot;,</span>
+                        <span class="s2">&quot;Epoch&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">epoch</span><span class="p">,</span>
+                        <span class="s2">&quot;Step&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="p">,</span>
+                        <span class="s2">&quot;Validation Loss&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;eval_loss&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;Validation Precision&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;eval_overall_precision&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;Validation Recall&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;eval_overall_recall&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;Validation F1&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;eval_overall_f1&quot;</span><span class="p">],</span>
+                        <span class="s2">&quot;Validation Accuracy&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;eval_overall_accuracy&quot;</span><span class="p">],</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Or set the post-training metrics</span>
+            <span class="c1"># Determine the dataset split</span>
+            <span class="n">runtime_key</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;_runtime&quot;</span><span class="p">)]</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">runtime_key</span><span class="p">:</span>
+                <span class="k">return</span>
+            <span class="n">dataset_split</span> <span class="o">=</span> <span class="n">runtime_key</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;_runtime&quot;</span><span class="p">)]</span>
+
+            <span class="n">metric_lines</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">metrics</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">float</span><span class="p">):</span>
+                    <span class="n">metric_lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="s2">&quot;Label&quot;</span><span class="p">:</span> <span class="n">key</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset_split</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:],</span>
+                            <span class="s2">&quot;Precision&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;precision&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;Recall&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;recall&quot;</span><span class="p">],</span>
+                            <span class="s2">&quot;F1&quot;</span><span class="p">:</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;f1&quot;</span><span class="p">],</span>
+                        <span class="p">}</span>
+                    <span class="p">)</span>
+            <span class="n">metric_lines</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span>
+                <span class="mi">0</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;Label&quot;</span><span class="p">:</span> <span class="s2">&quot;**all**&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;Precision&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_precision&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;Recall&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_recall&quot;</span><span class="p">],</span>
+                    <span class="s2">&quot;F1&quot;</span><span class="p">:</span> <span class="n">metrics</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_f1&quot;</span><span class="p">],</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">metric_lines</span> <span class="o">=</span> <span class="n">metric_lines</span></div>
+</div>
+
+
+
+<span class="n">YAML_FIELDS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;language&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;license&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;library_name&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;tags&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;datasets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;metrics&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pipeline_tag&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;widget&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;model-index&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;co2_eq_emissions&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;base_model&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+<span class="n">IGNORED_FIELDS</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;model&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="SpanMarkerModelCardData">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData">[docs]</a>
+<span class="nd">@dataclass</span>
+<span class="k">class</span> <span class="nc">SpanMarkerModelCardData</span><span class="p">(</span><span class="n">CardData</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;A dataclass storing data used in the model card.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        language (Optional[Union[str, List[str]]]): The model language, either a string or a list,</span>
+<span class="sd">            e.g. &quot;en&quot; or [&quot;en&quot;, &quot;de&quot;, &quot;nl&quot;]</span>
+<span class="sd">        license: (Optional[str]): The license of the model, e.g. &quot;apache-2.0&quot;, &quot;mit&quot;</span>
+<span class="sd">            or &quot;cc-by-nc-sa-4.0&quot;</span>
+<span class="sd">        model_name: (Optional[str]): The pretty name of the model, e.g. &quot;SpanMarker with mBERT-base on CoNLL03&quot;.</span>
+<span class="sd">            If not defined, uses encoder_name/encoder_id and dataset_name/dataset_id to generate a model name.</span>
+<span class="sd">        model_id: (Optional[str]): The model ID when pushing the model to the Hub,</span>
+<span class="sd">            e.g. &quot;tomaarsen/span-marker-mbert-base-multinerd&quot;.</span>
+<span class="sd">        encoder_name: (Optional[str]): The pretty name of the encoder, e.g. &quot;mBERT-base&quot;.</span>
+<span class="sd">        encoder_id: (Optional[str]): The model ID of the encoder, e.g. &quot;bert-base-multilingual-cased&quot;.</span>
+<span class="sd">        dataset_name: (Optional[str]): The pretty name of the dataset, e.g. &quot;CoNLL03&quot;.</span>
+<span class="sd">        dataset_id: (Optional[str]): The dataset ID of the dataset, e.g. &quot;tner/bionlp2004&quot;.</span>
+<span class="sd">        dataset_revision: (Optional[str]): The dataset revision/commit that was for training/evaluation.</span>
+
+<span class="sd">    Note:</span>
+
+<span class="sd">        Install ``nltk`` to detokenize the examples used in the model card, i.e. attach punctuation and brackets.</span>
+<span class="sd">        Additionally, ``codecarbon`` can be installed to automatically track carbon emission usage.</span>
+
+<span class="sd">    Example::</span>
+
+<span class="sd">        &gt;&gt;&gt; model = SpanMarkerModel.from_pretrained(</span>
+<span class="sd">        ...     &quot;bert-base-uncased&quot;,</span>
+<span class="sd">        ...     labels=[&quot;O&quot;, &quot;B-DNA&quot;, &quot;I-DNA&quot;, &quot;B-protein&quot;, ...],</span>
+<span class="sd">        ...     # SpanMarker hyperparameters:</span>
+<span class="sd">        ...     model_max_length=256,</span>
+<span class="sd">        ...     marker_max_length=128,</span>
+<span class="sd">        ...     entity_max_length=8,</span>
+<span class="sd">        ...     # Model card variables</span>
+<span class="sd">        ...     model_card_data=SpanMarkerModelCardData(</span>
+<span class="sd">        ...         model_id=&quot;tomaarsen/span-marker-bbu-bionlp&quot;,</span>
+<span class="sd">        ...         encoder_id=&quot;bert-base-uncased&quot;,</span>
+<span class="sd">        ...         dataset_name=&quot;BioNLP2004,</span>
+<span class="sd">        ...         dataset_id=&quot;tner/bionlp2004&quot;,</span>
+<span class="sd">        ...         license=&quot;apache-2.0&quot;,</span>
+<span class="sd">        ...         language=&quot;en&quot;,</span>
+<span class="sd">        ...     ),</span>
+<span class="sd">        ... )</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Potentially provided by the user</span>
+    <span class="n">language</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">license</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">tags</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span>
+            <span class="s2">&quot;span-marker&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;token-classification&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;ner&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;named-entity-recognition&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;generated_from_span_marker_trainer&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">model_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">model_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">encoder_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">encoder_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset_name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">dataset_revision</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">task_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;Named Entity Recognition&quot;</span>
+
+    <span class="c1"># Automatically filled by `ModelCardCallback` and the Trainer directly</span>
+    <span class="n">hyperparameters</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">eval_results_dict</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">eval_lines_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">metric_lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">widget</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">predict_example</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">label_example_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">tokenizer_warning</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">train_set_metrics_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">code_carbon_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CodeCarbonCallback</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Computed once, always unchanged</span>
+    <span class="n">pipeline_tag</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;token-classification&quot;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">library_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="s2">&quot;span-marker&quot;</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">version</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;python&quot;</span><span class="p">:</span> <span class="n">python_version</span><span class="p">(),</span>
+            <span class="s2">&quot;span_marker&quot;</span><span class="p">:</span> <span class="n">span_marker</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s2">&quot;transformers&quot;</span><span class="p">:</span> <span class="n">transformers</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s2">&quot;torch&quot;</span><span class="p">:</span> <span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s2">&quot;datasets&quot;</span><span class="p">:</span> <span class="n">datasets</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+            <span class="s2">&quot;tokenizers&quot;</span><span class="p">:</span> <span class="n">tokenizers</span><span class="o">.</span><span class="n">__version__</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">metrics</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="k">lambda</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;precision&quot;</span><span class="p">,</span> <span class="s2">&quot;recall&quot;</span><span class="p">,</span> <span class="s2">&quot;f1&quot;</span><span class="p">],</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="c1"># Passed via `register_model` only</span>
+    <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">field</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">init</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="nb">repr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__post_init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># We don&#39;t want to save &quot;ignore_metadata_errors&quot; in our Model Card</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">is_on_huggingface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+                <span class="c1"># if languages are not set, try to determine the language from the dataset on the Hub</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">info</span> <span class="o">=</span> <span class="n">dataset_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
+                <span class="k">except</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The provided </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> dataset could not be found on the Hugging Face Hub.&quot;</span>
+                    <span class="s2">&quot; Setting `dataset_id` to None.&quot;</span>
+                <span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_on_huggingface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span><span class="p">):</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The provided </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span><span class="si">!r}</span><span class="s2"> model could not be found on the Hugging Face Hub.&quot;</span>
+                <span class="s2">&quot; Setting `encoder_id` to None.&quot;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="o">.</span><span class="n">count</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;The provided </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model_id</span><span class="si">!r}</span><span class="s2"> model ID should include the organization or user,&quot;</span>
+                <span class="s1">&#39; such as &quot;tomaarsen/span-marker-mbert-base-multinerd&quot;. Setting `model_id` to None.&#39;</span>
+            <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">set_widget_examples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># If NLTK is installed, use its detokenization. Otherwise, join by spaces.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="kn">from</span> <span class="nn">nltk.tokenize.treebank</span> <span class="kn">import</span> <span class="n">TreebankWordDetokenizer</span>
+
+            <span class="n">detokenize</span> <span class="o">=</span> <span class="n">TreebankWordDetokenizer</span><span class="p">()</span><span class="o">.</span><span class="n">detokenize</span>
+
+            <span class="k">def</span> <span class="nf">map_detokenize</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">detokenize</span><span class="p">(</span><span class="n">tokens</span><span class="p">)}</span>
+
+        <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+
+            <span class="k">def</span> <span class="nf">map_detokenize</span><span class="p">(</span><span class="n">tokens</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+                <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">tokens</span><span class="p">)}</span>
+
+        <span class="c1"># Out of `sample_subset_size=100` random samples, select `example_count=5` good examples</span>
+        <span class="c1"># based on the number of unique entity classes.</span>
+        <span class="c1"># The shortest example is used in the inference example</span>
+        <span class="n">sample_subset_size</span> <span class="o">=</span> <span class="mi">100</span>
+        <span class="n">example_count</span> <span class="o">=</span> <span class="mi">5</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">sample_subset_size</span><span class="p">:</span>
+            <span class="n">example_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="n">random</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)),</span> <span class="n">k</span><span class="o">=</span><span class="n">sample_subset_size</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">example_dataset</span> <span class="o">=</span> <span class="n">dataset</span>
+
+        <span class="k">def</span> <span class="nf">count_entities</span><span class="p">(</span><span class="n">sample</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+            <span class="n">unique_count</span> <span class="o">=</span> <span class="p">{</span><span class="n">reduced_label_id</span> <span class="k">for</span> <span class="n">reduced_label_id</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]}</span>
+            <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;unique_entity_count&quot;</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">unique_count</span><span class="p">)}</span>
+
+        <span class="n">example_dataset</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">example_dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">count_entities</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">sort</span><span class="p">((</span><span class="s2">&quot;unique_entity_count&quot;</span><span class="p">,</span> <span class="s2">&quot;entity_count&quot;</span><span class="p">),</span> <span class="n">reverse</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">example_dataset</span><span class="p">),</span> <span class="n">example_count</span><span class="p">)))</span>
+            <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">map_detokenize</span><span class="p">,</span> <span class="n">input_columns</span><span class="o">=</span><span class="s2">&quot;tokens&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">widget</span> <span class="o">=</span> <span class="p">[{</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]}</span> <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">example_dataset</span><span class="p">]</span>
+
+        <span class="n">shortest_example</span> <span class="o">=</span> <span class="n">example_dataset</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="s2">&quot;word_count&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">predict_example</span> <span class="o">=</span> <span class="n">shortest_example</span>
+
+    <span class="k">def</span> <span class="nf">set_train_set_metrics</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">train_set_metrics_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Training set&quot;</span><span class="p">:</span> <span class="s2">&quot;Sentence length&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Min&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;word_count&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;Median&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;word_count&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span>
+                <span class="s2">&quot;Max&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;word_count&quot;</span><span class="p">]),</span>
+            <span class="p">},</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;Training set&quot;</span><span class="p">:</span> <span class="s2">&quot;Entities per sentence&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Min&quot;</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;entity_count&quot;</span><span class="p">]),</span>
+                <span class="s2">&quot;Median&quot;</span><span class="p">:</span> <span class="nb">sum</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;entity_count&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">),</span>
+                <span class="s2">&quot;Max&quot;</span><span class="p">:</span> <span class="nb">max</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;entity_count&quot;</span><span class="p">]),</span>
+            <span class="p">},</span>
+        <span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">set_label_examples</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">id2label</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span> <span class="n">outside_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">num_examples_per_label</span> <span class="o">=</span> <span class="mi">3</span>
+        <span class="n">examples</span> <span class="o">=</span> <span class="p">{</span><span class="n">label</span><span class="p">:</span> <span class="nb">set</span><span class="p">()</span> <span class="k">for</span> <span class="n">label_id</span><span class="p">,</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">id2label</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">label_id</span> <span class="o">!=</span> <span class="n">outside_id</span><span class="p">}</span>
+        <span class="n">unfinished_entity_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">id2label</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="o">-</span> <span class="p">{</span><span class="n">outside_id</span><span class="p">}</span>
+        <span class="k">for</span> <span class="n">sample</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">entity_id</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span> <span class="ow">in</span> <span class="n">sample</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]:</span>
+                <span class="k">if</span> <span class="n">entity_id</span> <span class="ow">in</span> <span class="n">unfinished_entity_ids</span><span class="p">:</span>
+                    <span class="n">entity</span> <span class="o">=</span> <span class="n">id2label</span><span class="p">[</span><span class="n">entity_id</span><span class="p">]</span>
+                    <span class="n">example</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">sample</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">])</span>
+                    <span class="n">examples</span><span class="p">[</span><span class="n">entity</span><span class="p">]</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">example</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">examples</span><span class="p">[</span><span class="n">entity</span><span class="p">])</span> <span class="o">&gt;=</span> <span class="n">num_examples_per_label</span><span class="p">:</span>
+                        <span class="n">unfinished_entity_ids</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">entity_id</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">unfinished_entity_ids</span><span class="p">:</span>
+                <span class="k">break</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">label_example_list</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">{</span><span class="s2">&quot;Label&quot;</span><span class="p">:</span> <span class="n">label</span><span class="p">,</span> <span class="s2">&quot;Examples&quot;</span><span class="p">:</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">example_set</span><span class="p">)}</span> <span class="k">for</span> <span class="n">label</span><span class="p">,</span> <span class="n">example_set</span> <span class="ow">in</span> <span class="n">examples</span><span class="o">.</span><span class="n">items</span><span class="p">()</span>
+        <span class="p">]</span>
+
+<div class="viewcode-block" id="SpanMarkerModelCardData.infer_dataset_id">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.infer_dataset_id">[docs]</a>
+    <span class="k">def</span> <span class="nf">infer_dataset_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">def</span> <span class="nf">subtuple_finder</span><span class="p">(</span><span class="nb">tuple</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">subtuple</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">element</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">tuple</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">element</span> <span class="o">==</span> <span class="n">subtuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">and</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">subtuple</span><span class="p">)]</span> <span class="o">==</span> <span class="n">subtuple</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">i</span>
+            <span class="k">return</span> <span class="o">-</span><span class="mi">1</span>
+
+        <span class="k">def</span> <span class="nf">normalize</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="s2">&quot;/</span><span class="se">\\</span><span class="s2">_-&quot;</span><span class="p">:</span>
+                <span class="n">dataset_id</span> <span class="o">=</span> <span class="n">dataset_id</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">token</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">dataset_id</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="p">(</span><span class="n">cache_files</span> <span class="o">:=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">cache_files</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;filename&quot;</span> <span class="ow">in</span> <span class="n">cache_files</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+            <span class="n">cache_path_parts</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">cache_files</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;filename&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">parts</span>
+            <span class="c1"># Check if the cachefile is under &quot;huggingface/datasets&quot;</span>
+            <span class="n">subtuple</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;huggingface&quot;</span><span class="p">,</span> <span class="s2">&quot;datasets&quot;</span><span class="p">)</span>
+            <span class="n">index</span> <span class="o">=</span> <span class="n">subtuple_finder</span><span class="p">(</span><span class="n">cache_path_parts</span><span class="p">,</span> <span class="n">subtuple</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">index</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Get the folder after &quot;huggingface/datasets&quot;</span>
+            <span class="n">cache_dataset_name</span> <span class="o">=</span> <span class="n">cache_path_parts</span><span class="p">[</span><span class="n">index</span> <span class="o">+</span> <span class="nb">len</span><span class="p">(</span><span class="n">subtuple</span><span class="p">)]</span>
+            <span class="c1"># If the dataset has an author:</span>
+            <span class="k">if</span> <span class="s2">&quot;___&quot;</span> <span class="ow">in</span> <span class="n">cache_dataset_name</span><span class="p">:</span>
+                <span class="n">author</span><span class="p">,</span> <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">cache_dataset_name</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;___&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">author</span> <span class="o">=</span> <span class="kc">None</span>
+                <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">cache_dataset_name</span>
+
+            <span class="c1"># Make sure the normalized dataset IDs match</span>
+            <span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">dataset</span>
+                <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">list_datasets</span><span class="p">(</span><span class="nb">filter</span><span class="o">=</span><span class="n">DatasetFilter</span><span class="p">(</span><span class="n">author</span><span class="o">=</span><span class="n">author</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">normalize</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">id</span><span class="p">)</span> <span class="o">==</span> <span class="n">normalize</span><span class="p">(</span><span class="n">cache_dataset_name</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="c1"># If there&#39;s only one match, get the ID from it</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span> <span class="o">=</span> <span class="n">dataset_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">id</span></div>
+
+
+    <span class="k">def</span> <span class="nf">register_model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">:</span> <span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">model</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">encoder_id_or_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_name_or_path&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">encoder_id_or_path</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span> <span class="o">=</span> <span class="n">encoder_id_or_path</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SpanMarker with </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot; on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span><span class="w"> </span><span class="ow">or</span><span class="w"> </span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;SpanMarker&quot;</span>
+
+<div class="viewcode-block" id="SpanMarkerModelCardData.to_dict">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.to_dict">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_dict</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="n">super_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">field</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">fields</span><span class="p">(</span><span class="bp">self</span><span class="p">)}</span>
+
+        <span class="c1"># Compute required formats from the raw data</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_results_dict</span><span class="p">:</span>
+            <span class="n">dataset_split</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_results_dict</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">dataset_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span> <span class="ow">or</span> <span class="s2">&quot;unknown&quot;</span>
+            <span class="n">dataset_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_name</span> <span class="ow">or</span> <span class="s2">&quot;Unknown&quot;</span>
+            <span class="n">eval_results</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">EvalResult</span><span class="p">(</span>
+                    <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;token-classification&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_type</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+                    <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="s2">&quot;f1&quot;</span><span class="p">,</span>
+                    <span class="n">metric_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_f1&quot;</span><span class="p">],</span>
+                    <span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;Named Entity Recognition&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_split</span><span class="o">=</span><span class="n">dataset_split</span><span class="p">,</span>
+                    <span class="n">dataset_revision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_revision</span><span class="p">,</span>
+                    <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;F1&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">EvalResult</span><span class="p">(</span>
+                    <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;token-classification&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_type</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+                    <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="s2">&quot;precision&quot;</span><span class="p">,</span>
+                    <span class="n">metric_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_precision&quot;</span><span class="p">],</span>
+                    <span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;Named Entity Recognition&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_split</span><span class="o">=</span><span class="n">dataset_split</span><span class="p">,</span>
+                    <span class="n">dataset_revision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_revision</span><span class="p">,</span>
+                    <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;Precision&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">EvalResult</span><span class="p">(</span>
+                    <span class="n">task_type</span><span class="o">=</span><span class="s2">&quot;token-classification&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_type</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+                    <span class="n">dataset_name</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">,</span>
+                    <span class="n">metric_type</span><span class="o">=</span><span class="s2">&quot;recall&quot;</span><span class="p">,</span>
+                    <span class="n">metric_value</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_results_dict</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_split</span><span class="si">}</span><span class="s2">_overall_recall&quot;</span><span class="p">],</span>
+                    <span class="n">task_name</span><span class="o">=</span><span class="s2">&quot;Named Entity Recognition&quot;</span><span class="p">,</span>
+                    <span class="n">dataset_split</span><span class="o">=</span><span class="n">dataset_split</span><span class="p">,</span>
+                    <span class="n">dataset_revision</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_revision</span><span class="p">,</span>
+                    <span class="n">metric_name</span><span class="o">=</span><span class="s2">&quot;Recall&quot;</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">]</span>
+            <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;model-index&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">eval_results_to_model_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model_name</span><span class="p">,</span> <span class="n">eval_results</span><span class="p">)</span>
+        <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;eval_lines&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_markdown_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eval_lines_list</span><span class="p">)</span>
+        <span class="c1"># Replace |:---:| with |:---| for left alignment</span>
+        <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;label_examples&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_markdown_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">label_example_list</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-:|&quot;</span><span class="p">,</span> <span class="s2">&quot;--|&quot;</span><span class="p">)</span>
+        <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;train_set_metrics&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_markdown_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_set_metrics_list</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-:|&quot;</span><span class="p">,</span> <span class="s2">&quot;--|&quot;</span><span class="p">)</span>
+        <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;metrics_table&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">make_markdown_table</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">metric_lines</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;-:|&quot;</span><span class="p">,</span> <span class="s2">&quot;--|&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">code_carbon_callback</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">code_carbon_callback</span><span class="o">.</span><span class="n">tracker</span><span class="p">:</span>
+            <span class="n">emissions_data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">code_carbon_callback</span><span class="o">.</span><span class="n">tracker</span><span class="o">.</span><span class="n">_prepare_emissions_data</span><span class="p">()</span>
+            <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;co2_eq_emissions&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="c1"># * 1000 to convert kg to g</span>
+                <span class="s2">&quot;emissions&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">emissions_data</span><span class="o">.</span><span class="n">emissions</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">,</span>
+                <span class="s2">&quot;source&quot;</span><span class="p">:</span> <span class="s2">&quot;codecarbon&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;training_type&quot;</span><span class="p">:</span> <span class="s2">&quot;fine-tuning&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;on_cloud&quot;</span><span class="p">:</span> <span class="n">emissions_data</span><span class="o">.</span><span class="n">on_cloud</span> <span class="o">==</span> <span class="s2">&quot;Y&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;cpu_model&quot;</span><span class="p">:</span> <span class="n">emissions_data</span><span class="o">.</span><span class="n">cpu_model</span><span class="p">,</span>
+                <span class="s2">&quot;ram_total_size&quot;</span><span class="p">:</span> <span class="n">emissions_data</span><span class="o">.</span><span class="n">ram_total_size</span><span class="p">,</span>
+                <span class="s2">&quot;hours_used&quot;</span><span class="p">:</span> <span class="nb">round</span><span class="p">(</span><span class="n">emissions_data</span><span class="o">.</span><span class="n">duration</span> <span class="o">/</span> <span class="mi">3600</span><span class="p">,</span> <span class="mi">3</span><span class="p">),</span>
+            <span class="p">}</span>
+            <span class="k">if</span> <span class="n">emissions_data</span><span class="o">.</span><span class="n">gpu_model</span><span class="p">:</span>
+                <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;co2_eq_emissions&quot;</span><span class="p">][</span><span class="s2">&quot;hardware_used&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">emissions_data</span><span class="o">.</span><span class="n">gpu_model</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">:</span>
+            <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;datasets&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span><span class="p">:</span>
+            <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;base_model&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">encoder_id</span>
+        <span class="n">super_dict</span><span class="p">[</span><span class="s2">&quot;model_max_length&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="o">.</span><span class="n">model_max_length</span>
+
+        <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">IGNORED_FIELDS</span><span class="p">:</span>
+            <span class="n">super_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span>
+            <span class="o">**</span><span class="n">super_dict</span><span class="p">,</span>
+        <span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="SpanMarkerModelCardData.to_yaml">
+<a class="viewcode-back" href="../../api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData.to_yaml">[docs]</a>
+    <span class="k">def</span> <span class="nf">to_yaml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">line_break</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">yaml_dump</span><span class="p">(</span>
+            <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">YAML_FIELDS</span> <span class="ow">and</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">},</span>
+            <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">line_break</span><span class="o">=</span><span class="n">line_break</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span></div>
+</div>
+
+
+
+<span class="k">def</span> <span class="nf">is_on_huggingface</span><span class="p">(</span><span class="n">repo_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">is_model</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="c1"># Models with more than two &#39;sections&#39; certainly are not public models</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">repo_id</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">))</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">is_model</span><span class="p">:</span>
+            <span class="n">model_info</span><span class="p">(</span><span class="n">repo_id</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">dataset_info</span><span class="p">(</span><span class="n">repo_id</span><span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">except</span><span class="p">:</span>
+        <span class="c1"># Fetching models can fail for many reasons: Repository not existing, no internet access, HF down, etc.</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+
+<span class="k">def</span> <span class="nf">generate_model_card</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">template_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;model_card_template.md&quot;</span>
+    <span class="n">model_card</span> <span class="o">=</span> <span class="n">ModelCard</span><span class="o">.</span><span class="n">from_template</span><span class="p">(</span><span class="n">card_data</span><span class="o">=</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="p">,</span> <span class="n">template_path</span><span class="o">=</span><span class="n">template_path</span><span class="p">,</span> <span class="n">hf_emoji</span><span class="o">=</span><span class="s2">&quot;🤗&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">model_card</span><span class="o">.</span><span class="n">content</span>
+</pre></div>
+
+        </div>
+      </div>
+
+    </div>
+
+<footer>
+    <div id="footer-info">
+        <ul id="build-details">
+            
+
+            
+
+            
+        </ul>
+
+        
+            <div id="copyright">
+                &copy; 2023, Tom Aarsen
+            </div>
+        
+
+        <div id="credit">
+            created with <a href="http://sphinx-doc.org/">Sphinx</a> and <a href="https://github.com/tomaarsen/nltk_theme">NLTK Theme</a>
+        </div>
+    </div>
+</footer> 
+
+</div>
+
+</body>
+</html>

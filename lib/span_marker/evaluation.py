@@ -9,7 +9,9 @@ from transformers import EvalPrediction
 from span_marker.tokenizer import SpanMarkerTokenizer
 
 
-def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: EvalPrediction) -> Dict[str, float]:
+def compute_f1_via_seqeval(
+    tokenizer: SpanMarkerTokenizer, eval_prediction: EvalPrediction, is_in_train: bool
+) -> Dict[str, float]:
     """Compute micro-F1, recall, precision and accuracy scores using ``seqeval`` for the evaluation predictions.
 
     Note:
@@ -98,7 +100,7 @@ def compute_f1_via_seqeval(tokenizer: SpanMarkerTokenizer, eval_prediction: Eval
     with warnings.catch_warnings():
         warnings.simplefilter("ignore", UndefinedMetricWarning)
         results = seqeval.compute()
-    # `results` also contains e.g. "person-athlete": {'precision': 0.5982658959537572, 'recall': 0.9, 'f1': 0.71875, 'number': 230}
-    # logging this all is overkill. Tensorboard doesn't even support it, WandB does, but it's not very useful generally.
-    # I'd like to revisit this to expose this information somehow still
-    return {key: value for key, value in results.items() if isinstance(value, float)}
+
+    if is_in_train:
+        return {key: value for key, value in results.items() if isinstance(value, float)}
+    return results

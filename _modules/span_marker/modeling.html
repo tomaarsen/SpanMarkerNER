@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -133,7 +134,7 @@
 <span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">__version__</span> <span class="k">as</span> <span class="n">span_marker_version</span>
 <span class="kn">from</span> <span class="nn">span_marker.configuration</span> <span class="kn">import</span> <span class="n">SpanMarkerConfig</span>
 <span class="kn">from</span> <span class="nn">span_marker.data_collator</span> <span class="kn">import</span> <span class="n">SpanMarkerDataCollator</span>
-<span class="kn">from</span> <span class="nn">span_marker.model_card</span> <span class="kn">import</span> <span class="n">generate_model_card</span>
+<span class="kn">from</span> <span class="nn">span_marker.model_card</span> <span class="kn">import</span> <span class="n">SpanMarkerModelCardData</span><span class="p">,</span> <span class="n">generate_model_card</span>
 <span class="kn">from</span> <span class="nn">span_marker.output</span> <span class="kn">import</span> <span class="n">SpanMarkerOutput</span>
 <span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
 
@@ -170,7 +171,13 @@
     <span class="n">base_model_prefix</span> <span class="o">=</span> <span class="s2">&quot;encoder&quot;</span>
     <span class="n">_no_split_modules</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># To support `load_in_8bit=True`` and `device_map=&quot;auto&quot;`</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span> <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PreTrainedModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">,</span>
+        <span class="n">encoder</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">PreTrainedModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_card_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanMarkerModelCardData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize a SpanMarkerModel using configuration.</span>
 
 <span class="sd">        Do not manually initialize a SpanMarkerModel this way! Use :meth:`~SpanMarkerModel.from_pretrained` instead.</span>
@@ -208,6 +215,9 @@
         <span class="c1"># tokenizer and data collator are filled using set_tokenizer</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">data_collator</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_card_data</span> <span class="o">=</span> <span class="n">model_card_data</span> <span class="ow">or</span> <span class="n">SpanMarkerModelCardData</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">register_model</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
 
         <span class="c1"># Initialize weights and apply final processing</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">post_init</span><span class="p">()</span>
@@ -324,6 +334,8 @@
         <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="o">*</span><span class="n">model_args</span><span class="p">,</span>
         <span class="n">labels</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanMarkerConfig</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">model_card_data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanMarkerModelCardData</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">T</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Instantiate a pretrained pytorch model from a pre-trained model configuration.</span>
@@ -365,7 +377,9 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If loading a SpanMarkerConfig, then we don&#39;t want to override id2label and label2id</span>
         <span class="c1"># Create an encoder or SpanMarker config</span>
-        <span class="n">config</span><span class="p">:</span> <span class="n">PretrainedConfig</span> <span class="o">=</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="n">config</span><span class="p">:</span> <span class="n">PretrainedConfig</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+            <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
 
         <span class="c1"># if &#39;pretrained_model_name_or_path&#39; refers to a SpanMarkerModel instance, initialize it directly</span>
         <span class="n">loading_span_marker</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">)</span>
@@ -378,7 +392,9 @@
                     <span class="s2">&quot; introduced in v1.0.0, this is not recommended. Either retrain your model for&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot; v</span><span class="si">{</span><span class="n">span_marker_version</span><span class="si">}</span><span class="s2">, or install `span_marker &lt; 1.0.0`.&quot;</span>
                 <span class="p">)</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+                <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">model_card_data</span><span class="o">=</span><span class="n">model_card_data</span>
+            <span class="p">)</span>
 
         <span class="c1"># If &#39;pretrained_model_name_or_path&#39; refers to an encoder (roberta, bert, distilbert, electra, etc.),</span>
         <span class="c1"># then initialize it and create the SpanMarker config and model using the encoder and its config.</span>
@@ -405,7 +421,7 @@
             <span class="n">config</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">(</span>
                 <span class="n">encoder_config</span><span class="o">=</span><span class="n">config</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(),</span> <span class="n">span_marker_version</span><span class="o">=</span><span class="n">span_marker_version</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
             <span class="p">)</span>
-            <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">model</span> <span class="o">=</span> <span class="bp">cls</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="n">encoder</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span> <span class="n">model_card_data</span><span class="o">=</span><span class="n">model_card_data</span><span class="p">)</span>
 
         <span class="c1"># Pass the tokenizer directly to the model for convenience, this way the user doesn&#39;t have to</span>
         <span class="c1"># make it themselves.</span>
@@ -413,7 +429,12 @@
             <span class="n">config</span><span class="o">.</span><span class="n">encoder</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;_name_or_path&quot;</span><span class="p">,</span> <span class="n">pretrained_model_name_or_path</span><span class="p">),</span> <span class="n">config</span><span class="o">=</span><span class="n">config</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
         <span class="n">model</span><span class="o">.</span><span class="n">set_tokenizer</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">)</span>
-        <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">))</span>
+        <span class="c1"># Since transformers 4.32.0 we should use `pad_to_multiple_of=8`.</span>
+        <span class="c1"># That&#39;ll fail for earlier versions, so we try-except it.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">),</span> <span class="n">pad_to_multiple_of</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">model</span></div>
 
 
@@ -716,7 +737,18 @@
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">save_directory</span><span class="p">,</span> <span class="s2">&quot;README.md&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">generate_model_card</span><span class="p">(</span><span class="n">save_directory</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="p">))</span></div>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">generate_model_card</span><span class="p">())</span></div>
+
+
+<div class="viewcode-block" id="SpanMarkerModel.generate_model_card">
+<a class="viewcode-back" href="../../api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.generate_model_card">[docs]</a>
+    <span class="k">def</span> <span class="nf">generate_model_card</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generate and return a model card string based on the model card data.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The model card string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">generate_model_card</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="SpanMarkerModel.try_cuda">

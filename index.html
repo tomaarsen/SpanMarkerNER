@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -165,19 +166,28 @@ Alternatively, check out any model from this list of particularly useful models:
 <td><p>18</p></td>
 <td><p>English</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms">tomaarsen/span-marker-bert-base-acronyms</a></p>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-keyphrase-inspec">tomaarsen/span-marker-bert-base-uncased-keyphrase-inspec</a></p></td>
+<td><p>Keyphrases</p></td>
+<td><p>1</p></td>
+<td><p>English</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms">tomaarsen/span-marker-bert-base-acronyms</a></p>
 <p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-acronyms">tomaarsen/span-marker-bert-base-uncased-acronyms</a></p>
 </td>
 <td><p>Acronyms</p></td>
 <td><p>2</p></td>
 <td><p>English</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease">tomaarsen/span-marker-bert-base-ncbi-disease</a></p></td>
-<td><p>Diseases</p></td>
-<td><p>1</p></td>
+<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease">tomaarsen/span-marker-bert-base-ncbi-disease</a></p>
+<p><a class="reference external" href="https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-bionlp">tomaarsen/span-marker-bert-base-uncased-bionlp</a></p>
+</td>
+<td><p>Biomedical</p></td>
+<td><p>1</p>
+<p>5</p>
+</td>
 <td><p>English</p></td>
 </tr>
-<tr class="row-even"><td><p><a class="reference external" href="https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14">stefan-it/span-marker-gelectra-large-germeval14</a></p>
+<tr class="row-odd"><td><p><a class="reference external" href="https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14">stefan-it/span-marker-gelectra-large-germeval14</a></p>
 <p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-teams-germeval14">gwlms/span-marker-teams-germeval14</a></p>
 <p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-token-dropping-bert-germeval14">gwlms/span-marker-token-dropping-bert-germeval14</a></p>
 <p><a class="reference external" href="https://huggingface.co/gwlms/span-marker-bert-germeval14">gwlms/span-marker-bert-germeval14</a></p>
@@ -196,10 +206,10 @@ Alternatively, check out any model from this list of particularly useful models:
    </a>
 </h1><p>I have developed this library as a part of my thesis work at <a class="reference external" href="https://github.com/argilla-io/argilla">Argilla</a>.
 Feel free to ⭐ star or watch the <a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker repository</a> to get notified when my thesis is published.</p>
+</section>
+</section>
 <section id="quick-reference">
-<h3>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading">¶</a></h3>
-</section>
-</section>
+<h1>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading">¶</a></h1>
 <section id="how-to-train">
 <h2>How to Train<a class="headerlink" href="#how-to-train" title="Link to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
@@ -211,9 +221,9 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;DFKI-SLT/few-nerd&quot;</span><span class="p">,</span> <span class="s2">&quot;supervised&quot;</span><span class="p">)</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;art&quot;</span><span class="p">,</span> <span class="s2">&quot;building&quot;</span><span class="p">,</span> <span class="s2">&quot;event&quot;</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">,</span> <span class="s2">&quot;organization&quot;</span><span class="p">,</span> <span class="s2">&quot;other&quot;</span><span class="p">,</span> <span class="s2">&quot;person&quot;</span><span class="p">,</span> <span class="s2">&quot;product&quot;</span><span class="p">]</span>
 
-<span class="c1"># Initialize a SpanMarkerModel using an encoder, e.g. BERT:</span>
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
+<span class="c1"># Initialize a SpanMarkerModel using an encoder, e.g. BERT, and the labels:</span>
+<span class="n">encoder_id</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
+<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">encoder_id</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">)</span>
 
 <span class="c1"># See the 🤗 TrainingArguments documentation for details here</span>
 <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
@@ -239,13 +249,18 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 
 <span class="c1"># Training is really simple using our Trainer!</span>
 <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;my_span_marker_model/checkpoint-final&quot;</span><span class="p">)</span>
 
 <span class="c1"># ... and so is evaluating!</span>
 <span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+
+<span class="c1"># Save the model locally or on the Hugging Face Hub</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;my_span_marker_model/checkpoint-final&quot;</span><span class="p">)</span>
+<span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="s2">&quot;my_span_marker_model/checkpoint-final&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>See <a class="reference internal" href="notebooks/model_training.html"><span class="doc">Initializing &amp; Training</span></a> for more details, or check out the documentation for
+<a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a>, <a class="reference internal" href="api/span_marker.trainer.html#span_marker.trainer.Trainer" title="span_marker.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></a>, <a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/loading_methods#datasets.load_dataset" title="(in datasets vmain)"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_dataset()</span></code></a>, or <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments" title="(in transformers vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingArguments</span></code></a>.</p>
 </section>
 <section id="how-to-predict">
 <h2>How to predict<a class="headerlink" href="#how-to-predict" title="Link to this heading">¶</a></h2>
@@ -254,7 +269,7 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 <span class="c1"># Load a finetuned SpanMarkerModel from the 🤗 Hub</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span><span class="p">)</span>
 
-<span class="c1"># It is recommended to explicitly move the model to CUDA for faster inference</span>
+<span class="c1"># It is recommended to explicitly move the model to CUDA for faster inference, if possible</span>
 <span class="n">model</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
 <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;A prototype was fitted in the mid-&#39;60s in a one-off DB5 extended 4&#39;&#39; after the doors and driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.&quot;</span><span class="p">)</span>
@@ -268,16 +283,25 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 <p>You can also load a locally saved model through <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained(&quot;path/to/model&quot;)</span></code>,
 much like in 🤗 Transformers.</p>
 </div>
+<p>See <a class="reference internal" href="notebooks/model_loading.html"><span class="doc">Loading &amp; Inferencing</span></a> for more details, or check out the documentation for
+<a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a> or <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict" title="span_marker.modeling.SpanMarkerModel.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a>.</p>
 </section>
 <section id="how-to-save-a-model">
 <h2>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Link to this heading">¶</a></h2>
+<section id="locally">
+<h3>Locally<a class="headerlink" href="#locally" title="Link to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="s2">&quot;my_model_dir&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
-<span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
+<p>See the documentation for <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.save_pretrained" title="span_marker.modeling.SpanMarkerModel.save_pretrained"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_pretrained()</span></code></a> for more details.</p>
+</section>
+<section id="to-the-hub">
+<h3>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Link to this heading">¶</a></h3>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_id</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
+<span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>See the documentation for <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.push_to_hub" title="span_marker.modeling.SpanMarkerModel.push_to_hub"><code class="xref py py-meth docutils literal notranslate"><span class="pre">push_to_hub()</span></code></a> for more details.</p>
 <div class="toctree-wrapper compound">
 <p class="caption" role="heading"><span class="caption-text">Documentation</span></p>
 <ul>
@@ -295,6 +319,7 @@ much like in 🤗 Transformers.</p>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -310,6 +335,7 @@ much like in 🤗 Transformers.</p>
 </div>
 <div class="toctree-wrapper compound">
 </div>
+</section>
 </section>
 </section>
 

@@ -83,6 +83,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -146,7 +147,8 @@
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;conll2003&quot;</span><span class="p">)</span>
+<span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;conll2003&quot;</span>
+<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
 <span class="n">dataset</span>
 </pre></div>
 </div>
@@ -205,23 +207,38 @@ DatasetDict({
 <li><p><a class="reference external" href="https://huggingface.co/prajjwal1/bert-medium">prajjwal1/bert-medium</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/bert-base-cased">bert-base-cased</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/bert-large-cased">bert-large-cased</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/bert-base-multilingual-cased">bert-base-multilingual-cased</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/bert-base-multilingual-uncased">bert-base-multilingual-uncased</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/roberta-base">roberta-base</a></p></li>
 <li><p><a class="reference external" href="https://huggingface.co/roberta-large">roberta-large</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/xlm-roberta-base">xlm-roberta-base</a></p></li>
+<li><p><a class="reference external" href="https://huggingface.co/xlm-roberta-large">xlm-roberta-large</a></p></li>
 </ul>
-<p>Not all encoders work though, they <strong>must</strong> allow for <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> as an input argument, which disqualifies DistilBERT, T5, DistilRoBERTa, ALBERT &amp; BART. Furthermore, using uncased models is generally not recommended, as the capitalisation can be very useful to find named entities.</p>
+<p>Not all encoders work though, they <strong>must</strong> allow for <code class="docutils literal notranslate"><span class="pre">position_ids</span></code> as an input argument, which disqualifies DistilBERT, T5, DistilRoBERTa, ALBERT &amp; BART.</p>
+<p>Additionally, it’s important to consider that cased models typically demand consistent capitalization in the inference data, aligning with how the training data is formatted. In simpler terms, if your training data consistently uses correct capitalization, but your inference data does not, it may lead to suboptimal performance. In such cases, you might find an uncased model more suitable. Although it may exhibit slightly lower F1 scores on the testing set, it remains functional regardless of
+capitalization, making it potentially more effective in real-world scenarios.</p>
 <p>We’ll use <code class="docutils literal notranslate"><span class="pre">&quot;roberta-base&quot;</span></code> for this notebook. If you’re running this on Google Colab, be sure to set hardware accelerator to “GPU” in <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> &gt; <code class="docutils literal notranslate"><span class="pre">Change</span> <span class="pre">runtime</span> <span class="pre">type</span></code>.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">SpanMarkerModelCardData</span>
 
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;roberta-base&quot;</span>
+<span class="n">encoder_id</span> <span class="o">=</span> <span class="s2">&quot;roberta-base&quot;</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
-    <span class="n">model_name</span><span class="p">,</span>
+    <span class="c1"># Required arguments</span>
+    <span class="n">encoder_id</span><span class="p">,</span>
     <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+    <span class="c1"># Optional arguments</span>
     <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
     <span class="n">entity_max_length</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+    <span class="c1"># To improve the generated model card</span>
+    <span class="n">model_card_data</span><span class="o">=</span><span class="n">SpanMarkerModelCardData</span><span class="p">(</span>
+        <span class="n">language</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">],</span>
+        <span class="n">license</span><span class="o">=</span><span class="s2">&quot;apache-2.0&quot;</span><span class="p">,</span>
+        <span class="n">encoder_id</span><span class="o">=</span><span class="n">encoder_id</span><span class="p">,</span>
+        <span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+    <span class="p">)</span>
 <span class="p">)</span>
 </pre></div>
 </div>
@@ -231,20 +248,28 @@ DatasetDict({
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Some weights of the model checkpoint at roberta-base were not used when initializing RobertaModel: [&#39;lm_head.dense.bias&#39;, &#39;lm_head.bias&#39;, &#39;lm_head.layer_norm.weight&#39;, &#39;lm_head.decoder.weight&#39;, &#39;lm_head.dense.weight&#39;, &#39;lm_head.layer_norm.bias&#39;]
-- This IS expected if you are initializing RobertaModel from the checkpoint of a model trained on another task or with another architecture (e.g. initializing a BertForSequenceClassification model from a BertForPreTraining model).
-- This IS NOT expected if you are initializing RobertaModel from the checkpoint of a model that you expect to be exactly identical (initializing a BertForSequenceClassification model from a BertForSequenceClassification model).
+Some weights of RobertaModel were not initialized from the model checkpoint at roberta-base and are newly initialized: [&#39;roberta.pooler.dense.bias&#39;, &#39;roberta.pooler.dense.weight&#39;]
+You should probably TRAIN this model on a down-stream task to be able to use it for predictions and inference.
 </pre></div></div>
 </div>
-<p>For us, these warnings are expected, as we are initializing <code class="docutils literal notranslate"><span class="pre">BertModel</span></code> for a new task.</p>
-<p>Note that we provided <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a> with a list of our labels. This is required when training a new model. See <a class="reference internal" href="model_configuration.html"><span class="doc">Configuring</span></a> for more details and recommendations on configuration options.</p>
+<p>For us, these warnings are expected, as we are initializing <code class="docutils literal notranslate"><span class="pre">RobertaModel</span></code> for a new task.</p>
+<p>Note that we provided <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code> with a list of our labels. This is required when training a new model using an encoder. Furthermore, we can specify some useful configuration parameters from <code class="docutils literal notranslate"><span class="pre">SpanMarkerConfig</span></code>, such as:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">model_max_length</span></code>: The maximum number of tokens that the model will process. If you only use short sentences for your model, reducing this number may help training and inference speeds with no loss in performance. Defaults to the encoder maximum, or 512 if the encoder doesn’t have a maximum.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">entity_max_length</span></code>: The total number of words that one entity can be. Defaults to 8.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">model_card_data</span></code>: A <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData">SpanMarkerModelCardData</a> instance where you can provide a lot of useful data about your model. This data will be automatically included in a generated model card whenever a model is saved or pushed to the Hugging Face Hub.</p>
+<ul>
+<li><p>Consider adding <code class="docutils literal notranslate"><span class="pre">language</span></code>, <code class="docutils literal notranslate"><span class="pre">license</span></code>, <code class="docutils literal notranslate"><span class="pre">model_id</span></code>, <code class="docutils literal notranslate"><span class="pre">encoder_id</span></code> and <code class="docutils literal notranslate"><span class="pre">dataset_id</span></code> to improve the generated model card README.md file.</p></li>
+</ul>
+</li>
+</ul>
 </section>
 <section id="Training">
 <h2>Training<a class="headerlink" href="#Training" title="Link to this heading">¶</a></h2>
 <p>At this point, our model is already ready for training! We can import <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer#transformers.TrainingArguments">TrainingArguments</a> directly from 🤗 Transformers as well as the SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. The <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> is a subclass of the 🤗 Transformers <a class="reference external" href="https://huggingface.co/docs/transformers/main_classes/trainer">Trainer</a> that simplifies some tasks for you, but otherwise it works just like the regular <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>.</p>
 <p>This next snippet shows some reasonable defaults. Feel free to adjust the batch size to a lower value if you experience out of memory exceptions.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
@@ -267,9 +292,10 @@ Some weights of the model checkpoint at roberta-base were not used when initiali
 </pre></div>
 </div>
 </div>
-<p>Now we can create a SpanMarker <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> in the same way that you would initialize a 🤗 Transformers <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. We’ll train on a subsection of the data to save us some time. Amazingly, this <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> will automatically create logs using exactly the logging tools that you have installed. With other words, if you prefer logging with <a class="reference external" href="https://www.tensorflow.org/tensorboard">Tensorboard</a>, all that you have to do is install it.</p>
+<p>Now we can create a SpanMarker <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.trainer.html#span_marker.trainer.Trainer">Trainer</a> in the same way that you would initialize a 🤗 Transformers <code class="docutils literal notranslate"><span class="pre">Trainer</span></code>. We’ll train on a subsection of the data to save us some time. Amazingly, this <code class="docutils literal notranslate"><span class="pre">Trainer</span></code> will automatically create logs using exactly the logging tools that you have installed. With other words, if you prefer logging with <a class="reference external" href="https://www.tensorflow.org/tensorboard">Tensorboard</a>,
+all that you have to do is install it.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">Trainer</span>
@@ -299,49 +325,18 @@ These are the frequencies of the missed entities due to maximum entity length ou
 <div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
-<div class="output_area rendered_html docutils container">
-wandb version 0.15.0 is available!  To upgrade, please run:
- $ pip install wandb --upgrade</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Tracking run with wandb version 0.14.0</div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Run data is saved locally in <code>wandb\run-20230428_160736-klxbldeq</code></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area rendered_html docutils container">
-Syncing run <strong>woven-plasma-757</strong> to Weights & Biases (<a href='https://wandb.me/run' target="_blank">docs</a>)<br/></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area docutils container">
-<script type="application/vnd.jupyter.widget-view+json">{"model_id": "be3fbeb39544469eba6382d146d521fa", "version_major": 2, "version_minor": 0}</script></div>
-</div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;loss&#39;: 0.9477, &#39;learning_rate&#39;: 2.6519337016574586e-06, &#39;epoch&#39;: 0.03}
-{&#39;loss&#39;: 0.2025, &#39;learning_rate&#39;: 5.414364640883978e-06, &#39;epoch&#39;: 0.06}
-{&#39;loss&#39;: 0.1407, &#39;learning_rate&#39;: 8.176795580110498e-06, &#39;epoch&#39;: 0.08}
-{&#39;loss&#39;: 0.1291, &#39;learning_rate&#39;: 9.895126465144972e-06, &#39;epoch&#39;: 0.11}
-{&#39;loss&#39;: 0.0973, &#39;learning_rate&#39;: 9.58667489204195e-06, &#39;epoch&#39;: 0.14}
-{&#39;loss&#39;: 0.0737, &#39;learning_rate&#39;: 9.278223318938926e-06, &#39;epoch&#39;: 0.17}
-{&#39;loss&#39;: 0.0639, &#39;learning_rate&#39;: 8.969771745835904e-06, &#39;epoch&#39;: 0.19}
-{&#39;loss&#39;: 0.0539, &#39;learning_rate&#39;: 8.661320172732882e-06, &#39;epoch&#39;: 0.22}
-{&#39;loss&#39;: 0.0481, &#39;learning_rate&#39;: 8.352868599629858e-06, &#39;epoch&#39;: 0.25}
-{&#39;loss&#39;: 0.0489, &#39;learning_rate&#39;: 8.044417026526836e-06, &#39;epoch&#39;: 0.28}
+{&#39;loss&#39;: 1.1135, &#39;learning_rate&#39;: 2.707182320441989e-06, &#39;epoch&#39;: 0.03}
+{&#39;loss&#39;: 0.245, &#39;learning_rate&#39;: 5.469613259668509e-06, &#39;epoch&#39;: 0.06}
+{&#39;loss&#39;: 0.1466, &#39;learning_rate&#39;: 8.232044198895029e-06, &#39;epoch&#39;: 0.08}
+{&#39;loss&#39;: 0.1077, &#39;learning_rate&#39;: 9.888957433682912e-06, &#39;epoch&#39;: 0.11}
+{&#39;loss&#39;: 0.0839, &#39;learning_rate&#39;: 9.58050586057989e-06, &#39;epoch&#39;: 0.14}
+{&#39;loss&#39;: 0.0702, &#39;learning_rate&#39;: 9.272054287476866e-06, &#39;epoch&#39;: 0.17}
+{&#39;loss&#39;: 0.0614, &#39;learning_rate&#39;: 8.963602714373844e-06, &#39;epoch&#39;: 0.19}
+{&#39;loss&#39;: 0.0476, &#39;learning_rate&#39;: 8.65515114127082e-06, &#39;epoch&#39;: 0.22}
+{&#39;loss&#39;: 0.0446, &#39;learning_rate&#39;: 8.346699568167798e-06, &#39;epoch&#39;: 0.25}
+{&#39;loss&#39;: 0.0327, &#39;learning_rate&#39;: 8.038247995064774e-06, &#39;epoch&#39;: 0.28}
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -360,27 +355,17 @@ These are the frequencies of the missed entities due to maximum entity length ou
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;eval_loss&#39;: 0.03809420391917229, &#39;eval_overall_precision&#39;: 0.8559068219633943, &#39;eval_overall_recall&#39;: 0.7527070529704419, &#39;eval_overall_f1&#39;: 0.8009965742759265, &#39;eval_overall_accuracy&#39;: 0.9548683524504692, &#39;eval_runtime&#39;: 13.4517, &#39;eval_samples_per_second&#39;: 153.661, &#39;eval_steps_per_second&#39;: 38.434, &#39;epoch&#39;: 0.28}
-{&#39;loss&#39;: 0.0379, &#39;learning_rate&#39;: 7.735965453423812e-06, &#39;epoch&#39;: 0.31}
-{&#39;loss&#39;: 0.039, &#39;learning_rate&#39;: 7.42751388032079e-06, &#39;epoch&#39;: 0.33}
-{&#39;loss&#39;: 0.0373, &#39;learning_rate&#39;: 7.119062307217768e-06, &#39;epoch&#39;: 0.36}
-{&#39;loss&#39;: 0.0362, &#39;learning_rate&#39;: 6.810610734114744e-06, &#39;epoch&#39;: 0.39}
-{&#39;loss&#39;: 0.0287, &#39;learning_rate&#39;: 6.502159161011722e-06, &#39;epoch&#39;: 0.42}
-{&#39;loss&#39;: 0.0283, &#39;learning_rate&#39;: 6.193707587908698e-06, &#39;epoch&#39;: 0.44}
-{&#39;loss&#39;: 0.0308, &#39;learning_rate&#39;: 5.885256014805676e-06, &#39;epoch&#39;: 0.47}
-{&#39;loss&#39;: 0.0266, &#39;learning_rate&#39;: 5.576804441702654e-06, &#39;epoch&#39;: 0.5}
-{&#39;loss&#39;: 0.0193, &#39;learning_rate&#39;: 5.26835286859963e-06, &#39;epoch&#39;: 0.53}
-{&#39;loss&#39;: 0.0163, &#39;learning_rate&#39;: 4.959901295496608e-06, &#39;epoch&#39;: 0.55}
-{&#39;eval_loss&#39;: 0.018327122554183006, &#39;eval_overall_precision&#39;: 0.9140995260663507, &#39;eval_overall_recall&#39;: 0.9031314018144572, &#39;eval_overall_f1&#39;: 0.9085823641984395, &#39;eval_overall_accuracy&#39;: 0.9804157977059437, &#39;eval_runtime&#39;: 13.537, &#39;eval_samples_per_second&#39;: 152.693, &#39;eval_steps_per_second&#39;: 38.192, &#39;epoch&#39;: 0.55}
-{&#39;loss&#39;: 0.0249, &#39;learning_rate&#39;: 4.651449722393585e-06, &#39;epoch&#39;: 0.58}
-{&#39;loss&#39;: 0.0225, &#39;learning_rate&#39;: 4.342998149290562e-06, &#39;epoch&#39;: 0.61}
-{&#39;loss&#39;: 0.0215, &#39;learning_rate&#39;: 4.0345465761875395e-06, &#39;epoch&#39;: 0.64}
-{&#39;loss&#39;: 0.0251, &#39;learning_rate&#39;: 3.726095003084516e-06, &#39;epoch&#39;: 0.67}
-{&#39;loss&#39;: 0.0186, &#39;learning_rate&#39;: 3.417643429981493e-06, &#39;epoch&#39;: 0.69}
-{&#39;loss&#39;: 0.0212, &#39;learning_rate&#39;: 3.10919185687847e-06, &#39;epoch&#39;: 0.72}
-{&#39;loss&#39;: 0.0166, &#39;learning_rate&#39;: 2.800740283775448e-06, &#39;epoch&#39;: 0.75}
-{&#39;loss&#39;: 0.0226, &#39;learning_rate&#39;: 2.492288710672425e-06, &#39;epoch&#39;: 0.78}
-{&#39;loss&#39;: 0.0162, &#39;learning_rate&#39;: 2.183837137569402e-06, &#39;epoch&#39;: 0.8}
+{&#39;eval_loss&#39;: 0.02650175243616104, &#39;eval_overall_precision&#39;: 0.8974691758598313, &#39;eval_overall_recall&#39;: 0.7968885047536733, &#39;eval_overall_f1&#39;: 0.8441934991606898, &#39;eval_overall_accuracy&#39;: 0.9632217370208637, &#39;eval_runtime&#39;: 20.1351, &#39;eval_samples_per_second&#39;: 102.656, &#39;eval_steps_per_second&#39;: 25.676, &#39;epoch&#39;: 0.28}
+{&#39;loss&#39;: 0.0348, &#39;learning_rate&#39;: 7.729796421961752e-06, &#39;epoch&#39;: 0.31}
+{&#39;loss&#39;: 0.0378, &#39;learning_rate&#39;: 7.42134484885873e-06, &#39;epoch&#39;: 0.33}
+{&#39;loss&#39;: 0.0275, &#39;learning_rate&#39;: 7.112893275755707e-06, &#39;epoch&#39;: 0.36}
+{&#39;loss&#39;: 0.0242, &#39;learning_rate&#39;: 6.804441702652684e-06, &#39;epoch&#39;: 0.39}
+{&#39;loss&#39;: 0.0255, &#39;learning_rate&#39;: 6.495990129549661e-06, &#39;epoch&#39;: 0.42}
+{&#39;loss&#39;: 0.0235, &#39;learning_rate&#39;: 6.187538556446638e-06, &#39;epoch&#39;: 0.44}
+{&#39;loss&#39;: 0.0223, &#39;learning_rate&#39;: 5.879086983343616e-06, &#39;epoch&#39;: 0.47}
+{&#39;loss&#39;: 0.0183, &#39;learning_rate&#39;: 5.570635410240592e-06, &#39;epoch&#39;: 0.5}
+{&#39;loss&#39;: 0.0194, &#39;learning_rate&#39;: 5.26218383713757e-06, &#39;epoch&#39;: 0.53}
+{&#39;loss&#39;: 0.0191, &#39;learning_rate&#39;: 4.953732264034547e-06, &#39;epoch&#39;: 0.55}
 </pre></div></div>
 </div>
 <div class="nboutput docutils container">
@@ -388,29 +373,50 @@ These are the frequencies of the missed entities due to maximum entity length ou
 </div>
 <div class="output_area stderr docutils container">
 <div class="highlight"><pre>
-Loading cached processed dataset at ...
-Loading cached processed dataset at ...
+This SpanMarker model won&#39;t be able to predict 0.172563% of all annotated entities in the evaluation dataset. This is caused by the SpanMarkerModel maximum entity length of 6 words.
+These are the frequencies of the missed entities due to maximum entity length out of 3477 total entities:
+- 5 missed entities with 7 words (0.143802%)
+- 1 missed entities with 10 words (0.028760%)
 </pre></div></div>
 </div>
-<div class="nboutput nblast docutils container">
+<div class="nboutput docutils container">
 <div class="prompt empty docutils container">
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;loss&#39;: 0.0178, &#39;learning_rate&#39;: 1.8753855644663791e-06, &#39;epoch&#39;: 0.83}
-{&#39;eval_loss&#39;: 0.013812492601573467, &#39;eval_overall_precision&#39;: 0.9375370041444642, &#39;eval_overall_recall&#39;: 0.9268364062042728, &#39;eval_overall_f1&#39;: 0.9321559970566594, &#39;eval_overall_accuracy&#39;: 0.9858902502606882, &#39;eval_runtime&#39;: 13.6173, &#39;eval_samples_per_second&#39;: 151.793, &#39;eval_steps_per_second&#39;: 37.967, &#39;epoch&#39;: 0.83}
-{&#39;loss&#39;: 0.017, &#39;learning_rate&#39;: 1.566933991363356e-06, &#39;epoch&#39;: 0.86}
-{&#39;loss&#39;: 0.0164, &#39;learning_rate&#39;: 1.2584824182603333e-06, &#39;epoch&#39;: 0.89}
-{&#39;loss&#39;: 0.0202, &#39;learning_rate&#39;: 9.500308451573104e-07, &#39;epoch&#39;: 0.92}
-{&#39;loss&#39;: 0.0203, &#39;learning_rate&#39;: 6.415792720542875e-07, &#39;epoch&#39;: 0.94}
-{&#39;loss&#39;: 0.0188, &#39;learning_rate&#39;: 3.3312769895126467e-07, &#39;epoch&#39;: 0.97}
-{&#39;loss&#39;: 0.0175, &#39;learning_rate&#39;: 2.4676125848241828e-08, &#39;epoch&#39;: 1.0}
-{&#39;train_runtime&#39;: 326.1576, &#39;train_samples_per_second&#39;: 44.193, &#39;train_steps_per_second&#39;: 5.525, &#39;train_loss&#39;: 0.06725485075976323, &#39;epoch&#39;: 1.0}
+{&#39;eval_loss&#39;: 0.016905048862099648, &#39;eval_overall_precision&#39;: 0.9247838616714698, &#39;eval_overall_recall&#39;: 0.9245174301354077, &#39;eval_overall_f1&#39;: 0.9246506267108485, &#39;eval_overall_accuracy&#39;: 0.9844412097687207, &#39;eval_runtime&#39;: 20.2213, &#39;eval_samples_per_second&#39;: 102.219, &#39;eval_steps_per_second&#39;: 25.567, &#39;epoch&#39;: 0.55}
+{&#39;loss&#39;: 0.0206, &#39;learning_rate&#39;: 4.645280690931524e-06, &#39;epoch&#39;: 0.58}
+{&#39;loss&#39;: 0.0198, &#39;learning_rate&#39;: 4.336829117828501e-06, &#39;epoch&#39;: 0.61}
+{&#39;loss&#39;: 0.0184, &#39;learning_rate&#39;: 4.028377544725479e-06, &#39;epoch&#39;: 0.64}
+{&#39;loss&#39;: 0.0203, &#39;learning_rate&#39;: 3.7199259716224557e-06, &#39;epoch&#39;: 0.67}
+{&#39;loss&#39;: 0.0206, &#39;learning_rate&#39;: 3.4114743985194327e-06, &#39;epoch&#39;: 0.69}
+{&#39;loss&#39;: 0.0187, &#39;learning_rate&#39;: 3.1030228254164097e-06, &#39;epoch&#39;: 0.72}
+{&#39;loss&#39;: 0.015, &#39;learning_rate&#39;: 2.794571252313387e-06, &#39;epoch&#39;: 0.75}
+{&#39;loss&#39;: 0.0221, &#39;learning_rate&#39;: 2.486119679210364e-06, &#39;epoch&#39;: 0.78}
+{&#39;loss&#39;: 0.0189, &#39;learning_rate&#39;: 2.177668106107341e-06, &#39;epoch&#39;: 0.8}
+{&#39;loss&#39;: 0.0158, &#39;learning_rate&#39;: 1.8692165330043186e-06, &#39;epoch&#39;: 0.83}
+{&#39;eval_loss&#39;: 0.01296199019998312, &#39;eval_overall_precision&#39;: 0.9394202898550724, &#39;eval_overall_recall&#39;: 0.933736675309709, &#39;eval_overall_f1&#39;: 0.9365698598468429, &#39;eval_overall_accuracy&#39;: 0.9868348698043021, &#39;eval_runtime&#39;: 20.2701, &#39;eval_samples_per_second&#39;: 101.973, &#39;eval_steps_per_second&#39;: 25.506, &#39;epoch&#39;: 0.83}
+{&#39;loss&#39;: 0.0165, &#39;learning_rate&#39;: 1.5607649599012956e-06, &#39;epoch&#39;: 0.86}
+{&#39;loss&#39;: 0.017, &#39;learning_rate&#39;: 1.2523133867982728e-06, &#39;epoch&#39;: 0.89}
+{&#39;loss&#39;: 0.0183, &#39;learning_rate&#39;: 9.438618136952499e-07, &#39;epoch&#39;: 0.92}
+{&#39;loss&#39;: 0.0164, &#39;learning_rate&#39;: 6.35410240592227e-07, &#39;epoch&#39;: 0.94}
+{&#39;loss&#39;: 0.0162, &#39;learning_rate&#39;: 3.2695866748920424e-07, &#39;epoch&#39;: 0.97}
+{&#39;loss&#39;: 0.021, &#39;learning_rate&#39;: 1.850709438618137e-08, &#39;epoch&#39;: 1.0}
+{&#39;train_runtime&#39;: 479.9392, &#39;train_samples_per_second&#39;: 30.033, &#39;train_steps_per_second&#39;: 3.755, &#39;train_loss&#39;: 0.06940532092560087, &#39;epoch&#39;: 1.0}
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+TrainOutput(global_step=1802, training_loss=0.06940532092560087, metrics={&#39;train_runtime&#39;: 479.9392, &#39;train_samples_per_second&#39;: 30.033, &#39;train_steps_per_second&#39;: 3.755, &#39;train_loss&#39;: 0.06940532092560087, &#39;epoch&#39;: 1.0})
 </pre></div></div>
 </div>
 <p>And now the final step is to compute the model’s performance.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
@@ -418,35 +424,42 @@ Loading cached processed dataset at ...
 </pre></div>
 </div>
 </div>
-<div class="nboutput docutils container">
-<div class="prompt empty docutils container">
-</div>
-<div class="output_area stderr docutils container">
-<div class="highlight"><pre>
-Loading cached processed dataset at ...
-Loading cached processed dataset at ...
-</pre></div></div>
-</div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;eval_loss&#39;: 0.01344103179872036,
- &#39;eval_overall_precision&#39;: 0.9364892678623934,
- &#39;eval_overall_recall&#39;: 0.9321041849575651,
- &#39;eval_overall_f1&#39;: 0.9342915811088296,
- &#39;eval_overall_accuracy&#39;: 0.9861183524504692,
- &#39;eval_runtime&#39;: 13.1532,
- &#39;eval_samples_per_second&#39;: 157.148,
- &#39;eval_steps_per_second&#39;: 39.306,
+{&#39;eval_loss&#39;: 0.012707239016890526,
+ &#39;eval_LOC&#39;: {&#39;precision&#39;: 0.9642857142857143,
+  &#39;recall&#39;: 0.9503610108303249,
+  &#39;f1&#39;: 0.9572727272727273,
+  &#39;number&#39;: 1108},
+ &#39;eval_MISC&#39;: {&#39;precision&#39;: 0.8805309734513275,
+  &#39;recall&#39;: 0.8378947368421052,
+  &#39;f1&#39;: 0.8586839266450916,
+  &#39;number&#39;: 475},
+ &#39;eval_ORG&#39;: {&#39;precision&#39;: 0.8736842105263158,
+  &#39;recall&#39;: 0.9021739130434783,
+  &#39;f1&#39;: 0.8877005347593583,
+  &#39;number&#39;: 736},
+ &#39;eval_PER&#39;: {&#39;precision&#39;: 0.9776247848537005,
+  &#39;recall&#39;: 0.9861111111111112,
+  &#39;f1&#39;: 0.9818496110630942,
+  &#39;number&#39;: 1152},
+ &#39;eval_overall_precision&#39;: 0.9379688401615696,
+ &#39;eval_overall_recall&#39;: 0.9366176894266782,
+ &#39;eval_overall_f1&#39;: 0.9372927778578637,
+ &#39;eval_overall_accuracy&#39;: 0.9872553776483908,
+ &#39;eval_runtime&#39;: 19.9052,
+ &#39;eval_samples_per_second&#39;: 103.842,
+ &#39;eval_steps_per_second&#39;: 25.973,
  &#39;epoch&#39;: 1.0}
 </pre></div></div>
 </div>
 <p>Additionally, we should evaluate using the test set.</p>
 <div class="nbinput docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;test&quot;</span><span class="p">],</span> <span class="n">metric_key_prefix</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">)</span>
@@ -454,22 +467,39 @@ Loading cached processed dataset at ...
 </div>
 </div>
 <div class="nboutput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
 </pre></div>
 </div>
 <div class="output_area docutils container">
 <div class="highlight"><pre>
-{&#39;test_loss&#39;: 0.027700792998075485,
- &#39;test_overall_precision&#39;: 0.9039692701664532,
- &#39;test_overall_recall&#39;: 0.9067889908256881,
- &#39;test_overall_f1&#39;: 0.9053769350554182,
- &#39;test_overall_accuracy&#39;: 0.9796867082332724,
- &#39;test_runtime&#39;: 22.7367,
- &#39;test_samples_per_second&#39;: 155.915,
- &#39;test_steps_per_second&#39;: 39.012,
+{&#39;test_loss&#39;: 0.029485255479812622,
+ &#39;test_LOC&#39;: {&#39;precision&#39;: 0.9335384615384615,
+  &#39;recall&#39;: 0.9094724220623501,
+  &#39;f1&#39;: 0.9213483146067416,
+  &#39;number&#39;: 1668},
+ &#39;test_MISC&#39;: {&#39;precision&#39;: 0.7503429355281207,
+  &#39;recall&#39;: 0.7792022792022792,
+  &#39;f1&#39;: 0.76450034940601,
+  &#39;number&#39;: 702},
+ &#39;test_ORG&#39;: {&#39;precision&#39;: 0.8538243626062323,
+  &#39;recall&#39;: 0.9072847682119205,
+  &#39;f1&#39;: 0.87974314068885,
+  &#39;number&#39;: 1661},
+ &#39;test_PER&#39;: {&#39;precision&#39;: 0.9658808933002482,
+  &#39;recall&#39;: 0.9628942486085343,
+  &#39;f1&#39;: 0.964385258593992,
+  &#39;number&#39;: 1617},
+ &#39;test_overall_precision&#39;: 0.8947827604257547,
+ &#39;test_overall_recall&#39;: 0.9079320113314447,
+ &#39;test_overall_f1&#39;: 0.9013094296511117,
+ &#39;test_overall_accuracy&#39;: 0.9782276300204588,
+ &#39;test_runtime&#39;: 33.9555,
+ &#39;test_samples_per_second&#39;: 104.401,
+ &#39;test_steps_per_second&#39;: 26.122,
  &#39;epoch&#39;: 1.0}
 </pre></div></div>
 </div>
+<p>Great performance for 8 minutes trained! 🎉</p>
 <p>Once trained, we can save our new model locally.</p>
 <div class="nbinput nblast docutils container">
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
@@ -479,12 +509,12 @@ Loading cached processed dataset at ...
 </pre></div>
 </div>
 </div>
-<p>Or we can push it to the 🤗 Hub like so. I’ve commented it away for now to prevent people from accidentally pushing models.</p>
+<p>Or we can push it to the 🤗 Hub like so.</p>
 <div class="nbinput nblast docutils container">
-<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="c1"># trainer.push_to_hub()</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">repo_id</span><span class="o">=</span><span class="s2">&quot;span-marker-roberta-base-conll03&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -502,40 +532,59 @@ Loading cached processed dataset at ...
 <span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
 
-<span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;conll2003&quot;</span><span class="p">)</span>
-<span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">names</span>
+<span class="k">def</span> <span class="nf">main</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">dataset_id</span> <span class="o">=</span> <span class="s2">&quot;conll2003&quot;</span>
+    <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">)</span>
+    <span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">features</span><span class="p">[</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">feature</span><span class="o">.</span><span class="n">names</span>
 
-<span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;roberta-base&quot;</span>
-<span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">,</span> <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span> <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>
+    <span class="n">encoder_id</span> <span class="o">=</span> <span class="s2">&quot;roberta-base&quot;</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
+        <span class="c1"># Required arguments</span>
+        <span class="n">encoder_id</span><span class="p">,</span>
+        <span class="n">labels</span><span class="o">=</span><span class="n">labels</span><span class="p">,</span>
+        <span class="c1"># Optional arguments</span>
+        <span class="n">model_max_length</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+        <span class="n">entity_max_length</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+        <span class="c1"># To improve the generated model card</span>
+        <span class="n">model_card_data</span><span class="o">=</span><span class="n">SpanMarkerModelCardData</span><span class="p">(</span>
+            <span class="n">language</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;en&quot;</span><span class="p">],</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;apache-2.0&quot;</span><span class="p">,</span>
+            <span class="n">encoder_id</span><span class="o">=</span><span class="n">encoder_id</span><span class="p">,</span>
+            <span class="n">dataset_id</span><span class="o">=</span><span class="n">dataset_id</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
 
-<span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
-    <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/span-marker-roberta-base-conll03&quot;</span><span class="p">,</span>
-    <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
-    <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
-    <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-    <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-    <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
-    <span class="n">save_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
-    <span class="n">eval_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
-    <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-    <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
-    <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
-<span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
+        <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/span-marker-roberta-base-conll03&quot;</span><span class="p">,</span>
+        <span class="n">learning_rate</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span>
+        <span class="n">gradient_accumulation_steps</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+        <span class="n">per_device_train_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">per_device_eval_batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">num_train_epochs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">evaluation_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+        <span class="n">save_strategy</span><span class="o">=</span><span class="s2">&quot;steps&quot;</span><span class="p">,</span>
+        <span class="n">eval_steps</span><span class="o">=</span><span class="mi">500</span><span class="p">,</span>
+        <span class="n">push_to_hub</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">logging_steps</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+        <span class="n">fp16</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">warmup_ratio</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+    <span class="p">)</span>
 
-<span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
-    <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
-    <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
-    <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8000</span><span class="p">)),</span>
-    <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span>
-<span class="p">)</span>
+    <span class="n">trainer</span> <span class="o">=</span> <span class="n">Trainer</span><span class="p">(</span>
+        <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
+        <span class="n">args</span><span class="o">=</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">train_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">8000</span><span class="p">)),</span>
+        <span class="n">eval_dataset</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;validation&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">select</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="mi">2000</span><span class="p">)),</span>
+    <span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
 
-<span class="n">trainer</span><span class="o">.</span><span class="n">train</span><span class="p">()</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;models/span-marker-roberta-base-conll03/checkpoint-final&quot;</span><span class="p">)</span>
-<span class="n">trainer</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">()</span>
+    <span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
 
-<span class="n">metrics</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">evaluate</span><span class="p">()</span>
-<span class="nb">print</span><span class="p">(</span><span class="n">metrics</span><span class="p">)</span>
+    <span class="n">trainer</span><span class="o">.</span><span class="n">save_model</span><span class="p">(</span><span class="s2">&quot;models/span-marker-roberta-base-conll03/checkpoint-final&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>With <code class="docutils literal notranslate"><span class="pre">wandb</span></code> initialized, you can enjoy their very useful training graphs straight in your browser. It ends up looking something like this. <img alt="image" src="https://user-images.githubusercontent.com/37621491/235172501-a3cdae91-faf0-42b7-ac60-e6738b78e67e.png" /> <img alt="image1" src="https://user-images.githubusercontent.com/37621491/235172726-795ded55-4b1c-40fa-ab91-476762f7dd57.png" /></p>

@@ -1,6 +1,8 @@
 __version__ = "1.3.1.dev"
 
+import importlib
 import logging
+import os
 from typing import Optional, Union
 
 import torch
@@ -8,6 +10,7 @@ from transformers import AutoConfig, AutoModel, TrainingArguments
 from transformers.pipelines import PIPELINE_REGISTRY, pipeline
 
 from span_marker.configuration import SpanMarkerConfig
+from span_marker.model_card import SpanMarkerModelCardData
 from span_marker.modeling import SpanMarkerModel
 from span_marker.pipeline_component import SpanMarkerPipeline
 from span_marker.trainer import Trainer
@@ -61,6 +64,11 @@ else:
                 pass
         return SpacySpanMarkerWrapper(model, batch_size=batch_size, device=device)
 
+
+# If codecarbon is installed and the log level is not defined,
+# automatically overwrite the default to "error"
+if importlib.util.find_spec("codecarbon") and "CODECARBON_LOG_LEVEL" not in os.environ:
+    os.environ["CODECARBON_LOG_LEVEL"] = "error"
 
 logger = logging.getLogger("span_marker")
 logger.setLevel(logging.INFO)

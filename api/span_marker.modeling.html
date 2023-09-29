@@ -83,6 +83,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -120,7 +121,7 @@
 <span id="span-marker-modeling-module"></span><h1>span_marker.modeling module<a class="headerlink" href="#module-span_marker.modeling" title="Link to this heading">¶</a></h1>
 <dl class="py class">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.modeling.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.modeling.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">config</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">encoder</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_card_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel" title="Link to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">PreTrainedModel</span></code></p>
 <p>This SpanMarker model allows for Named Entity Recognition (NER) using a variety of underlying encoders,
 such as BERT and RoBERTa. The model should be initialized using <a class="reference internal" href="#span_marker.modeling.SpanMarkerModel.from_pretrained" title="span_marker.modeling.SpanMarkerModel.from_pretrained"><code class="xref py py-meth docutils literal notranslate"><span class="pre">from_pretrained()</span></code></a>,
@@ -144,6 +145,7 @@ e.g. like so:</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a>) – </p></li>
 <li><p><strong>encoder</strong> (<em>PreTrainedModel</em><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>model_card_data</strong> (<a class="reference internal" href="span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData" title="span_marker.model_card.SpanMarkerModelCardData"><em>SpanMarkerModelCardData</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -176,7 +178,7 @@ e.g. like so:</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.from_pretrained">
-<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pretrained</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">model_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.from_pretrained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.from_pretrained" title="Link to this definition">¶</a></dt>
+<em class="property"><span class="pre">classmethod</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_pretrained</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">pretrained_model_name_or_path</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">model_args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">labels</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_card_data</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.from_pretrained"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.from_pretrained" title="Link to this definition">¶</a></dt>
 <dd><p>Instantiate a pretrained pytorch model from a pre-trained model configuration.</p>
 <p class="rubric">Example</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="c1"># Initialize a SpanMarkerModel using a pretrained encoder</span>
@@ -209,6 +211,8 @@ PyTorch model using the provided conversion scripts and loading the PyTorch mode
 </p></li>
 <li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> in your datasets.
 Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>model_card_data</strong> (<a class="reference internal" href="span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData" title="span_marker.model_card.SpanMarkerModelCardData"><em>SpanMarkerModelCardData</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -228,6 +232,8 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>pretrained_model_name_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.11)"><em>PathLike</em></a>) – </p></li>
 <li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.11)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>model_card_data</strong> (<a class="reference internal" href="span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData" title="span_marker.model_card.SpanMarkerModelCardData"><em>SpanMarkerModelCardData</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -312,6 +318,20 @@ if the input is a string.</p></li>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.generate_model_card">
+<span class="sig-name descname"><span class="pre">generate_model_card</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/modeling.html#SpanMarkerModel.generate_model_card"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.generate_model_card" title="Link to this definition">¶</a></dt>
+<dd><p>Generate and return a model card string based on the model card data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The model card string.</p>
+</dd>
+<dt class="field-even">Return type<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
 </dd>
 </dl>
 </dd></dl>

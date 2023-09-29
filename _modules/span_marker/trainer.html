@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.model_card.html">span_marker.model_card module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
@@ -119,6 +120,7 @@
 <span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span>
@@ -135,6 +137,7 @@
 
 <span class="kn">from</span> <span class="nn">span_marker.evaluation</span> <span class="kn">import</span> <span class="n">compute_f1_via_seqeval</span>
 <span class="kn">from</span> <span class="nn">span_marker.label_normalizer</span> <span class="kn">import</span> <span class="n">AutoLabelNormalizer</span><span class="p">,</span> <span class="n">LabelNormalizer</span>
+<span class="kn">from</span> <span class="nn">span_marker.model_card</span> <span class="kn">import</span> <span class="n">ModelCardCallback</span>
 <span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 <span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
 
@@ -227,7 +230,7 @@
         <span class="c1"># Set some Training arguments that must be set for SpanMarker</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">TrainingArguments</span><span class="p">(</span>
-                <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/my_span_marker_model&quot;</span><span class="p">,</span> <span class="n">include_inputs_for_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">True</span>
+                <span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot;models/my_span_marker_model&quot;</span><span class="p">,</span> <span class="n">include_inputs_for_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">False</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">args</span> <span class="o">=</span> <span class="n">dataclasses</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">include_inputs_for_metrics</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">remove_unused_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
@@ -235,11 +238,25 @@
         <span class="c1"># Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics</span>
         <span class="k">if</span> <span class="n">compute_metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">compute_metrics_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="p">{</span>
-                <span class="o">**</span><span class="n">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">),</span>
+                <span class="o">**</span><span class="n">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_in_train</span><span class="p">),</span>
                 <span class="o">**</span><span class="n">compute_metrics</span><span class="p">(</span><span class="n">eval_prediction</span><span class="p">),</span>
             <span class="p">}</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">compute_metrics_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">compute_f1_via_seqeval</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">)</span>
+            <span class="n">compute_metrics_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">eval_prediction</span><span class="p">:</span> <span class="n">compute_f1_via_seqeval</span><span class="p">(</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">eval_prediction</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_in_train</span>
+            <span class="p">)</span>
+
+        <span class="c1"># If the model ID is set via the TrainingArguments, but not via the SpanMarkerModelCardData,</span>
+        <span class="c1"># then we can set it here for the model card regardless</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">hub_model_id</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">model_id</span><span class="p">:</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">model_id</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">hub_model_id</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">:</span>
+            <span class="c1"># Inferring is hacky - it may break in the future, so let&#39;s be safe</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">infer_dataset_id</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                <span class="k">pass</span>
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">model</span><span class="o">=</span><span class="n">model</span><span class="p">,</span>
@@ -262,6 +279,10 @@
 
         <span class="c1"># Override the type hint</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">:</span> <span class="n">SpanMarkerModel</span>
+
+        <span class="c1"># Add the callback for filling the model card data with hyperparameters</span>
+        <span class="c1"># and evaluation results</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">ModelCardCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
 <div class="viewcode-block" id="Trainer.preprocess_dataset">
 <a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset">[docs]</a>
@@ -299,11 +320,31 @@
             <span class="nb">set</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">column_names</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">OPTIONAL_COLUMNS</span><span class="p">)</span> <span class="o">-</span> <span class="nb">set</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">REQUIRED_COLUMNS</span><span class="p">)</span>
         <span class="p">)</span>
         <span class="c1"># Normalize the labels to a common format (list of label-start-end tuples)</span>
+        <span class="c1"># Also add &quot;entity_count&quot; and &quot;word_count&quot; labels</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
             <span class="n">label_normalizer</span><span class="p">,</span>
             <span class="n">input_columns</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">),</span>
             <span class="n">desc</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Label normalizing the </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2"> dataset&quot;</span><span class="p">,</span>
+            <span class="n">batched</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="c1"># Setting model card data based on training data</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_evaluate</span><span class="p">:</span>
+            <span class="c1"># Pick some example entities from each entity class for the model card.</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">label_example_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">set_label_examples</span><span class="p">(</span>
+                    <span class="n">dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">id2label</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">outside_id</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">train_set_metrics_list</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">set_train_set_metrics</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="c1"># Set some example sentences for the model card widget</span>
+        <span class="k">if</span> <span class="n">is_evaluate</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">widget</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">model_card_data</span><span class="o">.</span><span class="n">set_widget_examples</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+        <span class="c1"># Remove dataset columns that are only used for model card</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">((</span><span class="s2">&quot;entity_count&quot;</span><span class="p">,</span> <span class="s2">&quot;word_count&quot;</span><span class="p">))</span>
+
         <span class="c1"># Tokenize and add start/end markers</span>
         <span class="k">with</span> <span class="n">tokenizer</span><span class="o">.</span><span class="n">entity_tracker</span><span class="p">(</span><span class="n">split</span><span class="o">=</span><span class="n">dataset_name</span><span class="p">):</span>
             <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
@@ -521,7 +562,18 @@
             <span class="sa">f</span><span class="s2">&quot;`Trainer.predict` is not recommended for a </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">. &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;Consider using `</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.predict` instead.&quot;</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Trainer.create_model_card">
+<a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.create_model_card">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_model_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Creates a draft of a model card using the information available to the `Trainer`,</span>
+<span class="sd">        the `SetFitModel` and the `SpanMarkerModelCardData`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">output_dir</span><span class="p">,</span> <span class="s2">&quot;README.md&quot;</span><span class="p">),</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">generate_model_card</span><span class="p">())</span></div>
+</div>
 
 </pre></div>
 
