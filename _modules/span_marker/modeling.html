@@ -142,7 +142,7 @@
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">,</span> <span class="n">bound</span><span class="o">=</span><span class="s2">&quot;SpanMarkerModel&quot;</span><span class="p">)</span>
 
-<span class="n">UNEXPECTED_KEYWORD_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;\S+ got an unexpected keyword argument &#39;([^&#39;]*)&#39;&quot;</span><span class="p">)</span>
+<span class="n">UNEXPECTED_KEYWORD_PATTERN</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\S+ got an unexpected keyword argument &#39;([^&#39;]*)&#39;&quot;</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="SpanMarkerModel">
@@ -528,7 +528,7 @@
         <span class="kn">from</span> <span class="nn">span_marker.trainer</span> <span class="kn">import</span> <span class="n">Trainer</span>
 
         <span class="k">if</span> <span class="n">torch</span><span class="o">.</span><span class="n">cuda</span><span class="o">.</span><span class="n">is_available</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">device</span> <span class="o">==</span> <span class="n">torch</span><span class="o">.</span><span class="n">device</span><span class="p">(</span><span class="s2">&quot;cpu&quot;</span><span class="p">):</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;SpanMarker model predictions are being computed on the CPU while CUDA is available.&quot;</span>
                 <span class="s2">&quot; Moving the model to CUDA using `model.cuda()` before performing predictions is heavily&quot;</span>
                 <span class="s2">&quot; recommended to significantly boost prediction speeds.&quot;</span><span class="p">,</span>
