@@ -33,6 +33,10 @@ Types of changes
 - Improve label normalization speed.
 - Allow you to call SpanMarkerModel.from_pretrained with a pre-initialized SpanMarkerConfig.
 
+### Deprecated
+
+- Deprecated Python 3.7.
+
 ### Fixed
 
 - Fixed tokenization mismatch between training and inference for XLM-RoBERTa models: allows for normal inference of those models.
