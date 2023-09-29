@@ -23,7 +23,7 @@ logger = logging.getLogger(__name__)
 
 T = TypeVar("T", bound="SpanMarkerModel")
 
-UNEXPECTED_KEYWORD_PATTERN = re.compile("\S+ got an unexpected keyword argument '([^']*)'")
+UNEXPECTED_KEYWORD_PATTERN = re.compile(r"\S+ got an unexpected keyword argument '([^']*)'")
 
 
 class SpanMarkerModel(PreTrainedModel):
