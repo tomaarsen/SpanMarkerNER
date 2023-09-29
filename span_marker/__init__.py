@@ -16,7 +16,11 @@ from span_marker.trainer import Trainer
 AutoConfig.register("span-marker", SpanMarkerConfig)
 AutoModel.register(SpanMarkerConfig, SpanMarkerModel)
 PIPELINE_REGISTRY.register_pipeline(
-    "span-marker", pipeline_class=SpanMarkerPipeline, pt_model=SpanMarkerModel, type="text"
+    "span-marker",
+    pipeline_class=SpanMarkerPipeline,
+    pt_model=SpanMarkerModel,
+    type="text",
+    default={"pt": ("tomaarsen/span-marker-bert-base-fewnerd-fine-super", "main")},
 )
 
 # Set up for spaCy
