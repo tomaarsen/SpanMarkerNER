@@ -5,14 +5,19 @@ from typing import Optional, Union
 
 import torch
 from transformers import AutoConfig, AutoModel, TrainingArguments
+from transformers.pipelines import PIPELINE_REGISTRY, pipeline
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
+from span_marker.pipeline_component import SpanMarkerPipeline
 from span_marker.trainer import Trainer
 
 # Set up for Transformers
 AutoConfig.register("span-marker", SpanMarkerConfig)
 AutoModel.register(SpanMarkerConfig, SpanMarkerModel)
+PIPELINE_REGISTRY.register_pipeline(
+    "span-marker", pipeline_class=SpanMarkerPipeline, pt_model=SpanMarkerModel, type="text"
+)
 
 # Set up for spaCy
 try:
