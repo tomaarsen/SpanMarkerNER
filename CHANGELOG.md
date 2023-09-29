@@ -22,6 +22,7 @@ Types of changes
 - Added `SpanMarkerModel.generate_model_card()` method to get a model card string.
 - Added `SpanMarkerModelCardData` that should be passed to `SpanMarkerModel.from_pretrained` with additional information like
   - `language`, `license`, `model_name`, `model_id`, `encoder_name`, `encoder_id`, `dataset_name`, `dataset_id`, `dataset_revision`.
+- Added `transformers` `pipeline` support, e.g. `pipeline(task="span-marker", model="tomaarsen/span-marker-mbert-base-multinerd")`.
 
 ### Changed
 
