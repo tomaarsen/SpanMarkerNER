@@ -19,7 +19,24 @@ Types of changes
 
 ### Added
 
+- Added `SpanMarkerModel.generate_model_card()` method to get a model card string.
+- Added `SpanMarkerModelCardData` that should be passed to `SpanMarkerModel.from_pretrained` with additional information like
+  - `language`, `license`, `model_name`, `model_id`, `encoder_name`, `encoder_id`, `dataset_name`, `dataset_id`, `dataset_revision`.
 - Added `transformers` `pipeline` support, e.g. `pipeline(task="span-marker", model="tomaarsen/span-marker-mbert-base-multinerd")`.
+
+### Changed
+
+- Heavily improved automatic model card generated.
+- Evaluating outside of training now returns per-label outputs instead of only "overall" F1, precision and recall.
+- Warn if the used tokenizer distinguishes between punctuation directly attached to a word and punctuation separated from a word by a space.
+  - If so, then inference of that model will require the punctuation to be split from the words.
+- Improve label normalization speed.
+- Allow you to call SpanMarkerModel.from_pretrained with a pre-initialized SpanMarkerConfig.
+
+### Fixed
+
+- Fixed tokenization mismatch between training and inference for XLM-RoBERTa models: allows for normal inference of those models.
+- Resolve niche bug when TrainingArguments are not provided.
 
 ## [1.3.0]
 

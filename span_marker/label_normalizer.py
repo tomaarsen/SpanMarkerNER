@@ -27,8 +27,17 @@ class LabelNormalizer(ABC):
         self.config = config
 
     @abstractmethod
-    def __call__(self, tokens: List[str], ner_tags: List[int]) -> Dict[str, List[Any]]:
-        raise NotImplementedError
+    def ner_tags_to_entities(self, ner_tags: List[int]) -> Iterator[Entity]:
+        pass
+
+    def __call__(self, tokens: List[List[str]], ner_tags: List[List[int]]) -> Dict[str, List[Any]]:
+        output = {"ner_tags": [], "entity_count": [], "word_count": []}
+        for tokens, ner_tags in zip(tokens, ner_tags):
+            ner_tags = list(self.ner_tags_to_entities(ner_tags))
+            output["ner_tags"].append(ner_tags)
+            output["entity_count"].append(len(ner_tags))
+            output["word_count"].append(len(tokens))
+        return output
 
 
 class LabelNormalizerScheme(LabelNormalizer):
@@ -56,9 +65,6 @@ class LabelNormalizerScheme(LabelNormalizer):
 
         if start_idx is not None:
             yield (reduced_label_id, start_idx, idx + 1)
-
-    def __call__(self, tokens: List[str], ner_tags: List[int]) -> Dict[str, List[Any]]:
-        return {"tokens": tokens, "ner_tags": list(self.ner_tags_to_entities(ner_tags))}
 
 
 class LabelNormalizerIOB(LabelNormalizerScheme):
@@ -107,9 +113,6 @@ class LabelNormalizerNoScheme(LabelNormalizer):
 
         if start_idx is not None:
             yield (entity_label_id, start_idx, idx + 1)
-
-    def __call__(self, tokens: List[str], ner_tags: List[int]) -> Dict[str, List[Any]]:
-        return {"tokens": tokens, "ner_tags": list(self.ner_tags_to_entities(ner_tags))}
 
 
 class AutoLabelNormalizer:

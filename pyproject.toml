@@ -27,7 +27,7 @@ dependencies = [
     "torch",
     "accelerate",
     "transformers>=4.19.0", # required for EvalPrediction.inputs
-    "datasets>=2.0.0",
+    "datasets>=2.14.0", # required for sorting with multiple columns
     "packaging>=20.0",
     "evaluate",
     "seqeval",
@@ -58,6 +58,9 @@ docs = [
 ]
 wandb = [
     "wandb"
+]
+codecarbon = [
+    "codecarbon"
 ]
 
 [project.urls]

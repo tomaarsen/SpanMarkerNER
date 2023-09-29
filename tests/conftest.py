@@ -30,10 +30,7 @@ def randomize_seed() -> None:
 
     yield
 
-    from datasets.fingerprint import (
-        _TEMP_DIR_FOR_TEMP_CACHE_FILES,
-        get_temporary_cache_files_directory,
-    )
+    from datasets.fingerprint import _TEMP_DIR_FOR_TEMP_CACHE_FILES
 
     if _TEMP_DIR_FOR_TEMP_CACHE_FILES:
         _TEMP_DIR_FOR_TEMP_CACHE_FILES._cleanup()
