@@ -82,6 +82,7 @@
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.modeling.html">span_marker.modeling module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.trainer.html">span_marker.trainer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.configuration.html">span_marker.configuration module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.pipeline_component.html">span_marker.pipeline_component module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.data_collator.html">span_marker.data_collator module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.tokenizer.html">span_marker.tokenizer module</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/span_marker.evaluation.html">span_marker.evaluation module</a></li>
@@ -177,7 +178,7 @@
 <span class="kn">from</span> <span class="nn">.debug_utils</span> <span class="kn">import</span> <span class="n">DebugOption</span><span class="p">,</span> <span class="n">DebugUnderflowOverflow</span>
 <span class="kn">from</span> <span class="nn">.dependency_versions_check</span> <span class="kn">import</span> <span class="n">dep_version_check</span>
 <span class="kn">from</span> <span class="nn">.hyperparameter_search</span> <span class="kn">import</span> <span class="n">ALL_HYPERPARAMETER_SEARCH_BACKENDS</span><span class="p">,</span> <span class="n">default_hp_search_backend</span>
-<span class="kn">from</span> <span class="nn">.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span>
+<span class="kn">from</span> <span class="nn">.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span><span class="p">,</span> <span class="n">is_deepspeed_available</span>
 <span class="kn">from</span> <span class="nn">.modelcard</span> <span class="kn">import</span> <span class="n">TrainingSummary</span>
 <span class="kn">from</span> <span class="nn">.modeling_utils</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">load_sharded_checkpoint</span><span class="p">,</span> <span class="n">unwrap_model</span>
 <span class="kn">from</span> <span class="nn">.models.auto.modeling_auto</span> <span class="kn">import</span> <span class="n">MODEL_FOR_CAUSAL_LM_MAPPING_NAMES</span><span class="p">,</span> <span class="n">MODEL_MAPPING_NAMES</span>
@@ -328,6 +329,9 @@
             <span class="n">save_fsdp_model</span><span class="p">,</span>
             <span class="n">save_fsdp_optimizer</span><span class="p">,</span>
         <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">is_deepspeed_available</span><span class="p">():</span>
+        <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="n">DeepSpeedSchedulerWrapper</span>
 
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
@@ -2482,7 +2486,14 @@
             <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">OPTIMIZER_NAME</span><span class="p">))</span>
 
         <span class="c1"># Save SCHEDULER &amp; SCALER</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_torch_tpu_available</span><span class="p">():</span>
+        <span class="n">is_deepspeed_custom_scheduler</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">DeepSpeedSchedulerWrapper</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span> <span class="ow">or</span> <span class="n">is_deepspeed_custom_scheduler</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_torch_tpu_available</span><span class="p">()</span>
+        <span class="p">):</span>
             <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught_warnings</span><span class="p">:</span>
                 <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">state_dict</span><span class="p">(),</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">SCHEDULER_NAME</span><span class="p">))</span>
             <span class="n">reissue_pt_warnings</span><span class="p">(</span><span class="n">caught_warnings</span><span class="p">)</span>
@@ -2548,6 +2559,10 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="c1"># deepspeed loads optimizer/lr_scheduler together with the model in deepspeed_init</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="p">,</span> <span class="n">DeepSpeedSchedulerWrapper</span><span class="p">):</span>
+                <span class="k">with</span> <span class="n">warnings</span><span class="o">.</span><span class="n">catch_warnings</span><span class="p">(</span><span class="n">record</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">caught_warnings</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">load_state_dict</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">checkpoint</span><span class="p">,</span> <span class="n">SCHEDULER_NAME</span><span class="p">)))</span>
+                <span class="n">reissue_pt_warnings</span><span class="p">(</span><span class="n">caught_warnings</span><span class="p">)</span>
             <span class="k">return</span>
 
         <span class="n">checkpoint_file_exists</span> <span class="o">=</span> <span class="p">(</span>
