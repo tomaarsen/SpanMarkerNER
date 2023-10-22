@@ -62,6 +62,8 @@ wandb = [
 codecarbon = [
     "codecarbon"
 ]
+[tool.poetry.plugins."spacy_factories"]
+"spacy" = "span_marker.__init__:_spacy_span_marker_factory"
 
 [project.urls]
 Documentation = "https://tomaarsen.github.io/SpanMarkerNER"
