@@ -20,6 +20,7 @@ Types of changes
 ### Fixed
 
 - No longer override `language` metadata from the dataset if the language was also set manually via `SpanMarkerModelCardData`.
+- No longer crash on `predict` with `ValueError: Failed to concatenate on axis=1 ...` if the first sentence in a list of sentences is just one word.
 
 ## [1.4.0]
 

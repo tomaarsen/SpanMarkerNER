@@ -180,10 +180,14 @@ class SpanMarkerTokenizer:
     ) -> Dict[str, List]:
         tokens = batch["tokens"]
         labels = batch.get("ner_tags", None)
-        # TODO: Increase robustness of this
         is_split_into_words = True
-        if isinstance(tokens, str) or (tokens and " " in tokens[0]):
+        if isinstance(tokens, str):
             is_split_into_words = False
+        elif tokens:
+            for token in tokens:
+                if " " in token:
+                    is_split_into_words = False
+                    break
 
         batch_encoding = self.tokenizer(
             tokens,
