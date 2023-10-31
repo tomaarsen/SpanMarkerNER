@@ -20,6 +20,7 @@ Types of changes
 ### Changed
 
 - Changed the error when an empty sentence is provided to the tokenizer.
+- Using spaCy `nlp.pipe` now processes texts sentence-wise, just like for `nlp(...)`.
 
 ### Fixed
 
