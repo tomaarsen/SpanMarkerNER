@@ -255,25 +255,48 @@
             <span class="n">stream</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">nlp</span><span class="o">.</span><span class="n">pipe</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">docs</span> <span class="ow">in</span> <span class="n">minibatch</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">):</span>
-            <span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_space</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">doc</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+            <span class="n">inputs</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_space</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">]</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">]</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span>
+            <span class="p">]</span>
+            <span class="n">tokens</span> <span class="o">=</span> <span class="p">[</span><span class="n">tokens</span> <span class="k">for</span> <span class="n">sentences</span> <span class="ow">in</span> <span class="n">inputs</span> <span class="k">for</span> <span class="n">tokens</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+            <span class="n">document_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">sentences</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">sentences</span><span class="p">]</span>
+            <span class="n">sentence_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">idx</span> <span class="k">for</span> <span class="n">sentences</span> <span class="ow">in</span> <span class="n">inputs</span> <span class="k">for</span> <span class="n">idx</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">sentences</span><span class="p">))]</span>
 
             <span class="c1"># use document-level context in the inference if the model was also trained that way</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">trained_with_document_context</span><span class="p">:</span>
-                <span class="n">inputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">tokens</span><span class="p">,</span>
+                        <span class="s2">&quot;document_id&quot;</span><span class="p">:</span> <span class="n">document_id</span><span class="p">,</span>
+                        <span class="s2">&quot;sentence_id&quot;</span><span class="p">:</span> <span class="n">sentence_id</span><span class="p">,</span>
+                    <span class="p">}</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inputs</span> <span class="o">=</span> <span class="n">tokens</span>
 
             <span class="n">entities_list</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">inputs</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">batch_size</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">doc</span><span class="p">,</span> <span class="n">entities</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">entities_list</span><span class="p">):</span>
+
+            <span class="n">ents_list</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">entities</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">entities_list</span><span class="p">):</span>
+                <span class="n">doc_id</span> <span class="o">=</span> <span class="n">document_id</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">num_prior_sentences</span> <span class="o">=</span> <span class="n">sentence_id</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span>
+                <span class="n">offset</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">sum</span><span class="p">(</span><span class="n">tokens</span><span class="p">[</span><span class="n">idx</span> <span class="o">-</span> <span class="n">num_prior_sentences</span> <span class="p">:</span> <span class="n">idx</span><span class="p">],</span> <span class="n">start</span><span class="o">=</span><span class="p">[]))</span>
                 <span class="n">ents</span> <span class="o">=</span> <span class="p">[]</span>
                 <span class="k">for</span> <span class="n">entity</span> <span class="ow">in</span> <span class="n">entities</span><span class="p">:</span>
-                    <span class="n">start</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">]</span>
-                    <span class="n">end</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span>
-                    <span class="n">span</span> <span class="o">=</span> <span class="n">doc</span><span class="p">[</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
+                    <span class="n">start</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_start_index&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span>
+                    <span class="n">end</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;word_end_index&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">offset</span>
+                    <span class="n">span</span> <span class="o">=</span> <span class="n">docs</span><span class="p">[</span><span class="n">doc_id</span><span class="p">][</span><span class="n">start</span><span class="p">:</span><span class="n">end</span><span class="p">]</span>
                     <span class="n">span</span><span class="o">.</span><span class="n">label_</span> <span class="o">=</span> <span class="n">entity</span><span class="p">[</span><span class="s2">&quot;label&quot;</span><span class="p">]</span>
                     <span class="n">ents</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">span</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">doc_id</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">ents_list</span><span class="p">):</span>
+                    <span class="n">ents_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ents</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ents_list</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">ents</span><span class="p">)</span>
 
+            <span class="k">for</span> <span class="n">doc</span><span class="p">,</span> <span class="n">ents</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">docs</span><span class="p">,</span> <span class="n">ents_list</span><span class="p">):</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">)</span>
 
-                <span class="k">yield</span> <span class="n">doc</span></div>
+            <span class="k">yield from</span> <span class="n">docs</span></div>
 </div>
 
 </pre></div>
