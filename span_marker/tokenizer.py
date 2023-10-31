@@ -206,7 +206,10 @@ class SpanMarkerTokenizer:
         all_labels = []
         all_num_words = []
         for sample_idx, input_ids in enumerate(batch_encoding["input_ids"]):
-            num_words = int(np.nanmax(np.array(batch_encoding.word_ids(sample_idx), dtype=float))) + 1
+            max_word_ids = np.nanmax(np.array(batch_encoding.word_ids(sample_idx), dtype=float))
+            if np.isnan(max_word_ids):
+                raise ValueError("The `SpanMarkerTokenizer` detected an empty sentence, please remove it.")
+            num_words = int(max_word_ids) + 1
             if self.tokenizer.pad_token_id in input_ids:
                 num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
             else:

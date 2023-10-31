@@ -202,6 +202,12 @@ def test_predict_where_first_sentence_is_word(finetuned_conll_span_marker_model:
     assert isinstance(outputs[0], list)
 
 
+def test_predict_empty_error(finetuned_conll_span_marker_model: SpanMarkerModel) -> None:
+    model = finetuned_conll_span_marker_model.try_cuda()
+    with pytest.raises(ValueError, match="The `SpanMarkerTokenizer` detected an empty sentence, please remove it."):
+        model.predict(["One Two", "Three Four Five", ""])
+
+
 def test_incorrect_predict_inputs(finetuned_conll_span_marker_model: SpanMarkerModel):
     model = finetuned_conll_span_marker_model.try_cuda()
     with pytest.raises(ValueError, match="could not recognize your input"):
