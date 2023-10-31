@@ -18,13 +18,14 @@ from span_marker.trainer import Trainer
 # Set up for Transformers
 AutoConfig.register("span-marker", SpanMarkerConfig)
 AutoModel.register(SpanMarkerConfig, SpanMarkerModel)
-PIPELINE_REGISTRY.register_pipeline(
-    "span-marker",
-    pipeline_class=SpanMarkerPipeline,
-    pt_model=SpanMarkerModel,
-    type="text",
-    default={"pt": ("tomaarsen/span-marker-bert-base-fewnerd-fine-super", "main")},
-)
+if "span-marker" not in PIPELINE_REGISTRY.supported_tasks:
+    PIPELINE_REGISTRY.register_pipeline(
+        "span-marker",
+        pipeline_class=SpanMarkerPipeline,
+        pt_model=SpanMarkerModel,
+        type="text",
+        default={"pt": ("tomaarsen/span-marker-bert-base-fewnerd-fine-super", "main")},
+    )
 
 # Set up for spaCy
 try:
