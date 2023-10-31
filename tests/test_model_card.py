@@ -26,7 +26,7 @@ def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -
             dataset_id="conll2003",
             dataset_name="CoNLL 2003",
             encoder_id=base_encoder_id,
-            language="en",
+            language=["en"],
             license="apache-2.0",
         ),
     )
