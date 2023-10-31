@@ -17,6 +17,10 @@ Types of changes
 
 ## [Unreleased]
 
+### Changed
+
+- Changed the error when an empty sentence is provided to the tokenizer.
+
 ### Fixed
 
 - No longer override `language` metadata from the dataset if the language was also set manually via `SpanMarkerModelCardData`.
