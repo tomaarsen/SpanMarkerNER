@@ -360,14 +360,15 @@
         <span class="c1"># We don&#39;t want to save &quot;ignore_metadata_errors&quot; in our Model Card</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">is_on_huggingface</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">,</span> <span class="n">is_model</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-                <span class="c1"># if languages are not set, try to determine the language from the dataset on the Hub</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">info</span> <span class="o">=</span> <span class="n">dataset_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
-                <span class="k">except</span><span class="p">:</span>
-                    <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="p">:</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># if languages are not set, try to determine the language from the dataset on the Hub</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">info</span> <span class="o">=</span> <span class="n">dataset_info</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="p">)</span>
+                    <span class="k">except</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="k">if</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="p">:</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">language</span> <span class="o">=</span> <span class="n">info</span><span class="o">.</span><span class="n">cardData</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;language&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">language</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;The provided </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_id</span><span class="si">!r}</span><span class="s2"> dataset could not be found on the Hugging Face Hub.&quot;</span>
