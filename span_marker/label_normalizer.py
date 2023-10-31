@@ -87,9 +87,10 @@ class LabelNormalizerBIOES(LabelNormalizerScheme):
 class LabelNormalizerBILOU(LabelNormalizerScheme):
     def __init__(self, config: SpanMarkerConfig) -> None:
         super().__init__(config)
-        logger.info("Detected the BILOU labeling scheme.")
-        self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["U"]
-        self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag["U"]
+        # Support for BILOU and BILO:
+        logger.info("Detected the BILOU or BILO labeling scheme.")
+        self.start_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag.get("U", set())
+        self.end_ids = self.label_ids_by_tag["B"] | self.label_ids_by_tag["O"] | self.label_ids_by_tag.get("U", set())
 
 
 class LabelNormalizerNoScheme(LabelNormalizer):
@@ -128,7 +129,7 @@ class AutoLabelNormalizer:
             return LabelNormalizerIOB(config)
         if tags == set("BIOES"):
             return LabelNormalizerBIOES(config)
-        if tags == set("BILOU"):
+        if tags == set("BILOU") or tags == set("BILO"):
             return LabelNormalizerBILOU(config)
         raise ValueError(
             "Data labeling scheme not recognized. Expected either IOB, IOB2, BIOES, BILOU "

@@ -17,6 +17,10 @@ Types of changes
 
 ## [Unreleased]
 
+### Added
+
+- Added support for BILO tagging schemes.
+
 ### Changed
 
 - Changed the error when an empty sentence is provided to the tokenizer.
