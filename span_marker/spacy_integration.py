@@ -126,22 +126,45 @@ class SpacySpanMarkerWrapper:
             stream = self.nlp.pipe(stream, batch_size=batch_size)
 
         for docs in minibatch(stream, size=batch_size):
-            inputs = [[token.text if not token.is_space else "" for token in doc] for doc in docs]
+            inputs = [
+                [[token.text if not token.is_space else "" for token in sent] for sent in doc.sents] for doc in docs
+            ]
+            tokens = [tokens for sentences in inputs for tokens in sentences]
+            document_id = [idx for idx, sentences in enumerate(inputs) for _ in sentences]
+            sentence_id = [idx for sentences in inputs for idx in range(len(sentences))]
 
             # use document-level context in the inference if the model was also trained that way
             if self.model.config.trained_with_document_context:
-                inputs = self.convert_inputs_to_dataset(inputs)
+                inputs = Dataset.from_dict(
+                    {
+                        "tokens": tokens,
+                        "document_id": document_id,
+                        "sentence_id": sentence_id,
+                    }
+                )
+            else:
+                inputs = tokens
 
             entities_list = self.model.predict(inputs, batch_size=self.batch_size)
-            for doc, entities in zip(docs, entities_list):
+
+            ents_list = []
+            for idx, entities in enumerate(entities_list):
+                doc_id = document_id[idx]
+                num_prior_sentences = sentence_id[idx]
+                offset = len(sum(tokens[idx - num_prior_sentences : idx], start=[]))
                 ents = []
                 for entity in entities:
-                    start = entity["word_start_index"]
-                    end = entity["word_end_index"]
-                    span = doc[start:end]
+                    start = entity["word_start_index"] + offset
+                    end = entity["word_end_index"] + offset
+                    span = docs[doc_id][start:end]
                     span.label_ = entity["label"]
                     ents.append(span)
+                if doc_id == len(ents_list):
+                    ents_list.append(ents)
+                else:
+                    ents_list[-1].extend(ents)
 
+            for doc, ents in zip(docs, ents_list):
                 self.set_ents(doc, ents)
 
-                yield doc
+            yield from docs

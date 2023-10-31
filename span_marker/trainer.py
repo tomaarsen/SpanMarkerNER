@@ -1,6 +1,7 @@
 import dataclasses
 import logging
 import math
+import os
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
 import torch
@@ -17,6 +18,7 @@ from transformers.trainer_utils import PredictionOutput
 
 from span_marker.evaluation import compute_f1_via_seqeval
 from span_marker.label_normalizer import AutoLabelNormalizer, LabelNormalizer
+from span_marker.model_card import ModelCardCallback
 from span_marker.modeling import SpanMarkerModel
 from span_marker.tokenizer import SpanMarkerTokenizer
 
@@ -107,7 +109,7 @@ class Trainer(TransformersTrainer):
         # Set some Training arguments that must be set for SpanMarker
         if args is None:
             args = TrainingArguments(
-                output_dir="models/my_span_marker_model", include_inputs_for_metrics=True, remove_unused_columns=True
+                output_dir="models/my_span_marker_model", include_inputs_for_metrics=True, remove_unused_columns=False
             )
         else:
             args = dataclasses.replace(args, include_inputs_for_metrics=True, remove_unused_columns=False)
@@ -115,11 +117,25 @@ class Trainer(TransformersTrainer):
         # Always compute `compute_f1_via_seqeval` - optionally compute user-provided metrics
         if compute_metrics is not None:
             compute_metrics_func = lambda eval_prediction: {
-                **compute_f1_via_seqeval(model.tokenizer, eval_prediction),
+                **compute_f1_via_seqeval(model.tokenizer, eval_prediction, self.is_in_train),
                 **compute_metrics(eval_prediction),
             }
         else:
-            compute_metrics_func = lambda eval_prediction: compute_f1_via_seqeval(model.tokenizer, eval_prediction)
+            compute_metrics_func = lambda eval_prediction: compute_f1_via_seqeval(
+                model.tokenizer, eval_prediction, self.is_in_train
+            )
+
+        # If the model ID is set via the TrainingArguments, but not via the SpanMarkerModelCardData,
+        # then we can set it here for the model card regardless
+        if args.hub_model_id and not model.model_card_data.model_id:
+            model.model_card_data.model_id = args.hub_model_id
+
+        if not model.model_card_data.dataset_id:
+            # Inferring is hacky - it may break in the future, so let's be safe
+            try:
+                model.model_card_data.infer_dataset_id(train_dataset)
+            except Exception:
+                pass
 
         super().__init__(
             model=model,
@@ -142,6 +158,10 @@ class Trainer(TransformersTrainer):
 
         # Override the type hint
         self.model: SpanMarkerModel
+
+        # Add the callback for filling the model card data with hyperparameters
+        # and evaluation results
+        self.add_callback(ModelCardCallback(self))
 
     def preprocess_dataset(
         self,
@@ -177,11 +197,31 @@ class Trainer(TransformersTrainer):
             set(dataset.column_names) - set(self.OPTIONAL_COLUMNS) - set(self.REQUIRED_COLUMNS)
         )
         # Normalize the labels to a common format (list of label-start-end tuples)
+        # Also add "entity_count" and "word_count" labels
         dataset = dataset.map(
             label_normalizer,
             input_columns=("tokens", "ner_tags"),
             desc=f"Label normalizing the {dataset_name} dataset",
+            batched=True,
         )
+
+        # Setting model card data based on training data
+        if not is_evaluate:
+            # Pick some example entities from each entity class for the model card.
+            if not self.model.model_card_data.label_example_list:
+                self.model.model_card_data.set_label_examples(
+                    dataset, self.model.config.id2label, self.model.config.outside_id
+                )
+            if not self.model.model_card_data.train_set_metrics_list:
+                self.model.model_card_data.set_train_set_metrics(dataset)
+
+        # Set some example sentences for the model card widget
+        if is_evaluate and not self.model.model_card_data.widget:
+            self.model.model_card_data.set_widget_examples(dataset)
+
+        # Remove dataset columns that are only used for model card
+        dataset = dataset.remove_columns(("entity_count", "word_count"))
+
         # Tokenize and add start/end markers
         with tokenizer.entity_tracker(split=dataset_name):
             dataset = dataset.map(
@@ -393,3 +433,11 @@ class Trainer(TransformersTrainer):
             f"Consider using `{self.model.__class__.__name__}.predict` instead."
         )
         return super().predict(test_dataset, ignore_keys, metric_key_prefix)
+
+    def create_model_card(self, *_args, **_kwargs) -> None:
+        """
+        Creates a draft of a model card using the information available to the `Trainer`,
+        the `SpanMarkerModel` and the `SpanMarkerModelCardData`.
+        """
+        with open(os.path.join(self.args.output_dir, "README.md"), "w", encoding="utf8") as f:
+            f.write(self.model.generate_model_card())

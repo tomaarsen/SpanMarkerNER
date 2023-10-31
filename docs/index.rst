@@ -19,43 +19,48 @@ or no label annotation scheme.
 Check out all publicly available SpanMarker models on the Hugging Face Hub `here <https://huggingface.co/models?library=span-marker>`_.
 Alternatively, check out any model from this list of particularly useful models:
 
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| Model ID                                                                                                                                            | Domain   | Label Count | Language     |
-+=====================================================================================================================================================+==========+=============+==============+
-| `tomaarsen/span-marker-mbert-base-multinerd <https://huggingface.co/tomaarsen/span-marker-mbert-base-multinerd>`_                                   | General  | 15          | Multilingual |
-|                                                                                                                                                     |          |             |              |
-| `lxyuan/span-marker-bert-base-multilingual-uncased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-uncased-multinerd>`_ |          |             |              |
-|                                                                                                                                                     |          |             |              |
-| `lxyuan/span-marker-bert-base-multilingual-cased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-cased-multinerd>`_     |          |             |              |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `tomaarsen/span-marker-bert-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super>`_                   | General  | 66          | English      |
-|                                                                                                                                                     |          |             |              |
-| `tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super>`_     |          |             | Multilingual |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `tomaarsen/span-marker-bert-base-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-cross-ner>`_                                     | General  | 39          | English      |
-|                                                                                                                                                     |          |             |              |
-| `tomaarsen/span-marker-bert-base-uncased-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-cross-ner>`_                     |          |             |              |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `tomaarsen/span-marker-roberta-large-ontonotes5 <https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5>`_                           | General  | 18          | English      |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `tomaarsen/span-marker-bert-base-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms>`_                                       | Acronyms | 2           | English      |
-|                                                                                                                                                     |          |             |              |
-| `tomaarsen/span-marker-bert-base-uncased-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-acronyms>`_                       |          |             |              |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `tomaarsen/span-marker-bert-base-ncbi-disease <https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease>`_                               | Diseases | 1           | English      |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
-| `stefan-it/span-marker-gelectra-large-germeval14 <https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14>`_                         | General  | 12          | German       |
-|                                                                                                                                                     |          |             |              |
-| `gwlms/span-marker-teams-germeval14 <https://huggingface.co/gwlms/span-marker-teams-germeval14>`_                                                   |          |             |              |
-|                                                                                                                                                     |          |             |              |
-| `gwlms/span-marker-token-dropping-bert-germeval14 <https://huggingface.co/gwlms/span-marker-token-dropping-bert-germeval14>`_                       |          |             |              |
-|                                                                                                                                                     |          |             |              |
-| `gwlms/span-marker-bert-germeval14 <https://huggingface.co/gwlms/span-marker-bert-germeval14>`_                                                     |          |             |              |
-+-----------------------------------------------------------------------------------------------------------------------------------------------------+----------+-------------+--------------+
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| Model ID                                                                                                                                            | Domain     | Label Count | Language     |
++=====================================================================================================================================================+============+=============+==============+
+| `tomaarsen/span-marker-mbert-base-multinerd <https://huggingface.co/tomaarsen/span-marker-mbert-base-multinerd>`_                                   | General    | 15          | Multilingual |
+|                                                                                                                                                     |            |             |              |
+| `lxyuan/span-marker-bert-base-multilingual-uncased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-uncased-multinerd>`_ |            |             |              |
+|                                                                                                                                                     |            |             |              |
+| `lxyuan/span-marker-bert-base-multilingual-cased-multinerd <https://huggingface.co/lxyuan/span-marker-bert-base-multilingual-cased-multinerd>`_     |            |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-bert-base-fewnerd-fine-super>`_                   | General    | 66          | English      |
+|                                                                                                                                                     |            |             |              |
+| `tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super <https://huggingface.co/tomaarsen/span-marker-xlm-roberta-base-fewnerd-fine-super>`_     |            |             | Multilingual |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-cross-ner>`_                                     | General    | 39          | English      |
+|                                                                                                                                                     |            |             |              |
+| `tomaarsen/span-marker-bert-base-uncased-cross-ner <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-cross-ner>`_                     |            |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-roberta-large-ontonotes5 <https://huggingface.co/tomaarsen/span-marker-roberta-large-ontonotes5>`_                           | General    | 18          | English      |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-uncased-keyphrase-inspec <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-keyphrase-inspec>`_       | Keyphrases | 1           | English      |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-acronyms>`_                                       | Acronyms   | 2           | English      |
+|                                                                                                                                                     |            |             |              |
+| `tomaarsen/span-marker-bert-base-uncased-acronyms <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-acronyms>`_                       |            |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `tomaarsen/span-marker-bert-base-ncbi-disease <https://huggingface.co/tomaarsen/span-marker-bert-base-ncbi-disease>`_                               | Biomedical | 1           | English      |
+|                                                                                                                                                     |            |             |              |
+| `tomaarsen/span-marker-bert-base-uncased-bionlp <https://huggingface.co/tomaarsen/span-marker-bert-base-uncased-bionlp>`_                           |            | 5           |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
+| `stefan-it/span-marker-gelectra-large-germeval14 <https://huggingface.co/stefan-it/span-marker-gelectra-large-germeval14>`_                         | General    | 12          | German       |
+|                                                                                                                                                     |            |             |              |
+| `gwlms/span-marker-teams-germeval14 <https://huggingface.co/gwlms/span-marker-teams-germeval14>`_                                                   |            |             |              |
+|                                                                                                                                                     |            |             |              |
+| `gwlms/span-marker-token-dropping-bert-germeval14 <https://huggingface.co/gwlms/span-marker-token-dropping-bert-germeval14>`_                       |            |             |              |
+|                                                                                                                                                     |            |             |              |
+| `gwlms/span-marker-bert-germeval14 <https://huggingface.co/gwlms/span-marker-bert-germeval14>`_                                                     |            |             |              |
++-----------------------------------------------------------------------------------------------------------------------------------------------------+------------+-------------+--------------+
 
 
+*******
 Context
-=======
+*******
 
 .. raw:: html
 
@@ -68,12 +73,13 @@ Context
 I have developed this library as a part of my thesis work at `Argilla <https://github.com/argilla-io/argilla>`_.
 Feel free to ⭐ star or watch the `SpanMarker repository <https://github.com/tomaarsen/SpanMarkerNER>`_ to get notified when my thesis is published.
 
-***************
+###############
 Quick Reference
-***************
+###############
 
+************
 How to Train
-============
+************
 
 ::
 
@@ -86,9 +92,9 @@ How to Train
    dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
    labels = ["O", "art", "building", "event", "location", "organization", "other", "person", "product"]
 
-   # Initialize a SpanMarkerModel using an encoder, e.g. BERT:
-   model_name = "bert-base-cased"
-   model = SpanMarkerModel.from_pretrained(model_name, labels=labels)
+   # Initialize a SpanMarkerModel using an encoder, e.g. BERT, and the labels:
+   encoder_id = "bert-base-cased"
+   model = SpanMarkerModel.from_pretrained(encoder_id, labels=labels)
 
    # See the 🤗 TrainingArguments documentation for details here
    args = TrainingArguments(
@@ -114,14 +120,21 @@ How to Train
 
    # Training is really simple using our Trainer!
    trainer.train()
-   trainer.save_model("my_span_marker_model/checkpoint-final")
 
    # ... and so is evaluating!
    metrics = trainer.evaluate()
    print(metrics)
 
+   # Save the model locally or on the Hugging Face Hub
+   trainer.save_model("my_span_marker_model/checkpoint-final")
+   trainer.push_to_hub("my_span_marker_model/checkpoint-final")
+
+See :doc:`Initializing & Training <notebooks/model_training>` for more details, or check out the documentation for
+:class:`~span_marker.modeling.SpanMarkerModel`, :class:`~span_marker.trainer.Trainer`, :func:`~datasets.load_dataset`, or :class:`~transformers.TrainingArguments`.
+
+**************
 How to predict
-==============
+**************
 
 ::
 
@@ -130,7 +143,7 @@ How to predict
    # Load a finetuned SpanMarkerModel from the 🤗 Hub
    model = SpanMarkerModel.from_pretrained("tomaarsen/span-marker-bert-base-fewnerd-fine-super")
 
-   # It is recommended to explicitly move the model to CUDA for faster inference
+   # It is recommended to explicitly move the model to CUDA for faster inference, if possible
    model.cuda()
 
    model.predict("A prototype was fitted in the mid-'60s in a one-off DB5 extended 4'' after the doors and driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.")
@@ -142,26 +155,33 @@ How to predict
    You can also load a locally saved model through ``SpanMarkerModel.from_pretrained("path/to/model")``,
    much like in 🤗 Transformers.
 
+See :doc:`Loading & Inferencing <notebooks/model_loading>` for more details, or check out the documentation for
+:class:`~span_marker.modeling.SpanMarkerModel` or :meth:`~span_marker.modeling.SpanMarkerModel.predict`.
 
+
+*******************
 How to save a model
-===================
+*******************
 
 Locally
--------
+=======
 
 ::
 
    model.save_pretrained("my_model_dir")
 
+See the documentation for :meth:`~span_marker.modeling.SpanMarkerModel.save_pretrained` for more details.
+
 
 To the 🤗 Hub
--------------
+=============
 
 ::
 
-   model_name = "span-marker-bert-base-fewnerd-fine-super"
-   model.push_to_hub(model_name)
+   model_id = "span-marker-bert-base-fewnerd-fine-super"
+   model.push_to_hub(model_id)
 
+See the documentation for :meth:`~span_marker.modeling.SpanMarkerModel.push_to_hub` for more details.
 
 .. toctree::
    :maxdepth: 2

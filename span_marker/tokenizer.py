@@ -5,7 +5,8 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, Iterator, List, Optional, Tuple, Union
 
 import numpy as np
-from transformers import AutoTokenizer, PreTrainedTokenizer
+from tokenizers.pre_tokenizers import Punctuation, Sequence
+from transformers import AutoTokenizer, PreTrainedTokenizer, XLMRobertaTokenizerFast
 
 from span_marker.configuration import SpanMarkerConfig
 
@@ -179,10 +180,14 @@ class SpanMarkerTokenizer:
     ) -> Dict[str, List]:
         tokens = batch["tokens"]
         labels = batch.get("ner_tags", None)
-        # TODO: Increase robustness of this
         is_split_into_words = True
-        if isinstance(tokens, str) or (tokens and " " in tokens[0]):
+        if isinstance(tokens, str):
             is_split_into_words = False
+        elif tokens:
+            for token in tokens:
+                if " " in token:
+                    is_split_into_words = False
+                    break
 
         batch_encoding = self.tokenizer(
             tokens,
@@ -201,7 +206,10 @@ class SpanMarkerTokenizer:
         all_labels = []
         all_num_words = []
         for sample_idx, input_ids in enumerate(batch_encoding["input_ids"]):
-            num_words = int(np.nanmax(np.array(batch_encoding.word_ids(sample_idx), dtype=float))) + 1
+            max_word_ids = np.nanmax(np.array(batch_encoding.word_ids(sample_idx), dtype=float))
+            if np.isnan(max_word_ids):
+                raise ValueError("The `SpanMarkerTokenizer` detected an empty sentence, please remove it.")
+            num_words = int(max_word_ids) + 1
             if self.tokenizer.pad_token_id in input_ids:
                 num_tokens = list(input_ids).index(self.tokenizer.pad_token_id)
             else:
@@ -269,4 +277,9 @@ class SpanMarkerTokenizer:
         tokenizer = AutoTokenizer.from_pretrained(
             pretrained_model_name_or_path, *inputs, **kwargs, add_prefix_space=True
         )
+        # XLM-R is known to have some tokenization issues, so be sure to also split on punctuation.
+        # Strictly required for inference, shouldn't affect training.
+        if isinstance(tokenizer, XLMRobertaTokenizerFast):
+            tokenizer._tokenizer.pre_tokenizer = Sequence([Punctuation(), tokenizer._tokenizer.pre_tokenizer])
+
         return cls(tokenizer, config=config, **kwargs)

@@ -1,25 +1,36 @@
 from datasets import load_dataset
 from transformers import TrainingArguments
 
-from span_marker import SpanMarkerModel, Trainer
+from span_marker import SpanMarkerModel, SpanMarkerModelCardData, Trainer
 
 
 def main() -> None:
     # Load the dataset, ensure "tokens" and "ner_tags" columns, and get a list of labels
-    dataset = load_dataset("DFKI-SLT/few-nerd", "supervised")
+    dataset_id = "DFKI-SLT/few-nerd"
+    dataset_name = "FewNERD"
+    dataset = load_dataset(dataset_id, "supervised")
     dataset = dataset.remove_columns("ner_tags")
     dataset = dataset.rename_column("fine_ner_tags", "ner_tags")
     labels = dataset["train"].features["ner_tags"].feature.names
 
     # Initialize a SpanMarker model using a pretrained BERT-style encoder
-    model_name = "roberta-large"
+    encoder_id = "roberta-large"
     model = SpanMarkerModel.from_pretrained(
-        model_name,
+        encoder_id,
         labels=labels,
         # SpanMarker hyperparameters:
         model_max_length=256,
         marker_max_length=128,
         entity_max_length=8,
+        # Model card arguments
+        model_card_data=SpanMarkerModelCardData(
+            model_id=f"tomaarsen/span-marker-{encoder_id}-fewnerd-fine-super",
+            encoder_id=encoder_id,
+            dataset_name=dataset_name,
+            dataset_id=dataset_id,
+            license="cc-by-nc-sa-4.0",
+            language="en",
+        ),
     )
 
     # Prepare the 🤗 transformers training arguments
