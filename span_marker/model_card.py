@@ -230,14 +230,15 @@ class SpanMarkerModelCardData(CardData):
         # We don't want to save "ignore_metadata_errors" in our Model Card
         if self.dataset_id:
             if is_on_huggingface(self.dataset_id, is_model=False):
-                # if languages are not set, try to determine the language from the dataset on the Hub
-                try:
-                    info = dataset_info(self.dataset_id)
-                except:
-                    pass
-                else:
-                    if info.cardData:
-                        self.language = info.cardData.get("language", self.language)
+                if self.language is None:
+                    # if languages are not set, try to determine the language from the dataset on the Hub
+                    try:
+                        info = dataset_info(self.dataset_id)
+                    except:
+                        pass
+                    else:
+                        if info.cardData:
+                            self.language = info.cardData.get("language", self.language)
             else:
                 logger.warning(
                     f"The provided {self.dataset_id!r} dataset could not be found on the Hugging Face Hub."

@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [Unreleased]
+
+### Fixed
+
+- No longer override `language` metadata from the dataset if the language was also set manually via `SpanMarkerModelCardData`.
+
 ## [1.4.0]
 
 ### Added
