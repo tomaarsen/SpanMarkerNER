@@ -136,6 +136,7 @@ Types of changes
 <h3>Fixed<a class="headerlink" href="#fixed" title="Link to this heading">¶</a></h3>
 <ul class="simple">
 <li><p>No longer override <code class="docutils literal notranslate"><span class="pre">language</span></code> metadata from the dataset if the language was also set manually via <code class="docutils literal notranslate"><span class="pre">SpanMarkerModelCardData</span></code>.</p></li>
+<li><p>No longer crash on <code class="docutils literal notranslate"><span class="pre">predict</span></code> with <code class="docutils literal notranslate"><span class="pre">ValueError:</span> <span class="pre">Failed</span> <span class="pre">to</span> <span class="pre">concatenate</span> <span class="pre">on</span> <span class="pre">axis=1</span> <span class="pre">...</span></code> if the first sentence in a list of sentences is just one word.</p></li>
 </ul>
 </section>
 </section>

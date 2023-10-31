@@ -319,10 +319,14 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">]:</span>
         <span class="n">tokens</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]</span>
         <span class="n">labels</span> <span class="o">=</span> <span class="n">batch</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
-        <span class="c1"># TODO: Increase robustness of this</span>
         <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="n">tokens</span> <span class="ow">and</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tokens</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="n">tokens</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">tokens</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s2">&quot; &quot;</span> <span class="ow">in</span> <span class="n">token</span><span class="p">:</span>
+                    <span class="n">is_split_into_words</span> <span class="o">=</span> <span class="kc">False</span>
+                    <span class="k">break</span>
 
         <span class="n">batch_encoding</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
             <span class="n">tokens</span><span class="p">,</span>
