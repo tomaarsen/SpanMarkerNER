@@ -195,6 +195,13 @@ def test_correct_predictions_with_document_level_context(
     )
 
 
+def test_predict_where_first_sentence_is_word(finetuned_conll_span_marker_model: SpanMarkerModel) -> None:
+    model = finetuned_conll_span_marker_model.try_cuda()
+    outputs = model.predict(["One", "Two Three Four Five"])
+    assert len(outputs) == 2
+    assert isinstance(outputs[0], list)
+
+
 def test_incorrect_predict_inputs(finetuned_conll_span_marker_model: SpanMarkerModel):
     model = finetuned_conll_span_marker_model.try_cuda()
     with pytest.raises(ValueError, match="could not recognize your input"):
