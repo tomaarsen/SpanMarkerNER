@@ -122,7 +122,7 @@
 <dl class="py class">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator">
 <em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">span_marker.data_collator.</span></span><span class="sig-name descname"><span class="pre">SpanMarkerDataCollator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">marker_max_length</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/data_collator.html#SpanMarkerDataCollator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator" title="Link to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.11)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.12)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Data Collator class responsible for converting the minimal outputs from the tokenizer into
 complete and meaningful inputs to the model. In particular, the <code class="docutils literal notranslate"><span class="pre">input_ids</span></code> from the tokenizer
 features are padded, and the correct amount of start and end markers (with padding) are added.</p>
@@ -140,7 +140,7 @@ features are padded, and the correct amount of start and end markers (with paddi
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – </p></li>
-<li><p><strong>marker_max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><em>int</em></a>) – </p></li>
+<li><p><strong>marker_max_length</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><em>int</em></a>) – </p></li>
 </ul>
 </dd>
 </dl>
@@ -151,7 +151,7 @@ features are padded, and the correct amount of start and end markers (with paddi
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="span_marker.data_collator.SpanMarkerDataCollator.marker_max_length">
-<span class="sig-name descname"><span class="pre">marker_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.11)"><span class="pre">int</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length" title="Link to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">marker_max_length</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.12)"><span class="pre">int</span></a></em><a class="headerlink" href="#span_marker.data_collator.SpanMarkerDataCollator.marker_max_length" title="Link to this definition">¶</a></dt>
 <dd></dd></dl>
 
 <dl class="py method">
@@ -160,7 +160,7 @@ features are padded, and the correct amount of start and end markers (with paddi
 <dd><p>Convert the minimal tokenizer outputs into inputs ready for <a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward" title="span_marker.modeling.SpanMarkerModel.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>features</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – <p>A list of dictionaries, one element per sample in the batch.
+<dd class="field-odd"><p><strong>features</strong> (<em>List</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – <p>A list of dictionaries, one element per sample in the batch.
 The dictionaries contain the following keys:</p>
 <ul class="simple">
 <li><p><code class="docutils literal notranslate"><span class="pre">input_ids</span></code>: The non-padded input IDs.</p></li>
@@ -180,7 +180,7 @@ The dictionaries contain the following keys:</p>
 <dd class="field-even"><p>Batch dictionary ready to be fed into <a class="reference internal" href="span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.forward" title="span_marker.modeling.SpanMarkerModel.forward"><code class="xref py py-meth docutils literal notranslate"><span class="pre">forward()</span></code></a>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))">torch.Tensor</a>]</p>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>, <a class="reference external" href="https://pytorch.org/docs/master/tensors.html#torch.Tensor" title="(in PyTorch vmaster (2.1.0a0+gitbe0b12e ))">torch.Tensor</a>]</p>
 </dd>
 </dl>
 </dd></dl>

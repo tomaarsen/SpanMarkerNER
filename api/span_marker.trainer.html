@@ -186,13 +186,13 @@ in <code class="docutils literal notranslate"><span class="pre">train</span></co
 <li><p><strong>label_normalizer</strong> (<a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer" title="span_marker.label_normalizer.LabelNormalizer"><em>LabelNormalizer</em></a>) – A callable that normalizes <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> into start-end-label tuples.</p></li>
 <li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – The tokenizer responsible for tokenizing <code class="docutils literal notranslate"><span class="pre">tokens</span></code> into input IDs,
 and adding start and end markers.</p></li>
-<li><p><strong>dataset_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dataset. Defaults to “train”.</p></li>
-<li><p><strong>is_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.11)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to return the number of words for each sample.
+<li><p><strong>dataset_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dataset. Defaults to “train”.</p></li>
+<li><p><strong>is_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to return the number of words for each sample.
 Required for evaluation. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.11)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.12)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The normalized and tokenized version of the input dataset.</p>
@@ -249,7 +249,7 @@ and 128 end markers, for a total of 256 markers per sample.</p></li>
 <dd class="field-even"><p>A dictionary of dataset keys to lists of values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, List[Any]]</p>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>, List[Any]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -258,7 +258,7 @@ and 128 end markers, for a total of 256 markers per sample.</p></li>
 <dt class="sig sig-object py" id="span_marker.trainer.Trainer.create_model_card">
 <span class="sig-name descname"><span class="pre">create_model_card</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">_args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">_kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/trainer.html#Trainer.create_model_card"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.trainer.Trainer.create_model_card" title="Link to this definition">¶</a></dt>
 <dd><p>Creates a draft of a model card using the information available to the <cite>Trainer</cite>,
-the <cite>SetFitModel</cite> and the <cite>SpanMarkerModelCardData</cite>.</p>
+the <cite>SpanMarkerModel</cite> and the <cite>SpanMarkerModelCardData</cite>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>None</p>
@@ -311,7 +311,7 @@ gathering predictions.</p></li>
 dictionary also contains the epoch number which comes from the training state.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.11)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.11)">float</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.12)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -333,7 +333,7 @@ dictionary also contains the epoch number which comes from the training state.</
 progress of the commit if <cite>blocking=True</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.11)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -359,8 +359,11 @@ optimizer/scheduler.</p>
 <li><p><strong>compute_objective</strong> (<cite>Callable[[Dict[str, float]], float]</cite>, <em>optional</em>) – A function computing the objective to minimize or maximize from the metrics returned by the <cite>evaluate</cite>
 method. Will default to [<cite>~trainer_utils.default_compute_objective</cite>].</p></li>
 <li><p><strong>n_trials</strong> (<cite>int</cite>, <em>optional</em>, defaults to 100) – The number of trial runs to test.</p></li>
-<li><p><strong>direction</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“minimize”</cite>) – Whether to optimize greater or lower objects. Can be <cite>“minimize”</cite> or <cite>“maximize”</cite>, you should pick
-<cite>“minimize”</cite> when optimizing the validation loss, <cite>“maximize”</cite> when optimizing one or several metrics.</p></li>
+<li><p><strong>direction</strong> (<cite>str</cite> or <cite>List[str]</cite>, <em>optional</em>, defaults to <cite>“minimize”</cite>) – If it’s single objective optimization, direction is <cite>str</cite>, can be <cite>“minimize”</cite> or <cite>“maximize”</cite>, you
+should pick <cite>“minimize”</cite> when optimizing the validation loss, <cite>“maximize”</cite> when optimizing one or
+several metrics. If it’s multi objectives optimization, direction is <cite>List[str]</cite>, can be List of
+<cite>“minimize”</cite> and <cite>“maximize”</cite>, you should pick <cite>“minimize”</cite> when optimizing the validation loss,
+<cite>“maximize”</cite> when optimizing one or several metrics.</p></li>
 <li><p><strong>backend</strong> (<cite>str</cite> or [<cite>~training_utils.HPSearchBackend</cite>], <em>optional</em>) – The backend to use for hyperparameter search. Will default to optuna or Ray Tune or SigOpt, depending
 on which one is installed. If all are installed, will default to optuna.</p></li>
 <li><p><strong>hp_name</strong> (<cite>Callable[[“optuna.Trial”], str]]</cite>, <em>optional</em>) – A function that defines the trial/run name. Will default to None.</p></li>
@@ -376,11 +379,12 @@ information see:</p>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>All the information about the best run. Experiment summary can be found in
-<cite>run_summary</cite> attribute for Ray backend.</p>
+<dd class="field-even"><p>All the information about the best run or best
+runs for multi-objective optimization. Experiment summary can be found in <cite>run_summary</cite> attribute for Ray
+backend.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[<cite>trainer_utils.BestRun</cite>]</p>
+<dd class="field-odd"><p>[<cite>trainer_utils.BestRun</cite> or <cite>List[trainer_utils.BestRun]</cite>]</p>
 </dd>
 </dl>
 </dd></dl>
