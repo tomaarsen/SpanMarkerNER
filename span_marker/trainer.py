@@ -437,7 +437,7 @@ class Trainer(TransformersTrainer):
     def create_model_card(self, *_args, **_kwargs) -> None:
         """
         Creates a draft of a model card using the information available to the `Trainer`,
-        the `SetFitModel` and the `SpanMarkerModelCardData`.
+        the `SpanMarkerModel` and the `SpanMarkerModelCardData`.
         """
         with open(os.path.join(self.args.output_dir, "README.md"), "w", encoding="utf8") as f:
             f.write(self.model.generate_model_card())
