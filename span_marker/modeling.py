@@ -125,29 +125,17 @@ class SpanMarkerModel(PreTrainedModel):
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
         position_ids: torch.Tensor,
-        start_marker_indices: torch.Tensor,
-        num_marker_pairs: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
-        num_words: Optional[torch.Tensor] = None,
-        document_ids: Optional[torch.Tensor] = None,
-        sentence_ids: Optional[torch.Tensor] = None,
         **kwargs,
-    ) -> SpanMarkerOutput:
+    ) -> Dict[str, torch.Tensor]:
         """Forward call of the SpanMarkerModel.
-
         Args:
             input_ids (~torch.Tensor): Input IDs including start/end markers.
             attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.
             position_ids (~torch.Tensor): Position IDs including start/end markers.
-            start_marker_indices (~torch.Tensor): The indices where the start markers begin per batch sample.
-            num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.
-            labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
-            num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
-            document_ids (Optional[~torch.Tensor]): The document ID of each batch sample. Defaults to None.
-            sentence_ids (Optional[~torch.Tensor]): The index of each sentence in their respective document. Defaults to None.
+        None.
 
         Returns:
-            SpanMarkerOutput: The output dataclass.
+            outputs: Encoder outputs
         """
         token_type_ids = torch.zeros_like(input_ids)
         outputs = self.encoder(
@@ -156,7 +144,20 @@ class SpanMarkerModel(PreTrainedModel):
             token_type_ids=token_type_ids,
             position_ids=position_ids,
         )
-        last_hidden_state = outputs[0]
+        return outputs
+
+    def postprocessing_encoder(
+        self,
+        encoder_outputs: Dict[str, torch.Tensor],
+        start_marker_indices: torch.Tensor,
+        num_marker_pairs: torch.Tensor,
+        labels: Optional[torch.Tensor] = None,
+        num_words: Optional[torch.Tensor] = None,
+        document_ids: Optional[torch.Tensor] = None,
+        sentence_ids: Optional[torch.Tensor] = None,
+        **kwargs,
+    ) -> SpanMarkerOutput:
+        last_hidden_state = encoder_outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
 
         batch_size = last_hidden_state.size(0)
@@ -195,12 +196,94 @@ class SpanMarkerModel(PreTrainedModel):
         return SpanMarkerOutput(
             loss=loss if labels is not None else None,
             logits=logits,
-            *outputs[2:],
+            *encoder_outputs[2:],
             num_marker_pairs=num_marker_pairs,
             num_words=num_words,
             document_ids=document_ids,
             sentence_ids=sentence_ids,
         )
+
+    # def forward(
+    #     self,
+    #     input_ids: torch.Tensor,
+    #     attention_mask: torch.Tensor,
+    #     position_ids: torch.Tensor,
+    #     start_marker_indices: torch.Tensor,
+    #     num_marker_pairs: torch.Tensor,
+    #     labels: Optional[torch.Tensor] = None,
+    #     num_words: Optional[torch.Tensor] = None,
+    #     document_ids: Optional[torch.Tensor] = None,
+    #     sentence_ids: Optional[torch.Tensor] = None,
+    #     **kwargs,
+    # ) -> SpanMarkerOutput:
+    #     """Forward call of the SpanMarkerModel.
+
+    #     Args:
+    #         input_ids (~torch.Tensor): Input IDs including start/end markers.
+    #         attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.
+    #         position_ids (~torch.Tensor): Position IDs including start/end markers.
+    #         start_marker_indices (~torch.Tensor): The indices where the start markers begin per batch sample.
+    #         num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.
+    #         labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
+    #         num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
+    #         document_ids (Optional[~torch.Tensor]): The document ID of each batch sample. Defaults to None.
+    #         sentence_ids (Optional[~torch.Tensor]): The index of each sentence in their respective document. Defaults to None.
+
+    #     Returns:
+    #         SpanMarkerOutput: The output dataclass.
+    #     """
+    #     token_type_ids = torch.zeros_like(input_ids)
+    #     outputs = self.encoder(
+    #         input_ids,
+    #         attention_mask=attention_mask,
+    #         token_type_ids=token_type_ids,
+    #         position_ids=position_ids,
+    #     )
+    #     last_hidden_state = outputs[0]
+    #     last_hidden_state = self.dropout(last_hidden_state)
+
+    #     batch_size = last_hidden_state.size(0)
+    #     sequence_length = last_hidden_state.size(1)
+
+    #     # Get the indices where the end markers start
+    #     end_marker_indices = start_marker_indices + num_marker_pairs
+
+    #     # The start marker embeddings concatenated with the end marker embeddings.
+    #     # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
+    #     # the batch iteratively per sample, but every sample produces a different shape matrix
+    #     # and this is the most convenient way to recombine them into a matrix.
+    #     embeddings = []
+    #     for i in range(batch_size):
+    #         embeddings.append(
+    #             torch.cat(
+    #                 (
+    #                     last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
+    #                     last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
+    #                 ),
+    #                 dim=-1,
+    #             )
+    #         )
+    #     padded_embeddings = [
+    #         F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
+    #     ]
+    #     feature_vector = torch.stack(padded_embeddings)
+
+    #     # NOTE: This was wrong in the older tests
+    #     feature_vector = self.dropout(feature_vector)
+    #     logits = self.classifier(feature_vector)
+
+    #     if labels is not None:
+    #         loss = self.loss_func(logits.view(-1, self.config.num_labels), labels.view(-1))
+
+    #     return SpanMarkerOutput(
+    #         loss=loss if labels is not None else None,
+    #         logits=logits,
+    #         *outputs[2:],
+    #         num_marker_pairs=num_marker_pairs,
+    #         num_words=num_words,
+    #         document_ids=document_ids,
+    #         sentence_ids=sentence_ids,
+    #     )
 
     @classmethod
     def from_pretrained(
@@ -509,7 +592,8 @@ class SpanMarkerModel(PreTrainedModel):
             # Moving the inputs to the right device
             batch = {key: value.to(self.device) for key, value in batch.items()}
             with torch.no_grad():
-                output = self(**batch)
+                encoder_outputs = self(**batch)
+                output = self.postprocessing_encoder(encoder_outputs=encoder_outputs, **batch)
             # Computing probabilities based on the logits
             probs = output.logits.softmax(-1)
             # Get the labels and the correponding probability scores
