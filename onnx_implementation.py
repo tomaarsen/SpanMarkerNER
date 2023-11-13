@@ -76,6 +76,10 @@ class SpanMarkerOnnxConfig(TextEncoderOnnxConfig):
         }
 
 
+# TODO
+# class SpanMarkerOnnxPipeline():
+
+
 if __name__ == "__main__":
     # Load SpanMarker model
     repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
