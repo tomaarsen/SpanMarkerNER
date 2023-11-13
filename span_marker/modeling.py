@@ -125,6 +125,12 @@ class SpanMarkerModel(PreTrainedModel):
         input_ids: torch.Tensor,
         attention_mask: torch.Tensor,
         position_ids: torch.Tensor,
+        start_marker_indices: torch.Tensor,
+        num_marker_pairs: torch.Tensor,
+        num_words: Optional[torch.Tensor] = None,
+        document_ids: Optional[torch.Tensor] = None,
+        sentence_ids: Optional[torch.Tensor] = None,
+        labels: Optional[torch.Tensor] = None,
         **kwargs,
     ) -> Dict[str, torch.Tensor]:
         """Forward call of the SpanMarkerModel.
@@ -144,34 +150,7 @@ class SpanMarkerModel(PreTrainedModel):
             token_type_ids=token_type_ids,
             position_ids=position_ids,
         )
-        return outputs
-
-    def postprocessing_encoder_output(
-        self,
-        encoder_outputs: Dict[str, torch.Tensor],
-        start_marker_indices: torch.Tensor,
-        num_marker_pairs: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
-        num_words: Optional[torch.Tensor] = None,
-        document_ids: Optional[torch.Tensor] = None,
-        sentence_ids: Optional[torch.Tensor] = None,
-        **kwargs,
-    ) -> SpanMarkerOutput:
-        """
-        Post-processes the output from the encoder to produce SpanMarkerOutput.
-        Args:
-            encoder_outputs (Dict[str, torch.Tensor]): Outputs from the encoder, typically including the last hidden state.
-            start_marker_indices (torch.Tensor): Indices in the input sequence where start markers are located.
-            num_marker_pairs (torch.Tensor): Number of start-end marker pairs in each example in the batch.
-            labels (Optional[torch.Tensor]): Labels for the input data, used for supervised learning. Default is None.
-            num_words (Optional[torch.Tensor]): Number of words in each input sequence. Default is None.
-            document_ids (Optional[torch.Tensor]): Identifiers for the documents in the batch. Default is None.
-            sentence_ids (Optional[torch.Tensor]): Identifiers for the sentences in the batch. Default is None.
-
-        Returns:
-            SpanMarkerOutput: Processed features and optionally the loss, if labels are provided.
-        """
-        last_hidden_state = encoder_outputs[0]
+        last_hidden_state = outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
 
         batch_size = last_hidden_state.size(0)
@@ -210,11 +189,11 @@ class SpanMarkerModel(PreTrainedModel):
         return SpanMarkerOutput(
             loss=loss if labels is not None else None,
             logits=logits,
-            *encoder_outputs[2:],
-            num_marker_pairs=num_marker_pairs,
-            num_words=num_words,
-            document_ids=document_ids,
-            sentence_ids=sentence_ids,
+            *outputs[2:],
+            out_num_marker_pairs=num_marker_pairs,
+            out_num_words=num_words,
+            out_document_ids=document_ids,
+            out_sentence_ids=sentence_ids,
         )
 
     @classmethod
@@ -524,19 +503,18 @@ class SpanMarkerModel(PreTrainedModel):
             # Moving the inputs to the right device
             batch = {key: value.to(self.device) for key, value in batch.items()}
             with torch.no_grad():
-                encoder_outputs = self(**batch)
-                output = self.postprocessing_encoder_output(encoder_outputs=encoder_outputs, **batch)
+                output = self(**batch)
             # Computing probabilities based on the logits
             probs = output.logits.softmax(-1)
             # Get the labels and the correponding probability scores
             scores, labels = probs.max(-1)
             # TODO: Iterate over output.num_marker_pairs instead with enumerate
-            for iter_idx in range(output.num_marker_pairs.size(0)):
+            for iter_idx in range(output.out_num_marker_pairs.size(0)):
                 input_id = dataset["id"][batch_start_idx + iter_idx]
-                num_marker_pairs = output.num_marker_pairs[iter_idx]
-                results[input_id]["scores"].extend(scores[iter_idx, :num_marker_pairs].tolist())
-                results[input_id]["labels"].extend(labels[iter_idx, :num_marker_pairs].tolist())
-                results[input_id]["num_words"] = output.num_words[iter_idx]
+                out_num_marker_pairs = output.out_num_marker_pairs[iter_idx]
+                results[input_id]["scores"].extend(scores[iter_idx, :out_num_marker_pairs].tolist())
+                results[input_id]["labels"].extend(labels[iter_idx, :out_num_marker_pairs].tolist())
+                results[input_id]["num_words"] = output.out_num_words[iter_idx]
 
         all_entities = []
         id2label = self.config.id2label
