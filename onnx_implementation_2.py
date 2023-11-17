@@ -24,6 +24,8 @@ import torch.nn.functional as F
 
 from datasets import Dataset, disable_progress_bar, enable_progress_bar
 import logging
+from optimum.version import __version__ as optimum_version
+
 
 logger = logging.getLogger(__name__)
 
