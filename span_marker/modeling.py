@@ -11,6 +11,7 @@ from torch import device, nn
 from tqdm.autonotebook import trange
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 from typing_extensions import Self
+import numpy as np
 
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
@@ -143,6 +144,8 @@ class SpanMarkerModel(PreTrainedModel):
         Returns:
             outputs: Encoder outputs
         """
+
+        ### Alternatite solution ###
         token_type_ids = torch.zeros_like(input_ids)
         outputs = self.encoder(
             input_ids,
@@ -152,34 +155,20 @@ class SpanMarkerModel(PreTrainedModel):
         )
         last_hidden_state = outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
-
         batch_size = last_hidden_state.size(0)
-        sequence_length = last_hidden_state.size(1)
-
-        # Get the indices where the end markers start
         end_marker_indices = start_marker_indices + num_marker_pairs
+        max_num_markers = num_marker_pairs.max() * 2
+        marker_embeddings = torch.zeros(
+            batch_size, max_num_markers, last_hidden_state.size(-1), device=last_hidden_state.device
+        )
 
-        # The start marker embeddings concatenated with the end marker embeddings.
-        # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
-        # the batch iteratively per sample, but every sample produces a different shape matrix
-        # and this is the most convenient way to recombine them into a matrix.
-        embeddings = []
         for i in range(batch_size):
-            embeddings.append(
-                torch.cat(
-                    (
-                        last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-                        last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-                    ),
-                    dim=-1,
-                )
-            )
-        padded_embeddings = [
-            F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
-        ]
-        feature_vector = torch.stack(padded_embeddings)
+            start_idx = start_marker_indices[i]
+            end_idx = end_marker_indices[i]
+            num_markers = num_marker_pairs[i] * 2
+            marker_embeddings[i, :num_markers] = last_hidden_state[i, start_idx : end_idx + num_marker_pairs[i]]
 
-        # NOTE: This was wrong in the older tests
+        feature_vector = marker_embeddings.view(batch_size, -1, last_hidden_state.size(-1) * 2)
         feature_vector = self.dropout(feature_vector)
         logits = self.classifier(feature_vector)
 
@@ -195,6 +184,60 @@ class SpanMarkerModel(PreTrainedModel):
             out_document_ids=document_ids,
             out_sentence_ids=sentence_ids,
         )
+        ### Alternatite solution ###
+
+        # ## Start Original solution ###
+        # token_type_ids = torch.zeros_like(input_ids)
+        # outputs = self.encoder(
+        #     input_ids,
+        #     attention_mask=attention_mask,
+        #     token_type_ids=token_type_ids,
+        #     position_ids=position_ids,
+        # )
+        # last_hidden_state = outputs[0]
+        # last_hidden_state = self.dropout(last_hidden_state)
+
+        # batch_size = last_hidden_state.size(0)
+        # Get the indices where the end markers start
+        # sequence_length = last_hidden_state.size(1)
+        # end_marker_indices = start_marker_indices + num_marker_pairs
+        # # The start marker embeddings concatenated with the end marker embeddings.
+        # # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
+        # # the batch iteratively per sample, but every sample produces a different shape matrix
+        # # and this is the most convenient way to recombine them into a matrix.
+        # embeddings = []
+        # for i in range(batch_size):
+        #     embeddings.append(
+        #         torch.cat(
+        #             (
+        #                 last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
+        #                 last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
+        #             ),
+        #             dim=-1,
+        #         )
+        #     )
+        # padded_embeddings = [
+        #     F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
+        # ]
+        # feature_vector = torch.stack(padded_embeddings)
+
+        #  NOTE: This was wrong in the older tests
+        # feature_vector = self.dropout(feature_vector)
+        # logits = self.classifier(feature_vector)
+
+        # if labels is not None:
+        #     loss = self.loss_func(logits.view(-1, self.config.num_labels), labels.view(-1))
+
+        # return SpanMarkerOutput(
+        #     loss=loss if labels is not None else None,
+        #     logits=logits,
+        #     *outputs[2:],
+        #     out_num_marker_pairs=num_marker_pairs,
+        #     out_num_words=num_words,
+        #     out_document_ids=document_ids,
+        #     out_sentence_ids=sentence_ids,
+        # )
+        # ## End Original solution ###
 
     @classmethod
     def from_pretrained(

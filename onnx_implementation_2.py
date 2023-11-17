@@ -3,12 +3,15 @@ from pathlib import Path
 import multiprocessing
 from tqdm import trange
 
+from span_marker.output import SpanMarkerOutput
+
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 import time
 from optimum.utils import DummyTextInputGenerator
 from optimum.utils.normalized_config import NormalizedTextConfig
 from optimum.exporters.onnx.config import TextEncoderOnnxConfig
-from typing import Dict, Union, List
+from typing import Dict, Union, Tuple, Any, List, Optional
+from optimum.version import __version__
 from optimum.exporters.onnx import export, validate_model_outputs
 from span_marker import SpanMarkerModel, SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
@@ -18,7 +21,6 @@ import torch
 import os
 import numpy as np
 import torch.nn.functional as F
-from optimum.version import __version__ as optimum_version
 
 from datasets import Dataset, disable_progress_bar, enable_progress_bar
 import logging
@@ -26,25 +28,25 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-assert "1.14.1" == optimum_version
-assert "1.16.2" >= ort.__version__
-print(f"Optimum version: {optimum_version}")
-print(f"Onnxruntime version: {ort.__version__}")
+assert "1.13.2" == __version__
+print(f"Optimum version: {__version__}")
 
 
-ORT_OPSET = 13
-
-
-class SpanMarkerDummyEncoderInputGenerator(DummyTextInputGenerator):
+class SpanMarkerDummyTextInputenerator(DummyTextInputGenerator):
     SUPPORTED_INPUT_NAMES = (
         "input_ids",
         "attention_mask",
         "position_ids",
+        "start_marker_indices",
+        "num_marker_pairs",
+        "num_words",
+        "document_ids",
+        "sentence_ids",
     )
 
     def __init__(self, *args, **kwargs):
-        super(SpanMarkerDummyEncoderInputGenerator, self).__init__(*args, **kwargs)
-        self.batch = 1
+        super(SpanMarkerDummyTextInputenerator, self).__init__(*args, **kwargs)
+        self.batch = 2
         self.sequence_length_encoder = 512
         self.min_value = 0
 
@@ -61,19 +63,22 @@ class SpanMarkerDummyEncoderInputGenerator(DummyTextInputGenerator):
                 "min": self.min_value,
                 "shape": [self.batch, self.sequence_length_encoder],
             },
+            "start_marker_indices": {"max": self.sequence_length, "min": self.min_value, "shape": [self.batch]},
+            "num_marker_pairs": {"max": self.sequence_length, "min": self.min_value, "shape": [self.batch]},
+            "others": {"max": 1, "min": self.min_value, "shape": [self.batch]},
         }
 
-        max_value = values[input_name]["max"]
-        min_value = values[input_name]["min"]
-        shape = values[input_name]["shape"]
+        max_value = values[input_name]["max"] if input_name in values else values["others"]["max"]
+        min_value = values[input_name]["min"] if input_name in values else values["others"]["min"]
+        shape = values[input_name]["shape"] if input_name in values else values["others"]["shape"]
 
         return self.random_int_tensor(shape, max_value, min_value=min_value, framework=framework, dtype=int_dtype)
 
 
-class SpanMarkerEncoderOnnxConfig(TextEncoderOnnxConfig):
+class SpanMarkerOnnxConfig(TextEncoderOnnxConfig):
     NORMALIZED_CONFIG_CLASS = NormalizedTextConfig
-    DUMMY_INPUT_GENERATOR_CLASSES = (SpanMarkerDummyEncoderInputGenerator,)
-    DEFAULT_ONNX_OPSET = ORT_OPSET
+    DUMMY_INPUT_GENERATOR_CLASSES = (SpanMarkerDummyTextInputenerator,)
+    DEFAULT_ONNX_OPSET = 14
     ATOL_FOR_VALIDATION = 1e-4
 
     @property
@@ -83,14 +88,41 @@ class SpanMarkerEncoderOnnxConfig(TextEncoderOnnxConfig):
             "input_ids": dynamic_axis,
             "attention_mask": dynamic_axis,
             "position_ids": dynamic_axis,
+            "start_marker_indices": dynamic_axis,
+            "num_marker_pairs": dynamic_axis,
+            "num_words": dynamic_axis,
+            "document_ids": dynamic_axis,
+            "sentence_ids": dynamic_axis,
         }
 
     @property
     def outputs(self) -> Dict[str, Dict[int, str]]:
         dynamic_axis = {0: "batch_size"}
         return {
-            "last_hidden_state": dynamic_axis,
-            "pooler_output": dynamic_axis,
+            "logits": dynamic_axis,
+            "out_num_marker_pairs": dynamic_axis,
+            "out_num_words": dynamic_axis,
+            "out_document_ids": dynamic_axis,
+            "out_sentence_ids": dynamic_axis,
+        }
+
+    NORMALIZED_CONFIG_CLASS = NormalizedTextConfig
+    DUMMY_INPUT_GENERATOR_CLASSES = (SpanMarkerClassifierInputGenerator,)
+    DEFAULT_ONNX_OPSET = 4
+    ATOL_FOR_VALIDATION = 1e-4
+
+    @property
+    def inputs(self) -> Dict[str, Dict[int, str]]:
+        dynamic_axis = {0: "batch_size"}
+        return {
+            "input": dynamic_axis,
+        }
+
+    @property
+    def outputs(self) -> Dict[str, Dict[int, str]]:
+        dynamic_axis = {0: "batch_size"}
+        return {
+            "output": dynamic_axis,
         }
 
 
@@ -100,40 +132,32 @@ class SpanMarkerOnnxPipeline:
 
     def __init__(
         self,
-        onnx_encoder_path: Union[str, os.PathLike],
-        onnx_classifier_path: Union[str, os.PathLike],
+        onnx_model_path: Union[str, os.PathLike],
         repo_id: Union[str, os.PathLike],
-        batch_size: int = 4,
-        providers: List[str] = ["CPUExecutionProvider"],
         show_progress_bar: bool = False,
         *args,
         **kwargs,
     ):
-        self.batch_size = batch_size
-        self.providers=providers
         self.show_progress_bar = show_progress_bar
         self.config = SpanMarkerConfig.from_pretrained(repo_id)
         self.tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=self.config)
         self.data_collator = SpanMarkerDataCollator(
             tokenizer=self.tokenizer, marker_max_length=self.config.marker_max_length
         )
-        self.encoder = self.load_ort_session(onnx_encoder_path,self.providers)
-        self.classifier = self.load_ort_session(onnx_classifier_path,self.providers)
+        self.ort_model = self.load_ort_session(onnx_model_path)
 
-    def load_ort_session(self, onnx_path: Union[str, os.PathLike],providers:List[str],**kwargs) -> ort.InferenceSession:
+    def load_ort_session(self, onnx_path: Union[str, os.PathLike], **kwargs) -> ort.InferenceSession:
         sess_options = ort.SessionOptions()
         sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
         sess_options.intra_op_num_threads = multiprocessing.cpu_count()
-        sess_options.log_severity_level = 2
+        sess_options.log_severity_level = 1
         ort_session = ort.InferenceSession(
-            onnx_path,
-            sess_options,
-            providers =providers,
+            onnx_path, sess_options, providers=["CoreMLExecutionProvider", "CPUExecutionProvider"]
         )
         return ort_session
 
-    def _forward(self, inputs: INPUT_TYPES) -> OUTPUT_TYPES:
+    def _forward(self, inputs: INPUT_TYPES, batch_size: int = 4) -> OUTPUT_TYPES:
         from span_marker.trainer import Trainer
 
         if not inputs:
@@ -232,45 +256,14 @@ class SpanMarkerOnnxPipeline:
         )
         if not self.show_progress_bar:
             enable_progress_bar()
-        for batch_start_idx in trange(0, len(dataset), self.batch_size, leave=True, disable=not self.show_progress_bar):
-            batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + self.batch_size)))
+        for batch_start_idx in trange(0, len(dataset), batch_size, leave=True, disable=not self.show_progress_bar):
+            batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
             # Expanding the small tokenized output into full-scale input_ids, position_ids and attention_mask matrices.
             batch = self.data_collator(batch)
             # Moving the inputs to the right device with onnx format
-            onnx_encoder_input = {
-                key: value.detach().cpu().numpy().astype(np.int64)
-                for key, value in batch.items()
-                if key in ["input_ids", "attention_mask", "position_ids"]
-            }
-            onnx_encoder_output = self.encoder.run(
-                ["last_hidden_state", "pooler_output"], input_feed=onnx_encoder_input
-            )
-            last_hidden_state = torch.from_numpy(onnx_encoder_output[0])
-            # Postprocessing steps for the encoder output
-            batch_size = last_hidden_state.size(0)
-            sequence_length = last_hidden_state.size(1)
-            end_marker_indices = batch["start_marker_indices"] + batch["num_marker_pairs"]
-
-            embeddings = []
-            for i in range(batch_size):
-                embeddings.append(
-                    torch.cat(
-                        (
-                            last_hidden_state[i, batch["start_marker_indices"][i] : end_marker_indices[i]],
-                            last_hidden_state[
-                                i, end_marker_indices[i] : end_marker_indices[i] + batch["num_marker_pairs"][i]
-                            ],
-                        ),
-                        dim=-1,
-                    )
-                )
-            padded_embeddings = [
-                F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
-            ]
-            feature_vector = torch.stack(padded_embeddings)
-            # Classifier output
-            onnx_classifier_output = self.classifier.run(["output"], input_feed={"input": np.array(feature_vector)})
-            logits = onnx_classifier_output[0]
+            onnx_input = {key: value.detach().cpu().numpy().astype(np.int64) for key, value in batch.items()}
+            onnx_encoder_output = self.ort_model.run(None, input_feed=onnx_input)
+            logits = onnx_encoder_output[0]
             # Computing probabilities based on the logits
             probs = torch.from_numpy(logits).softmax(-1)
             # Get the labels and the correponding probability scores
@@ -331,82 +324,56 @@ class SpanMarkerOnnxPipeline:
             return all_entities[0]
         return all_entities
 
-    def __call__(self, inputs: INPUT_TYPES) -> OUTPUT_TYPES:
-        predictions = self._forward(inputs)
-        return predictions
+    def __call__(self, inputs: INPUT_TYPES, batch_size: int = 4) -> OUTPUT_TYPES:
+        outputs = self._forward(inputs=inputs, batch_size=batch_size)
+        return outputs
 
 
 if __name__ == "__main__":
-    # # Load SpanMarker model
+    # Load SpanMarker model
     repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     base_model_config = base_model.config
+    base_model.eval()
 
-    # # Get ONNX model for the encoder
-    # onnx_encoder_path = Path("spanmarker_encoder.onnx")
-    # onnx_encoder_config = SpanMarkerEncoderOnnxConfig(base_model_config)
-    # onnx_encoder_inputs, onnx_encoder_outputs = export(
-    #     base_model.encoder.eval(),
-    #     onnx_encoder_config,
-    #     onnx_encoder_path,
-    #     opset=ORT_OPSET,
-    # )
-    # validate_model_outputs(
-    #     onnx_encoder_config,
-    #     base_model.encoder,
-    #     onnx_encoder_path,
-    #     onnx_encoder_outputs,
-    #     onnx_encoder_config.ATOL_FOR_VALIDATION,
-    # )
-
-    # # Get ONNX model for the classifier
-    # onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    # input_sample = torch.randn(4, 256, 1536)
-    # torch.onnx.export(
-    #     base_model.classifier.eval(),
-    #     input_sample,
-    #     onnx_classifier_path,
-    #     export_params=True,
-    #     opset_version=ORT_OPSET,
-    #     do_constant_folding=True,
-    #     input_names=["input"],
-    #     output_names=["output"],
-    #     dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
-    # )
-
-
-    onnx_encoder_path = Path("spanmarker_encoder.onnx")
-    onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    onnx_pipe = SpanMarkerOnnxPipeline(
-        onnx_encoder_path=onnx_encoder_path,
-        onnx_classifier_path=onnx_classifier_path,
-        repo_id=repo_id,
-        batch_size=30,
-        providers = ["CPUExecutionProvider",("CUDAExecutionProvider", {"cudnn_conv_use_max_workspace": '1'})]
+    #  Export to onnx
+    onnx_path = Path("spanmarker_model.onnx")
+    onnx_config = SpanMarkerOnnxConfig(base_model_config)
+    onnx_inputs, onnx_outputs = export(
+        base_model,
+        SpanMarkerOnnxConfig(base_model.config, task="token-classification"),
+        onnx_path,
+        opset=14,
     )
+    # ONNX Validation
+    validate_model_outputs(onnx_config, base_model, onnx_path, onnx_outputs, onnx_config.ATOL_FOR_VALIDATION)
 
-    # Benchmarking
-    batch = [[
+    # Load ONNX Pipeline
+    onnx_path = Path("spanmarker_model.onnx")
+    repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
+    onnx_pipe = SpanMarkerOnnxPipeline(onnx_path=onnx_path, repo_id=repo_id)
+
+    # BenchMark
+    def strip_score_from_results(results):
+        return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
+
+    batch_size = 30
+    batch = [
         "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-    ]] * 30
+    ] * batch_size
 
     print(f"-------- Start Torch--------")
     start_time = time.time()
-    torch_result = base_model.predict(batch,batch_size=30)
+    torch_result = base_model.predict(batch, batch_size)
     end_time = time.time()
     torch_time = end_time - start_time
     print(f"-------- End Torch --------")
-
     print(f"-------- Start ONNX--------")
     start_time = time.time()
-    onnx_result = onnx_pipe(batch)
+    onnx_result = onnx_pipe(batch, batch_size)
     end_time = time.time()
     onnx_time = end_time - start_time
     print(f"-------- End ONNX --------")
-
-
-    def strip_score_from_results(results):
-        return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
     print(f"Time results:")
     print(f"Batch size: {len(batch)}")
     print(f"Torch time: {torch_time}")
