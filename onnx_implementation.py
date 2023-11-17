@@ -26,7 +26,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-assert "1.13.2" == optimum_version
+assert "1.14.1" == optimum_version
 assert "1.16.2" >= ort.__version__
 print(f"Optimum version: {optimum_version}")
 print(f"Onnxruntime version: {ort.__version__}")
@@ -104,21 +104,23 @@ class SpanMarkerOnnxPipeline:
         onnx_classifier_path: Union[str, os.PathLike],
         repo_id: Union[str, os.PathLike],
         batch_size: int = 4,
+        providers: List[str] = ["CPUExecutionProvider"],
         show_progress_bar: bool = False,
         *args,
         **kwargs,
     ):
         self.batch_size = batch_size
+        self.providers=providers
         self.show_progress_bar = show_progress_bar
         self.config = SpanMarkerConfig.from_pretrained(repo_id)
         self.tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=self.config)
         self.data_collator = SpanMarkerDataCollator(
             tokenizer=self.tokenizer, marker_max_length=self.config.marker_max_length
         )
-        self.encoder = self.load_ort_session(onnx_encoder_path)
-        self.classifier = self.load_ort_session(onnx_classifier_path)
+        self.encoder = self.load_ort_session(onnx_encoder_path,self.providers)
+        self.classifier = self.load_ort_session(onnx_classifier_path,self.providers)
 
-    def load_ort_session(self, onnx_path: Union[str, os.PathLike], **kwargs) -> ort.InferenceSession:
+    def load_ort_session(self, onnx_path: Union[str, os.PathLike],providers:List[str],**kwargs) -> ort.InferenceSession:
         sess_options = ort.SessionOptions()
         sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
         sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
@@ -127,7 +129,7 @@ class SpanMarkerOnnxPipeline:
         ort_session = ort.InferenceSession(
             onnx_path,
             sess_options,
-            providers=["CoreMLExecutionProvider", "ArmNNExecutionProvider", "CPUExecutionProvider"],
+            providers =providers,
         )
         return ort_session
 
@@ -340,50 +342,57 @@ if __name__ == "__main__":
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     base_model_config = base_model.config
 
-    # Get ONNX model for the encoder
+    # # Get ONNX model for the encoder
+    # onnx_encoder_path = Path("spanmarker_encoder.onnx")
+    # onnx_encoder_config = SpanMarkerEncoderOnnxConfig(base_model_config)
+    # onnx_encoder_inputs, onnx_encoder_outputs = export(
+    #     base_model.encoder.eval(),
+    #     onnx_encoder_config,
+    #     onnx_encoder_path,
+    #     opset=ORT_OPSET,
+    # )
+    # validate_model_outputs(
+    #     onnx_encoder_config,
+    #     base_model.encoder,
+    #     onnx_encoder_path,
+    #     onnx_encoder_outputs,
+    #     onnx_encoder_config.ATOL_FOR_VALIDATION,
+    # )
+
+    # # Get ONNX model for the classifier
+    # onnx_classifier_path = Path("spanmarker_classifier.onnx")
+    # input_sample = torch.randn(4, 256, 1536)
+    # torch.onnx.export(
+    #     base_model.classifier.eval(),
+    #     input_sample,
+    #     onnx_classifier_path,
+    #     export_params=True,
+    #     opset_version=ORT_OPSET,
+    #     do_constant_folding=True,
+    #     input_names=["input"],
+    #     output_names=["output"],
+    #     dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+    # )
+
+
     onnx_encoder_path = Path("spanmarker_encoder.onnx")
-    onnx_encoder_config = SpanMarkerEncoderOnnxConfig(base_model_config)
-    onnx_encoder_inputs, onnx_encoder_outputs = export(
-        base_model.encoder.eval(),
-        onnx_encoder_config,
-        onnx_encoder_path,
-        opset=ORT_OPSET,
-    )
-    validate_model_outputs(
-        onnx_encoder_config,
-        base_model.encoder,
-        onnx_encoder_path,
-        onnx_encoder_outputs,
-        onnx_encoder_config.ATOL_FOR_VALIDATION,
-    )
-
-    # Get ONNX model for the classifier
     onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    input_sample = torch.randn(4, 256, 1536)
-    torch.onnx.export(
-        base_model.classifier.eval(),
-        input_sample,
-        onnx_classifier_path,
-        export_params=True,
-        opset_version=ORT_OPSET,
-        do_constant_folding=True,
-        input_names=["input"],
-        output_names=["output"],
-        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
-    )
-
     onnx_pipe = SpanMarkerOnnxPipeline(
-        onnx_encoder_path=onnx_encoder_path, onnx_classifier_path=onnx_classifier_path, repo_id=repo_id
+        onnx_encoder_path=onnx_encoder_path,
+        onnx_classifier_path=onnx_classifier_path,
+        repo_id=repo_id,
+        batch_size=30,
+        providers = ["CPUExecutionProvider",("CUDAExecutionProvider", {"cudnn_conv_use_max_workspace": '1'})]
     )
 
     # Benchmarking
-    batch = [
+    batch = [[
         "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-    ] * 30
+    ]] * 30
 
     print(f"-------- Start Torch--------")
     start_time = time.time()
-    torch_result = base_model.predict(batch)
+    torch_result = base_model.predict(batch,batch_size=30)
     end_time = time.time()
     torch_time = end_time - start_time
     print(f"-------- End Torch --------")
@@ -395,8 +404,11 @@ if __name__ == "__main__":
     onnx_time = end_time - start_time
     print(f"-------- End ONNX --------")
 
+
+    def strip_score_from_results(results):
+        return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
     print(f"Time results:")
     print(f"Batch size: {len(batch)}")
     print(f"Torch time: {torch_time}")
     print(f"ONNX time: {onnx_time}")
-    print(f"Results are the same: {torch_result==onnx_result}")
+    print(f"Results are the same: {strip_score_from_results(torch_result)==strip_score_from_results(onnx_result)}")
