@@ -28,8 +28,8 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-assert "1.13.2" == __version__
-print(f"Optimum version: {__version__}")
+print(f"Optimum version: {optimum_version}")
+print(f"Onnxruntime version: {ort.__version__}")
 
 
 class SpanMarkerDummyTextInputenerator(DummyTextInputGenerator):
