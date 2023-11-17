@@ -125,11 +125,7 @@ class SpanMarkerOnnxPipeline:
         ort_session = ort.InferenceSession(
             onnx_path,
             sess_options,
-<<<<<<< HEAD:onnx_implementation.py
             providers =providers,
-=======
-            providers=["CPUExecutionProvider"],
->>>>>>> 298ea7bc5e2ad755361755c8f8fdbddafcb510fa:onnx_implementation_1.py
         )
         return ort_session
 
