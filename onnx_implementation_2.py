@@ -323,19 +323,19 @@ if __name__ == "__main__":
     repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     base_model_config = base_model.config
-    base_model.eval()
 
-    #  Export to onnx
-    onnx_path = Path("spanmarker_model.onnx")
-    onnx_config = SpanMarkerOnnxConfig(base_model_config)
-    onnx_inputs, onnx_outputs = export(
-        base_model,
-        SpanMarkerOnnxConfig(base_model.config, task="token-classification"),
-        onnx_path,
-        opset=14,
-    )
-    # ONNX Validation
-    validate_model_outputs(onnx_config, base_model, onnx_path, onnx_outputs, onnx_config.ATOL_FOR_VALIDATION)
+    # #  Export to onnx
+    # onnx_path = Path("spanmarker_model.onnx")
+    # onnx_config = SpanMarkerOnnxConfig(base_model_config)
+    # base_model.eval()
+    # onnx_inputs, onnx_outputs = export(
+    #     base_model,
+    #     SpanMarkerOnnxConfig(base_model.config, task="token-classification"),
+    #     onnx_path,
+    #     opset=14,
+    # )
+    # # ONNX Validation
+    # validate_model_outputs(onnx_config, base_model, onnx_path, onnx_outputs, onnx_config.ATOL_FOR_VALIDATION)
 
     # Load ONNX Pipeline
     onnx_path = Path("spanmarker_model.onnx")
@@ -346,11 +346,11 @@ if __name__ == "__main__":
     def strip_score_from_results(results):
         return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
 
-    batch_size = 100
+    batch_size = 30
     batch = [
-        [
-            "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-        ]
+        
+            ["Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
+            ] 
     ] * batch_size
 
     print(f"-------- Start Torch--------")
