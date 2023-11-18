@@ -34,6 +34,9 @@ print(f"Optimum version: {optimum_version}")
 print(f"Onnxruntime version: {ort.__version__}")
 
 
+# TODO: Include document_ids and sentence_ids in the input
+
+
 class SpanMarkerDummyTextInputenerator(DummyTextInputGenerator):
     SUPPORTED_INPUT_NAMES = (
         "input_ids",
@@ -108,25 +111,6 @@ class SpanMarkerOnnxConfig(TextEncoderOnnxConfig):
             "out_sentence_ids": dynamic_axis,
         }
 
-    NORMALIZED_CONFIG_CLASS = NormalizedTextConfig
-    DUMMY_INPUT_GENERATOR_CLASSES = (SpanMarkerClassifierInputGenerator,)
-    DEFAULT_ONNX_OPSET = 4
-    ATOL_FOR_VALIDATION = 1e-4
-
-    @property
-    def inputs(self) -> Dict[str, Dict[int, str]]:
-        dynamic_axis = {0: "batch_size"}
-        return {
-            "input": dynamic_axis,
-        }
-
-    @property
-    def outputs(self) -> Dict[str, Dict[int, str]]:
-        dynamic_axis = {0: "batch_size"}
-        return {
-            "output": dynamic_axis,
-        }
-
 
 class SpanMarkerOnnxPipeline:
     INPUT_TYPES = Union[str, List[str], List[List[str]]]
@@ -154,9 +138,7 @@ class SpanMarkerOnnxPipeline:
         sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
         sess_options.intra_op_num_threads = multiprocessing.cpu_count()
         sess_options.log_severity_level = 1
-        ort_session = ort.InferenceSession(
-            onnx_path, sess_options, providers=["CoreMLExecutionProvider", "CPUExecutionProvider"]
-        )
+        ort_session = ort.InferenceSession(onnx_path, sess_options, providers=["CPUExecutionProvider"])
         return ort_session
 
     def _forward(self, inputs: INPUT_TYPES, batch_size: int = 4) -> OUTPUT_TYPES:
@@ -264,19 +246,24 @@ class SpanMarkerOnnxPipeline:
             batch = self.data_collator(batch)
             # Moving the inputs to the right device with onnx format
             onnx_input = {key: value.detach().cpu().numpy().astype(np.int64) for key, value in batch.items()}
-            onnx_encoder_output = self.ort_model.run(None, input_feed=onnx_input)
-            logits = onnx_encoder_output[0]
+            if "document_ids" not in list(batch.keys()):
+                onnx_input["document_ids"] = np.array([]).astype(np.int64)
+                onnx_input["sentence_ids"] = np.array([]).astype(np.int64)
+            onnx_output = self.ort_model.run(None, input_feed=onnx_input)
+            logits = onnx_output[0]
+            out_num_marker_pairs = torch.from_numpy(onnx_output[1])
+            out_num_words = torch.from_numpy(onnx_output[2])
             # Computing probabilities based on the logits
             probs = torch.from_numpy(logits).softmax(-1)
             # Get the labels and the correponding probability scores
             scores, labels = probs.max(-1)
             # TODO: Iterate over output.num_marker_pairs instead with enumerate
-            for iter_idx in range(batch["num_marker_pairs"].size(0)):
+            for iter_idx in range(out_num_marker_pairs.size(0)):
                 input_id = dataset["id"][batch_start_idx + iter_idx]
-                num_marker_pairs = batch["num_marker_pairs"][iter_idx]
+                num_marker_pairs = out_num_marker_pairs[iter_idx]
                 results[input_id]["scores"].extend(scores[iter_idx, :num_marker_pairs].tolist())
                 results[input_id]["labels"].extend(labels[iter_idx, :num_marker_pairs].tolist())
-                results[input_id]["num_words"] = batch["num_words"][iter_idx]
+                results[input_id]["num_words"] = out_num_words[iter_idx]
 
         all_entities = []
         id2label = self.config.id2label
@@ -353,7 +340,7 @@ if __name__ == "__main__":
     # Load ONNX Pipeline
     onnx_path = Path("spanmarker_model.onnx")
     repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
-    onnx_pipe = SpanMarkerOnnxPipeline(onnx_path=onnx_path, repo_id=repo_id)
+    onnx_pipe = SpanMarkerOnnxPipeline(onnx_model_path=onnx_path, repo_id=repo_id)
 
     # BenchMark
     def strip_score_from_results(results):
