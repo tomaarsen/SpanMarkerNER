@@ -346,9 +346,11 @@ if __name__ == "__main__":
     def strip_score_from_results(results):
         return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
 
-    batch_size = 30
+    batch_size = 100
     batch = [
-        "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
+        [
+            "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
+        ]
     ] * batch_size
 
     print(f"-------- Start Torch--------")
