@@ -325,17 +325,17 @@ if __name__ == "__main__":
     base_model_config = base_model.config
 
     # #  Export to onnx
-    # onnx_path = Path("spanmarker_model.onnx")
-    # onnx_config = SpanMarkerOnnxConfig(base_model_config)
-    # base_model.eval()
-    # onnx_inputs, onnx_outputs = export(
-    #     base_model,
-    #     SpanMarkerOnnxConfig(base_model.config, task="token-classification"),
-    #     onnx_path,
-    #     opset=14,
-    # )
-    # # ONNX Validation
-    # validate_model_outputs(onnx_config, base_model, onnx_path, onnx_outputs, onnx_config.ATOL_FOR_VALIDATION)
+    onnx_path = Path("spanmarker_model.onnx")
+    onnx_config = SpanMarkerOnnxConfig(base_model_config)
+    base_model.eval()
+    onnx_inputs, onnx_outputs = export(
+        base_model,
+        SpanMarkerOnnxConfig(base_model.config, task="token-classification"),
+        onnx_path,
+        opset=14,
+    )
+    # ONNX Validation
+    validate_model_outputs(onnx_config, base_model, onnx_path, onnx_outputs, onnx_config.ATOL_FOR_VALIDATION)
 
     # Load ONNX Pipeline
     onnx_path = Path("spanmarker_model.onnx")
