@@ -153,52 +153,35 @@ class SpanMarkerModel(PreTrainedModel):
         )
         last_hidden_state = outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
-
+        sequence_length = last_hidden_state.size(1)
         batch_size = last_hidden_state.size(0)
         # Get the indices where the end markers start
-        sequence_length = last_hidden_state.size(1)
-        sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
         end_marker_indices = start_marker_indices + num_marker_pairs
-        ### Alternative solution ###
+        sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
+        #  Pre-allocates the necessary space for feature_vector
         feature_vector = torch.zeros(
             batch_size,
             sequence_length // 2,
             sequence_length_last_hidden_state,
+            device = self.device
         )
         for i in range(batch_size):
-            embedding_concatenated = torch.cat(
-                (
-                    last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-                    last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-                ),
-                dim=-1,
-            )
-            feature_vector[i, : embedding_concatenated.size(0), :] = embedding_concatenated
+            ### Without torch.cat
+            feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], :last_hidden_state.shape[-1]] = last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]]
+            feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], last_hidden_state.shape[-1]:] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
+            ### End without torch.cat
 
-        ### End Alternative solution ###
-
-        # ### Original solution ###
-        # # The start marker embeddings concatenated with the end marker embeddings.
-        # # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
-        # # the batch iteratively per sample, but every sample produces a different shape matrix
-        # # and this is the most convenient way to recombine them into a matrix.
-        # embeddings = []
-        # for i in range(batch_size):
-        #     embeddings.append(
-        #         torch.cat(
-        #             (
-        #                 last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-        #                 last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-        #             ),
-        #             dim=-1,
-        #         )
-        #     )
-        # padded_embeddings = [
-        #     F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
-        # ]
-        # feature_vector = torch.stack(padded_embeddings)
-        # ### End Original Solution ###
-
+            # # With torch.cat
+            # embedding_concatenated = torch.cat(
+            #     (
+            #         last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
+            #         last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
+            #     ),
+            #     dim=-1,
+            # )
+            # feature_vector[i, : embedding_concatenated.size(0), :] = embedding_concatenated
+            # # End with torch.cat
+        
         # NOTE: This was wrong in the older tests
         feature_vector = self.dropout(feature_vector)
         logits = self.classifier(feature_vector)

@@ -8,20 +8,20 @@ from span_marker import SpanMarkerModel
 
 repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
 model = SpanMarkerModel.from_pretrained(repo_id)
-model = torch.compile(model)
 
-batch_size = 100
-batch = [
-    "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-] * batch_size
+batch_size = 10
+batch = ["Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres"]* batch_size
 
+number_of_tests = 10
+time_results = []
+results = []
 
-print(f"-------- Start Torch--------")
-start_time = time.time()
-torch_result = model.predict(batch, batch_size)
-end_time = time.time()
-torch_time = end_time - start_time
-print(f"-------- End Torch --------")
-print(f"Time results:")
-print(f"Batch size: {len(batch)}")
-print(f"Torch time: {torch_time}")
+for _ in range(number_of_tests):
+    start_time = time.time()
+    torch_result = model.predict(batch, batch_size)
+    end_time = time.time()
+    torch_time = end_time - start_time
+    time_results.append(torch_time)
+    results.append(torch_result)
+print(f"Mean time: {sum(time_results)/len(time_results)}")
+
