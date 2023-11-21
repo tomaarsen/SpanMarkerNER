@@ -120,7 +120,7 @@ class SpanMarkerModel(PreTrainedModel):
             module.weight.data.fill_(1.0)
         if isinstance(module, nn.Linear) and module.bias is not None:
             module.bias.data.zero_()
-
+    
     def forward(
         self,
         input_ids: torch.Tensor,
@@ -166,22 +166,9 @@ class SpanMarkerModel(PreTrainedModel):
             device = self.device
         )
         for i in range(batch_size):
-            ### Without torch.cat
             feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], :last_hidden_state.shape[-1]] = last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]]
             feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], last_hidden_state.shape[-1]:] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
-            ### End without torch.cat
 
-            # # With torch.cat
-            # embedding_concatenated = torch.cat(
-            #     (
-            #         last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-            #         last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-            #     ),
-            #     dim=-1,
-            # )
-            # feature_vector[i, : embedding_concatenated.size(0), :] = embedding_concatenated
-            # # End with torch.cat
-        
         # NOTE: This was wrong in the older tests
         feature_vector = self.dropout(feature_vector)
         logits = self.classifier(feature_vector)
