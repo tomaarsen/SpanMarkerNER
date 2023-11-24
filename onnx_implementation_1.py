@@ -2,14 +2,15 @@ import sys
 from pathlib import Path
 import multiprocessing
 from tqdm import trange
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
 import time
 from optimum.utils import DummyTextInputGenerator
 from optimum.utils.normalized_config import NormalizedTextConfig
 from optimum.exporters.onnx.config import TextEncoderOnnxConfig
 from typing import Dict, Union, List
 from optimum.exporters.onnx import export, validate_model_outputs
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from span_marker import SpanMarkerModel, SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
@@ -338,53 +339,54 @@ if __name__ == "__main__":
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     base_model_config = base_model.config
 
-    # # Get ONNX model for the encoder
-    # onnx_encoder_path = Path("spanmarker_encoder.onnx")
-    # onnx_encoder_config = SpanMarkerEncoderOnnxConfig(base_model_config)
-    # onnx_encoder_inputs, onnx_encoder_outputs = export(
-    #     base_model.encoder.eval(),
-    #     onnx_encoder_config,
-    #     onnx_encoder_path,
-    #     opset=ORT_OPSET,
-    # )
-    # validate_model_outputs(
-    #     onnx_encoder_config,
-    #     base_model.encoder,
-    #     onnx_encoder_path,
-    #     onnx_encoder_outputs,
-    #     onnx_encoder_config.ATOL_FOR_VALIDATION,
-    # )
+    # Get ONNX model for the encoder
+    onnx_encoder_path = Path("spanmarker_encoder.onnx")
+    onnx_encoder_config = SpanMarkerEncoderOnnxConfig(base_model_config)
+    onnx_encoder_inputs, onnx_encoder_outputs = export(
+        base_model.encoder.eval(),
+        onnx_encoder_config,
+        onnx_encoder_path,
+        opset=ORT_OPSET,
+    )
+    validate_model_outputs(
+        onnx_encoder_config,
+        base_model.encoder,
+        onnx_encoder_path,
+        onnx_encoder_outputs,
+        onnx_encoder_config.ATOL_FOR_VALIDATION,
+    )
 
     # # Get ONNX model for the classifier
-    # onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    # input_sample = torch.randn(4, 256, 1536)
-    # torch.onnx.export(
-    #     base_model.classifier.eval(),
-    #     input_sample,
-    #     onnx_classifier_path,
-    #     export_params=True,
-    #     opset_version=ORT_OPSET,
-    #     do_constant_folding=True,
-    #     input_names=["input"],
-    #     output_names=["output"],
-    #     dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
-    # )
+    onnx_classifier_path = Path("spanmarker_classifier.onnx")
+    input_sample = torch.randn(4, 256, 1536)
+    torch.onnx.export(
+        base_model.classifier.eval(),
+        input_sample,
+        onnx_classifier_path,
+        export_params=True,
+        opset_version=ORT_OPSET,
+        do_constant_folding=True,
+        input_names=["input"],
+        output_names=["output"],
+        dynamic_axes={"input": {0: "batch_size"}, "output": {0: "batch_size"}},
+    )
 
 
     onnx_encoder_path = Path("spanmarker_encoder.onnx")
     onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    onnx_pipe = SpanMarkerOnnxPipeline(
-        onnx_encoder_path=onnx_encoder_path, onnx_classifier_path=onnx_classifier_path, repo_id=repo_id, batch_size=30
-    )
-
     # Benchmarking
-    batch = [[
+    batch_size = 2
+    batch = [
         "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-    ]] * 30
+    ] * batch_size
+
+    onnx_pipe = SpanMarkerOnnxPipeline(
+        onnx_encoder_path=onnx_encoder_path, onnx_classifier_path=onnx_classifier_path, repo_id=repo_id, batch_size=batch_size
+    )
 
     print(f"-------- Start Torch--------")
     start_time = time.time()
-    torch_result = base_model.predict(batch,batch_size=30)
+    torch_result = base_model.predict(batch,batch_size=batch_size)
     end_time = time.time()
     torch_time = end_time - start_time
     print(f"-------- End Torch --------")

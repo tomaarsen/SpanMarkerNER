@@ -9,10 +9,10 @@ from span_marker import SpanMarkerModel
 repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
 model = SpanMarkerModel.from_pretrained(repo_id)
 
-batch_size = 10
-batch = ["Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres","Antonio Polo is living in Cáceres"]* batch_size
+batch_size = 1
+batch = ["Antonio Polo lives in Cáceres".split()]*batch_size
 
-number_of_tests = 10
+number_of_tests = 1
 time_results = []
 results = []
 

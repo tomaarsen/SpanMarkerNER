@@ -3,8 +3,6 @@ from pathlib import Path
 import multiprocessing
 from tqdm import trange
 
-from span_marker.output import SpanMarkerOutput
-
 sys.path.append(str(Path(__file__).resolve().parent.parent))
 import time
 from optimum.utils import DummyTextInputGenerator
@@ -16,6 +14,7 @@ from optimum.exporters.onnx import export, validate_model_outputs
 from span_marker import SpanMarkerModel, SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
+from span_marker.output import SpanMarkerOutput
 import onnxruntime as ort
 import torch
 import os
@@ -51,7 +50,7 @@ class SpanMarkerDummyTextInputenerator(DummyTextInputGenerator):
 
     def __init__(self, *args, **kwargs):
         super(SpanMarkerDummyTextInputenerator, self).__init__(*args, **kwargs)
-        self.batch = 2
+        self.batch = 1
         self.sequence_length_encoder = 512
         self.min_value = 0
 
@@ -86,29 +85,33 @@ class SpanMarkerOnnxConfig(TextEncoderOnnxConfig):
     DEFAULT_ONNX_OPSET = 14
     ATOL_FOR_VALIDATION = 1e-4
 
+
+
     @property
     def inputs(self) -> Dict[str, Dict[int, str]]:
-        dynamic_axis = {0: "batch_size"}
+        DYNAMIC_AXIS_1 = {0:"batch_size"}
+
         return {
-            "input_ids": dynamic_axis,
-            "attention_mask": dynamic_axis,
-            "position_ids": dynamic_axis,
-            "start_marker_indices": dynamic_axis,
-            "num_marker_pairs": dynamic_axis,
-            "num_words": dynamic_axis,
-            "document_ids": dynamic_axis,
-            "sentence_ids": dynamic_axis,
+            "input_ids": DYNAMIC_AXIS_1,
+            "attention_mask": DYNAMIC_AXIS_1,
+            "position_ids": DYNAMIC_AXIS_1,
+            "start_marker_indices": DYNAMIC_AXIS_1,
+            "num_marker_pairs": DYNAMIC_AXIS_1,
+            "num_words": DYNAMIC_AXIS_1,
+            "document_ids": DYNAMIC_AXIS_1,
+            "sentence_ids": DYNAMIC_AXIS_1,
         }
 
     @property
     def outputs(self) -> Dict[str, Dict[int, str]]:
-        dynamic_axis = {0: "batch_size"}
+        DYNAMIC_AXIS_1 = {0:"batch_size",1:"sequence_legth",2:"hidden_states"}
+        DYNAMIC_AXIS_2 = {0:"batch_size"}
         return {
-            "logits": dynamic_axis,
-            "out_num_marker_pairs": dynamic_axis,
-            "out_num_words": dynamic_axis,
-            "out_document_ids": dynamic_axis,
-            "out_sentence_ids": dynamic_axis,
+            "logits": DYNAMIC_AXIS_1,
+            "out_num_marker_pairs": DYNAMIC_AXIS_2,
+            "out_num_words": DYNAMIC_AXIS_2,
+            "out_document_ids": DYNAMIC_AXIS_2,
+            "out_sentence_ids": DYNAMIC_AXIS_2,
         }
 
 
@@ -324,7 +327,7 @@ if __name__ == "__main__":
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     base_model_config = base_model.config
 
-    # #  Export to onnx
+    # Export to onnx
     onnx_path = Path("spanmarker_model.onnx")
     onnx_config = SpanMarkerOnnxConfig(base_model_config)
     base_model.eval()
@@ -346,11 +349,9 @@ if __name__ == "__main__":
     def strip_score_from_results(results):
         return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
 
-    batch_size = 30
+    batch_size = 3
     batch = [
-        
-            ["Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
-            ] 
+        "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
     ] * batch_size
 
     print(f"-------- Start Torch--------")
