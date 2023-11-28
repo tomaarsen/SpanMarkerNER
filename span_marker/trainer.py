@@ -240,7 +240,7 @@ class Trainer(TransformersTrainer):
             elif not self.model.config.trained_with_document_context:
                 logger.warning(
                     "This model was trained without document-level context: "
-                    "evaluation with document-level context may cause decreased performance."
+                    "evaluation without document-level context may cause decreased performance."
                 )
             dataset = dataset.sort(column_names=["document_id", "sentence_id"])
             dataset = self.add_context(
