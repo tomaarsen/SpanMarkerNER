@@ -2,14 +2,15 @@ import sys
 from pathlib import Path
 import multiprocessing
 from tqdm import trange
-
-sys.path.append(str(Path(__file__).resolve().parent.parent))
 import time
 from optimum.utils import DummyTextInputGenerator
 from optimum.utils.normalized_config import NormalizedTextConfig
 from optimum.exporters.onnx.config import TextEncoderOnnxConfig
 from typing import Dict, Union, List
 from optimum.exporters.onnx import export, validate_model_outputs
+
+sys.path.append(str(Path(__file__).resolve().parent.parent))
+
 from span_marker import SpanMarkerModel, SpanMarkerConfig
 from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.tokenizer import SpanMarkerTokenizer
@@ -374,10 +375,6 @@ if __name__ == "__main__":
 
     onnx_encoder_path = Path("spanmarker_encoder.onnx")
     onnx_classifier_path = Path("spanmarker_classifier.onnx")
-    onnx_pipe = SpanMarkerOnnxPipeline(
-        onnx_encoder_path=onnx_encoder_path, onnx_classifier_path=onnx_classifier_path, repo_id=repo_id, batch_size=30
-    )
-
     # Benchmarking
     batch = [
         [
