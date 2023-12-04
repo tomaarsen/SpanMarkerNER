@@ -120,7 +120,7 @@ class SpanMarkerModel(PreTrainedModel):
             module.weight.data.fill_(1.0)
         if isinstance(module, nn.Linear) and module.bias is not None:
             module.bias.data.zero_()
-    
+
     def forward(
         self,
         input_ids: torch.Tensor,
@@ -160,14 +160,15 @@ class SpanMarkerModel(PreTrainedModel):
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
         #  Pre-allocates the necessary space for feature_vector
         feature_vector = torch.zeros(
-            batch_size,
-            sequence_length // 2,
-            sequence_length_last_hidden_state,
-            device = self.device
+            batch_size, sequence_length // 2, sequence_length_last_hidden_state, device=self.device
         )
         for i in range(batch_size):
-            feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], :last_hidden_state.shape[-1]] = last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]]
-            feature_vector[i, :end_marker_indices[i]-start_marker_indices[i], last_hidden_state.shape[-1]:] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
+            feature_vector[
+                i, : end_marker_indices[i] - start_marker_indices[i], : last_hidden_state.shape[-1]
+            ] = last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]]
+            feature_vector[
+                i, : end_marker_indices[i] - start_marker_indices[i], last_hidden_state.shape[-1] :
+            ] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
 
         # NOTE: This was wrong in the older tests
         feature_vector = self.dropout(feature_vector)
@@ -275,7 +276,7 @@ class SpanMarkerModel(PreTrainedModel):
                 )
             config.id2label = dict(enumerate(labels))
             config.label2id = {v: k for k, v in config.id2label.items()}
-            # Set the span_marker version for freshly initialized models
+            # Set the  version for freshly initialized models
             config = cls.config_class(
                 encoder_config=config.to_dict(), span_marker_version=span_marker_version, **kwargs
             )
