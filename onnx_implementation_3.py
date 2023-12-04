@@ -427,7 +427,7 @@ if __name__ == "__main__":
             "input_ids": {0: "batch_size"},
             "attention_mask": {0: "batch_size"},
             "position_ids": {0: "batch_size"},
-            "last_hidden_states": {0: "batch_size"},
+            "last_hidden_state": {0: "batch_size"},
             "pooler_output": {0: "batch_size"},
         },
         do_constant_folding=True,
