@@ -35,7 +35,6 @@ class SpanMarkerDummyInputenerator:
     SUPPORTED_INPUT_NAMES = [
         "input_ids",
         "attention_mask",
-        "token_type_ids",
         "position_ids",
     ]
     BATCH_SIZE = 1
@@ -56,7 +55,6 @@ class SpanMarkerDummyInputenerator:
                 "min": 0,
                 "shape": [cls.BATCH_SIZE, sequence_length, sequence_length],
             },
-            "token_type_ids": None,
             "position_ids": {
                 "max": sequence_length,
                 "min": 0,
@@ -65,13 +63,10 @@ class SpanMarkerDummyInputenerator:
         }
 
         for value in cls.SUPPORTED_INPUT_NAMES:
-            if value == "token_type_ids":
-                dummy_input[value] = torch.zeros_like(dummy_input["input_ids"])
-            else:
-                min_val = values[value]["min"]
-                max_value = values[value]["max"]
-                shape = values[value]["shape"]
-                dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=dtype)
+            min_val = values[value]["min"]
+            max_value = values[value]["max"]
+            shape = values[value]["shape"]
+            dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=dtype)
         return dummy_input
 
 
@@ -93,20 +88,23 @@ class SpanMarkerOnnx:
         self.data_collator = SpanMarkerDataCollator(
             tokenizer=self.tokenizer, marker_max_length=self.config.marker_max_length
         )
-        self.classifier = SpanMarkerModel.from_pretrained(repo_id=repo_id).classifier
+        self.classifier = SpanMarkerModel.from_pretrained(repo_id).classifier
         self.ort_encoder = self._load_ort_session(
             onnx_encoder_path, sess_options=onnx_sess_options, providers=providers
         )
 
+        if torch.cuda.is_available() and providers[0]=="CUDAExecutionProvider":
+            self.device = "cuda"
+        else:
+            self.device = "cpu"
+
+
     def _load_ort_session(
         self, onnx_path: Union[str, os.PathLike], sess_options=None, providers=["CPUExecutionProvider"]
     ) -> ort.InferenceSession:
-        if not sess_options:
-            sess_options = ort.SessionOptions()
-            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-            sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
-            sess_options.intra_op_num_threads = multiprocessing.cpu_count()
-            sess_options.log_severity_level = 1
+        sess_options = ort.SessionOptions()
+        sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+        sess_options.intra_op_num_threads = multiprocessing.cpu_count()
         ort_session = ort.InferenceSession(onnx_path, sess_options, providers=providers)
         return ort_session
 
@@ -132,19 +130,17 @@ class SpanMarkerOnnx:
         Returns:
             outputs: Encoder outputs
         """
-        token_type_ids = torch.zeros_like(input_ids)
 
         # Moving the inputs to the right device with onnx format
         onnx_input = {
-            "input_ids": input_ids.detach().cpu().numpy().astype(np.int64),
-            "attention_mask": attention_mask.detach().cpu().numpy().astype(np.int64),
-            "token_type_ids": token_type_ids.detach().cpu().numpy().astype(np.int64),
-            "position_ids": position_ids.detach().cpu().numpy().astype(np.int64),
+            "input_ids": input_ids.detach().cpu().numpy().astype(np.int32),
+            "attention_mask": attention_mask.detach().cpu().numpy().astype(np.int32),
+            "position_ids": position_ids.detach().cpu().numpy().astype(np.int32),
         }
 
         onnx_output = self.ort_encoder.run(None, input_feed=onnx_input)
         outputs = onnx_output
-        last_hidden_state = outputs[0]
+        last_hidden_state = torch.from_numpy(outputs[0])
         sequence_length = last_hidden_state.size(1)
         batch_size = last_hidden_state.size(0)
         # Get the indices where the end markers start
@@ -152,8 +148,7 @@ class SpanMarkerOnnx:
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
         #  Pre-allocates the necessary space for feature_vector
         feature_vector = torch.zeros(
-            batch_size, sequence_length // 2, sequence_length_last_hidden_state, device=self.device
-        )
+            batch_size, sequence_length // 2, sequence_length_last_hidden_state, device="cpu")
         for i in range(batch_size):
             feature_vector[
                 i, : end_marker_indices[i] - start_marker_indices[i], : last_hidden_state.shape[-1]
@@ -225,13 +220,6 @@ class SpanMarkerOnnx:
                 If the input is multiple sentences, then we return a list containing multiple of the aforementioned lists.
         """
         from span_marker.trainer import Trainer
-
-        if torch.cuda.is_available() and self.device == torch.device("cpu"):
-            logger.warning(
-                "SpanMarker model predictions are being computed on the CPU while CUDA is available."
-                " Moving the model to CUDA using `model.cuda()` before performing predictions is heavily"
-                " recommended to significantly boost prediction speeds.",
-            )
 
         if not inputs:
             return []
@@ -400,29 +388,25 @@ class SpanMarkerOnnx:
         return outputs
 
 
-if __name__ == "__main__":
-    # Load SpanMarker model
-    repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
+def export_to_onnx(repo_id: Union[str,os.PathLike],onnx_encoder_path:str = "spanmarker_encoder.onnx"):
+    # Get the spanmaker encoder
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     encoder = base_model.encoder.eval()
-    base_model_config = base_model.config
 
-    # Generate dummy inputs
+    # Generate dummy input
     dummy_input = SpanMarkerDummyInputenerator.generate_dummy_input(repo_id)
 
     # Export encoder to onnx
-    onnx_path = Path("spanmarker_model.onnx")
     torch.onnx.export(
         encoder,
         dummy_input,
-        onnx_path,
+        onnx_encoder_path,
         input_names=[
             "input_ids",
             "attention_mask",
-            "token_type_ids",
             "position_ids",
         ],
-        output_names=["last_hidden_states", "pooler_output"],
+        output_names=["last_hidden_state", "pooler_output"],
         dynamic_axes={
             "input_ids": {0: "batch_size"},
             "attention_mask": {0: "batch_size"},
@@ -434,3 +418,51 @@ if __name__ == "__main__":
         export_params=True,
         opset_version=ORT_OPSET,
     )
+
+
+if __name__ == "__main__":
+    
+    onnx_encoder_path = "spanmarker_encoder.onnx"
+    repo_id="lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
+
+    # # Export model to onnx
+    export_to_onnx(repo_id=repo_id,onnx_encoder_path=onnx_encoder_path)
+        
+    # Test
+    batch_size = 30
+    batch = [
+        "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
+    ] * batch_size
+
+    reps = 5
+    spanonnx_cpu = SpanMarkerOnnx(onnx_encoder_path=onnx_encoder_path,repo_id=repo_id)
+    base_model = SpanMarkerModel.from_pretrained(repo_id)
+    torch_times = []
+    onnx_times = []
+    for _ in range(reps):
+
+        start_time = time.time()
+        torch_result = base_model.predict(batch, batch_size)
+        end_time = time.time()
+        torch_time = end_time - start_time
+        torch_times.append(torch_time)
+
+        start_time = time.time()
+        onnx_cpu_result = spanonnx_cpu(batch, batch_size=batch_size)
+        end_time = time.time()
+        onnx_cpu_time = end_time - start_time
+        onnx_times.append(onnx_cpu_time)
+
+
+    print(f"Time results:")
+    print(f"Batch size: {len(batch)}")
+    print(f"Torch times: {torch_times}")
+    print(f"ONNX CPU times: {onnx_times}")
+    print(f"Avg Torch time: {sum(torch_times)/len(torch_times)}")
+    print(f"Avg ONNX CPU time: {sum(onnx_times)/len(onnx_times)}")
+
+
+    def strip_score_from_results(results):
+            return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
+
+    print(f"Results are the same: {strip_score_from_results(torch_result)==strip_score_from_results(onnx_cpu_result)}")
