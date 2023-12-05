@@ -102,9 +102,11 @@ class SpanMarkerOnnx:
     def _load_ort_session(
         self, onnx_path: Union[str, os.PathLike], sess_options=None, providers=["CPUExecutionProvider"]
     ) -> ort.InferenceSession:
-        sess_options = ort.SessionOptions()
-        sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-        sess_options.intra_op_num_threads = multiprocessing.cpu_count()
+        if not sess_options:
+            sess_options = ort.SessionOptions()
+            sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
+            sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
+            sess_options.intra_op_num_threads = multiprocessing.cpu_count()
         ort_session = ort.InferenceSession(onnx_path, sess_options, providers=providers)
         return ort_session
 
@@ -383,7 +385,7 @@ class SpanMarkerOnnx:
             return all_entities[0]
         return all_entities
 
-    def __call__(self, inputs: INPUT_TYPES, batch_size: int = 4) -> OUTPUT_TYPES:
+    def __call__(self, inputs: INPUT_TYPES, batch_size: int = 30) -> OUTPUT_TYPES:
         outputs = self.predict(inputs=inputs, batch_size=batch_size)
         return outputs
 
@@ -426,7 +428,7 @@ if __name__ == "__main__":
     repo_id="lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
 
     # # Export model to onnx
-    export_to_onnx(repo_id=repo_id,onnx_encoder_path=onnx_encoder_path)
+    #export_to_onnx(repo_id=repo_id,onnx_encoder_path=onnx_encoder_path)
         
     # Test
     batch_size = 30
@@ -434,7 +436,7 @@ if __name__ == "__main__":
         "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
     ] * batch_size
 
-    reps = 5
+    reps = 15
     spanonnx_cpu = SpanMarkerOnnx(onnx_encoder_path=onnx_encoder_path,repo_id=repo_id)
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     torch_times = []

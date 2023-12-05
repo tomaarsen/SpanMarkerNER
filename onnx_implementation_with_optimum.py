@@ -375,7 +375,7 @@ if __name__ == "__main__":
         "Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante.Pedro is working in Alicante. Pedro is working in Alicante. Pedro is working in Alicante",
     ] * batch_size
 
-    reps = 5
+    reps = 15
     spanonnx_cpu = SpanMarkerOnnxPipeline(onnx_encoder_path=onnx_encoder_path, onnx_classifier_path=onnx_classifier_path, repo_id=repo_id)    
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     torch_times = []
