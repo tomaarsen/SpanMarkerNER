@@ -93,11 +93,10 @@ class SpanMarkerOnnx:
             onnx_encoder_path, sess_options=onnx_sess_options, providers=providers
         )
 
-        if torch.cuda.is_available() and providers[0]=="CUDAExecutionProvider":
+        if torch.cuda.is_available() and providers[0] == "CUDAExecutionProvider":
             self.device = "cuda"
         else:
             self.device = "cpu"
-
 
     def _load_ort_session(
         self, onnx_path: Union[str, os.PathLike], sess_options=None, providers=["CPUExecutionProvider"]
@@ -149,8 +148,7 @@ class SpanMarkerOnnx:
         end_marker_indices = start_marker_indices + num_marker_pairs
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
         #  Pre-allocates the necessary space for feature_vector
-        feature_vector = torch.zeros(
-            batch_size, sequence_length // 2, sequence_length_last_hidden_state, device="cpu")
+        feature_vector = torch.zeros(batch_size, sequence_length // 2, sequence_length_last_hidden_state, device="cpu")
         for i in range(batch_size):
             feature_vector[
                 i, : end_marker_indices[i] - start_marker_indices[i], : last_hidden_state.shape[-1]
@@ -385,12 +383,12 @@ class SpanMarkerOnnx:
             return all_entities[0]
         return all_entities
 
-    def __call__(self, inputs: INPUT_TYPES, batch_size: int = 30) -> OUTPUT_TYPES:
+    def __call__(self, inputs: INPUT_TYPES, batch_size: int = 4) -> OUTPUT_TYPES:
         outputs = self.predict(inputs=inputs, batch_size=batch_size)
         return outputs
 
 
-def export_to_onnx(repo_id: Union[str,os.PathLike],onnx_encoder_path:str = "spanmarker_encoder.onnx"):
+def export_to_onnx(repo_id: Union[str, os.PathLike], onnx_encoder_path: str = "spanmarker_encoder.onnx"):
     # Get the spanmaker encoder
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     encoder = base_model.encoder.eval()
@@ -423,13 +421,12 @@ def export_to_onnx(repo_id: Union[str,os.PathLike],onnx_encoder_path:str = "span
 
 
 if __name__ == "__main__":
-    
     onnx_encoder_path = "spanmarker_encoder.onnx"
-    repo_id="lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
+    repo_id = "lxyuan/span-marker-bert-base-multilingual-uncased-multinerd"
 
     # # Export model to onnx
-    #export_to_onnx(repo_id=repo_id,onnx_encoder_path=onnx_encoder_path)
-        
+    export_to_onnx(repo_id=repo_id, onnx_encoder_path=onnx_encoder_path)
+
     # Test
     batch_size = 30
     batch = [
@@ -437,12 +434,11 @@ if __name__ == "__main__":
     ] * batch_size
 
     reps = 15
-    spanonnx_cpu = SpanMarkerOnnx(onnx_encoder_path=onnx_encoder_path,repo_id=repo_id)
+    spanonnx_cpu = SpanMarkerOnnx(onnx_encoder_path=onnx_encoder_path, repo_id=repo_id)
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     torch_times = []
     onnx_times = []
     for _ in range(reps):
-
         start_time = time.time()
         torch_result = base_model.predict(batch, batch_size)
         end_time = time.time()
@@ -455,7 +451,6 @@ if __name__ == "__main__":
         onnx_cpu_time = end_time - start_time
         onnx_times.append(onnx_cpu_time)
 
-
     print(f"Time results:")
     print(f"Batch size: {len(batch)}")
     print(f"Torch times: {torch_times}")
@@ -463,8 +458,7 @@ if __name__ == "__main__":
     print(f"Avg Torch time: {sum(torch_times)/len(torch_times)}")
     print(f"Avg ONNX CPU time: {sum(onnx_times)/len(onnx_times)}")
 
-
     def strip_score_from_results(results):
-            return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
+        return [[{key: value for key, value in ent.items() if key != "score"} for ent in ents] for ents in results]
 
     print(f"Results are the same: {strip_score_from_results(torch_result)==strip_score_from_results(onnx_cpu_result)}")

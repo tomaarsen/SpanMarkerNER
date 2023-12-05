@@ -159,9 +159,7 @@ class SpanMarkerModel(PreTrainedModel):
         end_marker_indices = start_marker_indices + num_marker_pairs
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
         #  Pre-allocates the necessary space for feature_vector
-        feature_vector = torch.zeros(
-            batch_size, sequence_length // 2, sequence_length_last_hidden_state, device=self.device
-        )
+        feature_vector = torch.zeros(batch_size, sequence_length // 2, sequence_length_last_hidden_state)
         for i in range(batch_size):
             feature_vector[
                 i, : end_marker_indices[i] - start_marker_indices[i], : last_hidden_state.shape[-1]
