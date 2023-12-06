@@ -415,7 +415,7 @@ class SpanMarkerOnnx:
 def export_spanmarker_to_onnx(
     pretrained_model_name_or_path: Union[str, os.PathLike, pathlib.Path],
     onnx_encoder_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_encoder.onnx",
-    onnx_classifier_onnx: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
+    onnx_classifier_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
     opset_version:int = 13
 ) -> None:
     """
@@ -451,7 +451,7 @@ def export_spanmarker_to_onnx(
     torch.onnx.export(
         classifier,
         classifier_dummy_input,
-        onnx_classifier_onnx,
+        onnx_classifier_path,
         export_params=True,
         opset_version=opset_version,
         do_constant_folding=True,
