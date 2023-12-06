@@ -109,9 +109,9 @@ class SpanMarkerOnnx:
 
     def data_to_device(self, data) -> None:
         if self.device == "cuda":
-            return data.to(self.device).numpy().astype(self.numpy_dtype)
+            return data.detach().to(self.device).numpy().astype(self.numpy_dtype)
         else:
-            return data.cpu().numpy().astype(self.numpy_dtype)
+            return data.detach().cpu().numpy().astype(self.numpy_dtype)
 
     def forward(
         self,
