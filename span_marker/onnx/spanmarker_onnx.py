@@ -17,8 +17,6 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-ORT_OPSET = 13
-
 
 class SpanMarkerEncoderDummyInputenerator:
     SUPPORTED_INPUT_NAMES = [
@@ -29,14 +27,7 @@ class SpanMarkerEncoderDummyInputenerator:
     BATCH_SIZE = 1
 
     @classmethod
-    def generate_dummy_input(cls, config: SpanMarkerConfig):
-        if config.torch_dtype == torch.float32:
-            torch_dtype = torch.int32
-        elif config.torch_dtype == torch.float64:
-            torch_dtype = torch.int64
-        vocab_size = config.vocab_size
-        sequence_length = config.model_max_length_default
-
+    def generate_dummy_input(cls, vocab_size: int, sequence_length: int, torch_dtype: torch.dtype = torch.int32):
         dummy_input = {}
         values = {
             "input_ids": {"max": vocab_size, "min": 0, "shape": [cls.BATCH_SIZE, sequence_length]},
@@ -61,6 +52,29 @@ class SpanMarkerEncoderDummyInputenerator:
 
 
 class SpanMarkerOnnx:
+    """
+    A class for performing named entity recognition using the SpanMarker model in ONNX format.
+
+    This class handles the loading of ONNX models for both the encoder and classifier components of the SpanMarker model,
+    manages data processing, and provides methods for making predictions on input data.
+
+    >>> # Initialize a SpanMarkerOnnx
+    >>> onnx_model = SpanMarkerOnnx(SpanMarkerOnnx(
+        onnx_encoder_path="spanmarker_encoder.onnx",
+        onnx_classifier_path="spanmarker_classifier.onnx",
+        tokenizer=spanmarker_tokenizer,
+        config=config,
+        ))
+
+    After the model is loaded (and finetuned if it wasn't already), it can be used to predict entities:
+
+    >>> onnx_model.predict("A prototype was fitted in the mid-'60s in a one-off DB5 extended 4'' after the doors and "
+    ... "driven by Marek personally, and a normally 6-cylinder Aston Martin DB7 was equipped with a V8 unit in 1998.")
+    [{'span': 'DB5', 'label': 'product-car', 'score': 0.8675689101219177, 'char_start_index': 52, 'char_end_index': 55},
+     {'span': 'Marek', 'label': 'person-other', 'score': 0.9100819230079651, 'char_start_index': 99, 'char_end_index': 104},
+     {'span': 'Aston Martin DB7', 'label': 'product-car', 'score': 0.9931442737579346, 'char_start_index': 143, 'char_end_index': 159}]
+    """
+
     INPUT_TYPES = Union[str, List[str], List[List[str]], Dataset]
     OUTPUT_TYPES = Union[List[Dict[str, Union[str, int, float]]], List[List[Dict[str, Union[str, int, float]]]]]
 
@@ -81,11 +95,6 @@ class SpanMarkerOnnx:
             tokenizer=self.tokenizer, marker_max_length=self.config.marker_max_length
         )
 
-        if config.torch_dtype == torch.float32:
-            self.numpy_dtype = np.int32
-        elif config.torch_dtype == torch.float64:
-            self.numpy_dtype = np.int64
-
         self.ort_encoder = self.load_ort_session(onnx_encoder_path, sess_options=onnx_sess_options, providers=providers)
         self.ort_classifier = self.load_ort_session(
             onnx_classifier_path, sess_options=onnx_sess_options, providers=providers
@@ -99,6 +108,25 @@ class SpanMarkerOnnx:
     def load_ort_session(
         self, onnx_path: Union[str, os.PathLike], sess_options=None, providers=["CPUExecutionProvider"]
     ) -> ort.InferenceSession:
+        """
+        Loads an ONNX Runtime (ORT) inference session from a specified ONNX model path.
+        This function initializes an ONNX Runtime inference session with the provided model. It offers customization through session options and execution providers.
+
+        Args:
+            onnx_path (Union[str, os.PathLike]):
+                The file path to the ONNX model.
+            sess_options (Optional[ort.SessionOptions]):
+                Configuration options for the session. If not provided, default options are used with optimized settings for execution mode, graph optimization level, and the number of threads based on the CPU count.
+            providers (List[str], optional):
+                The execution providers to use. Defaults to ["CPUExecutionProvider"].
+
+        Returns:
+            ort.InferenceSession:
+                An ONNX Runtime inference session configured with the specified model and session options.
+
+        The function sets up default session options if none are provided, optimizing for sequential execution, enabling all graph optimizations, and setting the number of intra-operation threads to the number of CPU cores available. It then creates and returns an ORT inference session using these settings.
+        """
+
         if not sess_options:
             sess_options = ort.SessionOptions()
             sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
@@ -107,11 +135,15 @@ class SpanMarkerOnnx:
         ort_session = ort.InferenceSession(onnx_path, sess_options, providers=providers)
         return ort_session
 
-    def data_to_device(self, data) -> None:
+    def data_to_device(self, data: torch.Tensor, classifier=False) -> None:
         if self.device == "cuda":
-            return data.detach().to(self.device).numpy().astype(self.numpy_dtype)
+            if classifier:
+                return data.detach().to(self.device).numpy()
+            return data.detach().to(self.device).numpy().astype(np.int32)
         else:
-            return data.detach().cpu().numpy().astype(self.numpy_dtype)
+            if classifier:
+                return data.detach().cpu().numpy()
+            return data.detach().cpu().numpy().astype(np.int32)
 
     def forward(
         self,
@@ -138,6 +170,7 @@ class SpanMarkerOnnx:
         # Get the indices where the end markers start
         end_marker_indices = start_marker_indices + num_marker_pairs
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
+
         # TODO: Solve the dynamic slicing problem when exporting with torchdynamo
         #  Pre-allocates the necessary space for feature_vector
         feature_vector = torch.zeros(batch_size, sequence_length // 2, sequence_length_last_hidden_state, device="cpu")
@@ -150,7 +183,7 @@ class SpanMarkerOnnx:
             ] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
 
         # Moving the feature_vector to the device with the onnx classifier
-        input_onnx_classifier = {"input": self.data_to_device(feature_vector)}
+        input_onnx_classifier = {"input": self.data_to_device(feature_vector, classifier=True)}
         logits = self.ort_classifier.run(None, input_feed=input_onnx_classifier)
         logits = torch.from_numpy(logits[0])
 
@@ -382,24 +415,46 @@ class SpanMarkerOnnx:
 def export_spanmarker_to_onnx(
     pretrained_model_name_or_path: Union[str, os.PathLike, pathlib.Path],
     onnx_encoder_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_encoder.onnx",
-    onnx_classifier_onnx: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
+    onnx_classifier_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
+    opset_version: int = 13,
 ) -> None:
+    """
+    Exports a pretrained SpanMarker model to ONNX format.
+
+    Args:
+        pretrained_model_name_or_path (Union[str, os.PathLike, pathlib.Path]):
+            The name or path of the pretrained SpanMarker model.
+        onnx_encoder_path (Union[str, os.PathLike, pathlib.Path], optional):
+            The output path for the encoder exported to ONNX. Defaults to "spanmarker_encoder.onnx".
+        onnx_classifier_onnx (Union[str, os.PathLike, pathlib.Path], optional):
+            The output path for the classifier exported to ONNX. Defaults to "spanmarker_classifier.onnx".
+
+    Returns:
+        None: This function does not return any value.
+
+    The function carries out the export of the pretrained model to ONNX, separating and exporting the encoder and classifier.
+    It uses dummy inputs to facilitate the export and specifies relevant parameters for the ONNX conversion,
+    such as input/output names, dynamic axes, and optimization settings.
+    """
+
     base_model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path)
     config = SpanMarkerConfig.from_pretrained(pretrained_model_name_or_path)
     encoder = base_model.encoder.eval()
     classifier = base_model.classifier.eval()
 
     # Dummy input for encoder and classifier
-    encoder_dummy_input = SpanMarkerEncoderDummyInputenerator.generate_dummy_input(config)
-    classifier_dummy_input = torch.randn(4, 256, 1536)
+    encoder_dummy_input = SpanMarkerEncoderDummyInputenerator.generate_dummy_input(
+        vocab_size=config.vocab_size, sequence_length=config.model_max_length_default
+    )
+    classifier_dummy_input = torch.randn(1, 256, 1536)
 
     # Export Onnx classifier
     torch.onnx.export(
         classifier,
         classifier_dummy_input,
-        onnx_classifier_onnx,
+        onnx_classifier_path,
         export_params=True,
-        opset_version=ORT_OPSET,
+        opset_version=opset_version,
         do_constant_folding=True,
         input_names=["input"],
         output_names=["output"],
@@ -426,5 +481,5 @@ def export_spanmarker_to_onnx(
         },
         do_constant_folding=True,
         export_params=True,
-        opset_version=ORT_OPSET,
+        opset_version=opset_version,
     )
