@@ -13,7 +13,6 @@ import os
 import numpy as np
 from datasets import Dataset, disable_progress_bar, enable_progress_bar
 import logging
-import tempfile
 
 
 logger = logging.getLogger(__name__)
