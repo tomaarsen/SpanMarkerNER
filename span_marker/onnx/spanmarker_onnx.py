@@ -379,7 +379,7 @@ class SpanMarkerOnnx:
 def export_spanmarker_to_onnx(
     pretrained_model_name_or_path: Union[str, os.PathLike, pathlib.Path],
     onnx_encoder_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_encoder.onnx",
-    onnx_classifier_onnx: str = "spanmarker_classifier.onnx",
+    onnx_classifier_onnx: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
 ) -> None:
     base_model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path)
     encoder = base_model.encoder.eval()
