@@ -29,14 +29,11 @@ class SpanMarkerEncoderDummyInputenerator:
     BATCH_SIZE = 1
 
     @classmethod
-    def generate_dummy_input(cls, pretrained_model_name_or_path: Union[str, os.PathLike]):
-        config = SpanMarkerConfig.from_pretrained(pretrained_model_name_or_path)
-
+    def generate_dummy_input(cls, config: SpanMarkerConfig):
         if config.torch_dtype == torch.float32:
-            dtype = torch.int32
+            torch_dtype = torch.int32
         elif config.torch_dtype == torch.float64:
-            dtype = torch.int64
-
+            torch_dtype = torch.int64
         vocab_size = config.vocab_size
         sequence_length = config.model_max_length_default
 
@@ -59,7 +56,7 @@ class SpanMarkerEncoderDummyInputenerator:
             min_val = values[value]["min"]
             max_value = values[value]["max"]
             shape = values[value]["shape"]
-            dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=dtype)
+            dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=torch_dtype)
         return dummy_input
 
 
@@ -110,6 +107,12 @@ class SpanMarkerOnnx:
         ort_session = ort.InferenceSession(onnx_path, sess_options, providers=providers)
         return ort_session
 
+    def data_to_device(self, data) -> None:
+        if self.device == "cuda":
+            return data.to(self.device).numpy().astype(self.numpy_dtype)
+        else:
+            return data.cpu().numpy().astype(self.numpy_dtype)
+
     def forward(
         self,
         input_ids: torch.Tensor,
@@ -123,9 +126,9 @@ class SpanMarkerOnnx:
     ) -> Dict[str, torch.Tensor]:
         # Moving the inputs to the device with onnx encoder
         onnx_input = {
-            "input_ids": input_ids.detach().cpu().numpy().astype(self.numpy_dtype),
-            "attention_mask": attention_mask.detach().cpu().numpy().astype(self.numpy_dtype),
-            "position_ids": position_ids.detach().cpu().numpy().astype(self.numpy_dtype),
+            "input_ids": self.data_to_device(input_ids),
+            "attention_mask": self.data_to_device(attention_mask),
+            "position_ids": self.data_to_device(position_ids),
         }
 
         onnx_output = self.ort_encoder.run(None, input_feed=onnx_input)
@@ -135,6 +138,7 @@ class SpanMarkerOnnx:
         # Get the indices where the end markers start
         end_marker_indices = start_marker_indices + num_marker_pairs
         sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
+        # TODO: Solve the dynamic slicing problem when exporting with torchdynamo
         #  Pre-allocates the necessary space for feature_vector
         feature_vector = torch.zeros(batch_size, sequence_length // 2, sequence_length_last_hidden_state, device="cpu")
         for i in range(batch_size):
@@ -146,7 +150,7 @@ class SpanMarkerOnnx:
             ] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
 
         # Moving the feature_vector to the device with the onnx classifier
-        input_onnx_classifier = {"input": feature_vector.detach().cpu().numpy()}
+        input_onnx_classifier = {"input": self.data_to_device(feature_vector)}
         logits = self.ort_classifier.run(None, input_feed=input_onnx_classifier)
         logits = torch.from_numpy(logits[0])
 
@@ -381,11 +385,12 @@ def export_spanmarker_to_onnx(
     onnx_classifier_onnx: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
 ) -> None:
     base_model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path)
+    config = SpanMarkerConfig.from_pretrained(pretrained_model_name_or_path)
     encoder = base_model.encoder.eval()
     classifier = base_model.classifier.eval()
 
     # Dummy input for encoder and classifier
-    encoder_dummy_input = SpanMarkerEncoderDummyInputenerator.generate_dummy_input(pretrained_model_name_or_path)
+    encoder_dummy_input = SpanMarkerEncoderDummyInputenerator.generate_dummy_input(config)
     classifier_dummy_input = torch.randn(4, 256, 1536)
 
     # Export Onnx classifier
