@@ -70,7 +70,7 @@ if __name__ == "__main__":
     repo_id = "guishe/span-marker-generic-ner-v1-fewnerd-fine-super"
 
     # Export encoder and classifier to ONNX
-    #export_spanmarker_to_onnx(repo_id)
+    export_spanmarker_to_onnx(repo_id)
 
     # Get you SpanMarkerOnnx model
     config = SpanMarkerConfig.from_pretrained(repo_id)
