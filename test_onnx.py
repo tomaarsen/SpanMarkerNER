@@ -2,8 +2,16 @@ from span_marker.onnx.spanmarker_onnx import export_spanmarker_to_onnx, SpanMark
 from span_marker.tokenizer import SpanMarkerTokenizer, SpanMarkerConfig
 import time
 from span_marker import SpanMarkerModel
+import onnxruntime
 
-def run_test(base_model:SpanMarkerModel,onnx_model:SpanMarkerOnnx,sample:str="Huggingface is the best AI company",batch_size=1,reps=1):
+
+def run_test(
+    base_model: SpanMarkerModel,
+    onnx_model: SpanMarkerOnnx,
+    sample: str = "Huggingface is the best AI company",
+    batch_size=1,
+    reps=1,
+):
     """
     Runs a performance test comparing a SpanMarkerModel and its ONNX equivalent, SpanMarkerOnnx.
 
@@ -12,26 +20,22 @@ def run_test(base_model:SpanMarkerModel,onnx_model:SpanMarkerOnnx,sample:str="Hu
     (defined by 'reps') and calculates the average inference time for each model.
 
     Args:
-        base_model (SpanMarkerModel): 
+        base_model (SpanMarkerModel):
             The SpanMarkerModel instance to be tested.
-        onnx_model (SpanMarkerOnnx): 
+        onnx_model (SpanMarkerOnnx):
             The SpanMarkerOnnx instance to be tested.
-        sample (str, optional): 
+        sample (str, optional):
             The sample text to be processed by the models. Defaults to "Huggingface is the best AI company".
-        batch_size (int, optional): 
+        batch_size (int, optional):
             The size of the batch to be processed by the models. Defaults to 1.
-        reps (int, optional): 
+        reps (int, optional):
             The number of repetitions for running the test to average out the inference time. Defaults to 1.
 
     The function measures the time taken for each repetition for both models, prints the average times, and checks if the results
     from both models are consistent (excluding the score values).
     """
-    
-    batch = [
-        sample
-    ] * batch_size
 
-    base_model = SpanMarkerModel.from_pretrained(repo_id)
+    batch = [sample] * batch_size
     torch_times = []
     onnx_times = []
     for _ in range(reps):
@@ -61,7 +65,6 @@ def run_test(base_model:SpanMarkerModel,onnx_model:SpanMarkerOnnx,sample:str="Hu
 
 
 if __name__ == "__main__":
-
     # Introduce your repo_id
     repo_id = "guishe/span-marker-generic-ner-v1-fewnerd-fine-super"
 
@@ -72,16 +75,21 @@ if __name__ == "__main__":
     config = SpanMarkerConfig.from_pretrained(repo_id)
     tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=config)
     spanmarker_tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=config)
+
+    sess_options = onnxruntime.SessionOptions()
+    sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
     onnx_cpu = SpanMarkerOnnx(
         onnx_encoder_path="spanmarker_encoder.onnx",
         onnx_classifier_path="spanmarker_classifier.onnx",
         tokenizer=spanmarker_tokenizer,
         config=config,
+        onnx_sess_options=sess_options,
+        providers=["CoreMLExecutionProvider"],
     )
 
     # Base Model VS Onnx Model
-    base_model = SpanMarkerModel.from_pretrained("lxyuan/span-marker-bert-base-multilingual-uncased-multinerd")
+    base_model = SpanMarkerModel.from_pretrained(repo_id)
     sample = "Huggingface is the best AI company in the world"
-    batch_size = 5
-    reps = 1
-    run_test(base_model=base_model,onnx_model=onnx_cpu,sample=sample,batch_size=batch_size,reps=reps)
+    batch_size = 10
+    reps = 5
+    run_test(base_model=base_model, onnx_model=onnx_cpu, sample=sample, batch_size=batch_size, reps=reps)

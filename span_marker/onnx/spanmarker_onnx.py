@@ -59,12 +59,12 @@ class SpanMarkerOnnx:
     manages data processing, and provides methods for making predictions on input data.
 
     >>> # Initialize a SpanMarkerOnnx
-    >>> onnx_model = SpanMarkerOnnx(SpanMarkerOnnx(
+    >>> onnx_model = SpanMarkerOnnx(
         onnx_encoder_path="spanmarker_encoder.onnx",
         onnx_classifier_path="spanmarker_classifier.onnx",
         tokenizer=spanmarker_tokenizer,
         config=config,
-        ))
+        )
 
     After the model is loaded (and finetuned if it wasn't already), it can be used to predict entities:
 
@@ -101,9 +101,11 @@ class SpanMarkerOnnx:
         )
 
         if torch.cuda.is_available() and providers[0] == "CUDAExecutionProvider":
-            self.device = "cuda"
+            self.device = torch.device(device="cuda")
+        elif torch.backends.mps.is_available() and providers[0] == "CoreMLExecutionProvider":
+            self.device = torch.device(device="mps")
         else:
-            self.device = "cpu"
+            self.device = torch.device(device="cpu")
 
     def load_ort_session(
         self, onnx_path: Union[str, os.PathLike], sess_options=None, providers=["CPUExecutionProvider"]
@@ -136,10 +138,10 @@ class SpanMarkerOnnx:
         return ort_session
 
     def data_to_device(self, data: torch.Tensor, classifier=False) -> None:
-        if self.device == "cuda":
+        if self.device != "cpu":
             if classifier:
-                return data.detach().to(self.device).numpy()
-            return data.detach().to(self.device).numpy().astype(np.int32)
+                return data.detach().cpu().numpy()
+            return data.detach().cpu().numpy().astype(np.int32)
         else:
             if classifier:
                 return data.detach().cpu().numpy()
@@ -417,6 +419,7 @@ def export_spanmarker_to_onnx(
     onnx_encoder_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_encoder.onnx",
     onnx_classifier_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
     opset_version: int = 13,
+    device: str = "cpu",
 ) -> None:
     """
     Exports a pretrained SpanMarker model to ONNX format.
@@ -447,6 +450,12 @@ def export_spanmarker_to_onnx(
         vocab_size=config.vocab_size, sequence_length=config.model_max_length_default
     )
     classifier_dummy_input = torch.randn(1, 256, 1536)
+
+    # Moving to device
+    encoder_dummy_input = {key: value.to(device=torch.device(device)) for key, value in encoder_dummy_input.items()}
+    classifier_dummy_input = classifier_dummy_input.to(device=torch.device(device))
+    encoder = encoder.to(device=torch.device(device))
+    classifier = classifier.to(device=torch.device(device))
 
     # Export Onnx classifier
     torch.onnx.export(
