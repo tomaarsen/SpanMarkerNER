@@ -2,7 +2,8 @@ from span_marker.onnx.spanmarker_onnx import export_spanmarker_to_onnx, SpanMark
 from span_marker.tokenizer import SpanMarkerTokenizer, SpanMarkerConfig
 import time
 from span_marker import SpanMarkerModel
-import onnxruntime
+import onnxruntime as ort
+import multiprocessing
 
 
 def run_test(
@@ -69,27 +70,23 @@ if __name__ == "__main__":
     repo_id = "guishe/span-marker-generic-ner-v1-fewnerd-fine-super"
 
     # Export encoder and classifier to ONNX
-    export_spanmarker_to_onnx(repo_id)
+    #export_spanmarker_to_onnx(repo_id)
 
     # Get you SpanMarkerOnnx model
     config = SpanMarkerConfig.from_pretrained(repo_id)
     tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=config)
     spanmarker_tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=config)
-
-    sess_options = onnxruntime.SessionOptions()
-    sess_options.graph_optimization_level = onnxruntime.GraphOptimizationLevel.ORT_ENABLE_ALL
+    
     onnx_cpu = SpanMarkerOnnx(
         onnx_encoder_path="spanmarker_encoder.onnx",
         onnx_classifier_path="spanmarker_classifier.onnx",
         tokenizer=spanmarker_tokenizer,
         config=config,
-        onnx_sess_options=sess_options,
-        providers=["CoreMLExecutionProvider"],
     )
 
     # Base Model VS Onnx Model
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     sample = "Huggingface is the best AI company in the world"
-    batch_size = 10
-    reps = 5
+    batch_size = 30
+    reps = 3
     run_test(base_model=base_model, onnx_model=onnx_cpu, sample=sample, batch_size=batch_size, reps=reps)

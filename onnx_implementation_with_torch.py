@@ -42,7 +42,6 @@ class SpanMarkerDummyInputenerator:
     @classmethod
     def generate_dummy_input(cls, pretrained_model_name_or_path: Union[str, os.PathLike], framework: str = "pt"):
         config = SpanMarkerConfig.from_pretrained(pretrained_model_name_or_path)
-        dtype = config.torch_dtype
         vocab_size = config.vocab_size
         sequence_length = config.model_max_length_default
 
@@ -65,7 +64,7 @@ class SpanMarkerDummyInputenerator:
             min_val = values[value]["min"]
             max_value = values[value]["max"]
             shape = values[value]["shape"]
-            dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=dtype)
+            dummy_input[value] = torch.randint(low=min_val, high=max_value, size=shape, dtype=torch.int32)
         return dummy_input
 
 
