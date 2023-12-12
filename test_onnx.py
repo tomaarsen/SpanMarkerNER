@@ -68,9 +68,9 @@ def run_test(
 if __name__ == "__main__":
     # Introduce your repo_id
     repo_id = "guishe/span-marker-generic-ner-v1-fewnerd-fine-super"
+    onnx_folder = "spanmarker_onnx"
 
     # Export encoder and classifier to ONNX
-    onnx_folder = "spanmarker_onnx"
     export_spanmarker_to_onnx(repo_id, quantized=True, output_folder=onnx_folder)
 
     # Get you SpanMarkerOnnx model
@@ -79,15 +79,16 @@ if __name__ == "__main__":
     spanmarker_tokenizer = SpanMarkerTokenizer.from_pretrained(repo_id, config=config)
 
     onnx_cpu = SpanMarkerOnnx(
-        onnx_encoder_path=f"{onnx_folder}/spanmarker_encoder.onnx",
-        onnx_classifier_path=f"{onnx_folder}/spanmarker_classifier.onnx",
+        onnx_encoder_path=f"{onnx_folder}/spanmarker_fp16_encoder.onnx",
+        onnx_classifier_path=f"{onnx_folder}/spanmarker_fp16_classifier.onnx",
         tokenizer=spanmarker_tokenizer,
         config=config,
+        quantized=True
     )
 
     # Base Model VS Onnx Model
     base_model = SpanMarkerModel.from_pretrained(repo_id)
     sample = "Huggingface is the best AI company in the world"
-    batch_size = 30
+    batch_size = 1
     reps = 3
     run_test(base_model=base_model, onnx_model=onnx_cpu, sample=sample, batch_size=batch_size, reps=reps)

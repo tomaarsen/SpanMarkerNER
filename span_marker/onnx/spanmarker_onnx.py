@@ -88,8 +88,10 @@ class SpanMarkerOnnx:
         tokenizer: SpanMarkerTokenizer,
         show_progress_bar: bool = False,
         onnx_sess_options: SessionOptions = None,
+        quantized: bool = False,
         providers: list = ["CPUExecutionProvider"],
     ):
+        self.quantized = quantized
         self.show_progress_bar = show_progress_bar
         self.config = config
         self.tokenizer = tokenizer
@@ -135,19 +137,15 @@ class SpanMarkerOnnx:
             sess_options = ort.SessionOptions()
             sess_options.execution_mode = ort.ExecutionMode.ORT_SEQUENTIAL
             sess_options.graph_optimization_level = ort.GraphOptimizationLevel.ORT_ENABLE_ALL
-            sess_options.intra_op_num_threads = multiprocessing.cpu_count()
         ort_session = ort.InferenceSession(onnx_path, sess_options, providers=providers)
         return ort_session
 
     def data_to_device(self, data: torch.Tensor, classifier=False) -> None:
-        if self.device != "cpu":
-            if classifier:
-                return data.detach().cpu().numpy()
-            return data.detach().cpu().numpy().astype(np.int32)
-        else:
-            if classifier:
-                return data.detach().cpu().numpy()
-            return data.detach().cpu().numpy().astype(np.int32)
+        if classifier:
+            np_type = np.float16 if self.quantized else np.float32
+            return data.detach().cpu().numpy().astype(np_type)
+        return data.detach().cpu().numpy().astype(np.int32)
+
 
     def forward(
         self,
@@ -356,7 +354,10 @@ class SpanMarkerOnnx:
             with torch.no_grad():
                 output = self.forward(**batch)
             # Computing probabilities based on the logits
-            probs = output.logits.softmax(-1)
+            if self.quantized:
+                probs = output.logits.float().softmax(-1)
+            else:
+                probs = output.logits.softmax(-1)
             # Get the labels and the correponding probability scores
             scores, labels = probs.max(-1)
             # TODO: Iterate over output.num_marker_pairs instead with enumerate
