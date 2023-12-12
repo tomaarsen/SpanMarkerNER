@@ -8,6 +8,8 @@ from span_marker.tokenizer import SpanMarkerTokenizer
 import onnxruntime as ort
 from onnxruntime import SessionOptions
 import pathlib
+import onnx
+from onnxconverter_common import float16
 import torch
 import os
 import numpy as np
@@ -415,30 +417,39 @@ class SpanMarkerOnnx:
 
 
 def export_spanmarker_to_onnx(
-    pretrained_model_name_or_path: Union[str, os.PathLike, pathlib.Path],
-    onnx_encoder_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_encoder.onnx",
-    onnx_classifier_path: Union[str, os.PathLike, pathlib.Path] = "spanmarker_classifier.onnx",
+    pretrained_model_name_or_path: Union[str, os.PathLike],
+    output_folder: Union[str, os.PathLike] = "spanmarker_onnx",
     opset_version: int = 13,
     device: str = "cpu",
+    quantized: bool = False,
 ) -> None:
     """
     Exports a pretrained SpanMarker model to ONNX format.
 
     Args:
-        pretrained_model_name_or_path (Union[str, os.PathLike, pathlib.Path]):
-            The name or path of the pretrained SpanMarker model.
-        onnx_encoder_path (Union[str, os.PathLike, pathlib.Path], optional):
-            The output path for the encoder exported to ONNX. Defaults to "spanmarker_encoder.onnx".
-        onnx_classifier_onnx (Union[str, os.PathLike, pathlib.Path], optional):
-            The output path for the classifier exported to ONNX. Defaults to "spanmarker_classifier.onnx".
+        pretrained_model_name_or_path (Union[str, os.PathLike]):
+            The path or name of the pretrained SpanMarker model.
+        output_folder (Union[str, os.PathLike]):
+            The directory where the ONNX files will be saved. Defaults to 'spanmarker_onnx'.
+        opset_version (int):
+            The ONNX opset version to use for the model export. Defaults to 13.
+        device (str):
+            The device to use for model inference ('cpu' or 'gpu'). Defaults to 'cpu'.
+        quantized (bool):
+            If True, the exported model will be quantized for reduced model size and potentially faster inference.
+
+    The function initializes the SpanMarker model components (encoder and classifier), generates dummy inputs,
+    and then exports these components to ONNX format. If quantization is enabled, the model is further converted
+    to a quantized version, which uses 16-bit floating-point numbers instead of 32-bit, reducing the model size and
+    potentially improving performance on compatible hardware.
 
     Returns:
         None: This function does not return any value.
-
-    The function carries out the export of the pretrained model to ONNX, separating and exporting the encoder and classifier.
-    It uses dummy inputs to facilitate the export and specifies relevant parameters for the ONNX conversion,
-    such as input/output names, dynamic axes, and optimization settings.
     """
+
+    os.makedirs(output_folder, exist_ok=True)
+    onnx_encoder_path = f"{output_folder}/spanmarker_encoder.onnx"
+    onnx_classifier_path = f"{output_folder}/spanmarker_classifier.onnx"
 
     base_model = SpanMarkerModel.from_pretrained(pretrained_model_name_or_path)
     config = SpanMarkerConfig.from_pretrained(pretrained_model_name_or_path)
@@ -492,3 +503,10 @@ def export_spanmarker_to_onnx(
         export_params=True,
         opset_version=opset_version,
     )
+
+    if quantized:
+        for onnx_file in os.listdir(output_folder):
+            model = onnx.load(os.path.join(output_folder, onnx_file))
+            model_fp16 = float16.convert_float_to_float16(model)
+            onnx_fp16_file = f"spanmarker_fp16_{onnx_file.split('_')[-1]}"
+            onnx.save(model_fp16, os.path.join(output_folder, onnx_fp16_file))
