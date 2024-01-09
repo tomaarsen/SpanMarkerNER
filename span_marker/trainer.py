@@ -203,6 +203,7 @@ class Trainer(TransformersTrainer):
             input_columns=("tokens", "ner_tags"),
             desc=f"Label normalizing the {dataset_name} dataset",
             batched=True,
+            num_proc=4,
         )
 
         # Setting model card data based on training data
@@ -230,6 +231,7 @@ class Trainer(TransformersTrainer):
                 remove_columns=set(dataset.column_names) - set(self.OPTIONAL_COLUMNS),
                 desc=f"Tokenizing the {dataset_name} dataset",
                 fn_kwargs={"return_num_words": is_evaluate},
+                num_proc=4,
             )
         # If "document_id" AND "sentence_id" exist in the training dataset
         if {"document_id", "sentence_id"} <= set(dataset.column_names):
@@ -265,6 +267,7 @@ class Trainer(TransformersTrainer):
                 "model_max_length": tokenizer.model_max_length,
                 "marker_max_length": self.model.config.marker_max_length,
             },
+            num_proc=4,
         )
         new_length = len(dataset)
         logger.info(
