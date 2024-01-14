@@ -192,6 +192,8 @@ class Trainer(TransformersTrainer):
             if column not in dataset.column_names:
                 raise ValueError(f"The {dataset_name} dataset must contain a {column!r} column.")
 
+        dataset_num_proc = self.args.dataloader_num_workers or None
+
         # Drop all unused columns, only keep "tokens", "ner_tags", "document_id", "sentence_id"
         dataset = dataset.remove_columns(
             set(dataset.column_names) - set(self.OPTIONAL_COLUMNS) - set(self.REQUIRED_COLUMNS)
@@ -203,7 +205,7 @@ class Trainer(TransformersTrainer):
             input_columns=("tokens", "ner_tags"),
             desc=f"Label normalizing the {dataset_name} dataset",
             batched=True,
-            num_proc=4,
+            num_proc=dataset_num_proc,
         )
 
         # Setting model card data based on training data
@@ -231,7 +233,7 @@ class Trainer(TransformersTrainer):
                 remove_columns=set(dataset.column_names) - set(self.OPTIONAL_COLUMNS),
                 desc=f"Tokenizing the {dataset_name} dataset",
                 fn_kwargs={"return_num_words": is_evaluate},
-                num_proc=4,
+                num_proc=dataset_num_proc,
             )
         # If "document_id" AND "sentence_id" exist in the training dataset
         if {"document_id", "sentence_id"} <= set(dataset.column_names):
@@ -267,7 +269,7 @@ class Trainer(TransformersTrainer):
                 "model_max_length": tokenizer.model_max_length,
                 "marker_max_length": self.model.config.marker_max_length,
             },
-            num_proc=4,
+            num_proc=dataset_num_proc,
         )
         new_length = len(dataset)
         logger.info(
