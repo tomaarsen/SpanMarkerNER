@@ -297,9 +297,20 @@ gathering predictions for evaluation during the training.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eval_dataset</strong> (<cite>Dataset</cite>, <em>optional</em>) – Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
-not accepted by the <cite>model.forward()</cite> method are automatically removed. It must implement the <cite>__len__</cite>
-method.</p></li>
+<li><p><strong>eval_dataset</strong> (Union[<cite>Dataset</cite>, Dict[str, <cite>Dataset</cite>]), <em>optional</em>) – <p>Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
+not accepted by the <cite>model.forward()</cite> method are automatically removed. If it is a dictionary, it will
+evaluate on each dataset, prepending the dictionary key to the metric name. Datasets must implement the
+<cite>__len__</cite> method.</p>
+<p>&lt;Tip&gt;</p>
+<p>If you pass a dictionary with names of datasets as keys and datasets as values, evaluate will run
+separate evaluations on each dataset. This can be useful to monitor how training affects other
+datasets or simply to get a more fine-grained evaluation.
+When used with <cite>load_best_model_at_end</cite>, make sure <cite>metric_for_best_model</cite> references exactly one
+of the datasets. If you, for example, pass in <cite>{“data1”: data1, “data2”: data2}</cite> for two datasets
+<cite>data1</cite> and <cite>data2</cite>, you could specify <cite>metric_for_best_model=”eval_data1_loss”</cite> for using the
+loss on <cite>data1</cite> and <cite>metric_for_best_model=”eval_data1_loss”</cite> for the loss on <cite>data2</cite>.</p>
+<p>&lt;/Tip&gt;</p>
+</p></li>
 <li><p><strong>ignore_keys</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
 gathering predictions.</p></li>
 <li><p><strong>metric_key_prefix</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“eval”</cite>) – An optional prefix to be used as the metrics key prefix. For example the metrics “bleu” will be named
@@ -415,7 +426,7 @@ backend.</p>
 
         
             <div id="copyright">
-                &copy; 2023, Tom Aarsen
+                &copy; 2024, Tom Aarsen
             </div>
         
 

@@ -362,7 +362,7 @@ copied to that device</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.push_to_hub">
-<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">push_to_hub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'10GB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_pr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe_serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.push_to_hub" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">push_to_hub</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">repo_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_temp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">private</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_shard_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'5GB'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">create_pr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">safe_serialization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">revision</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">commit_description</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tags</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">deprecated_kwargs</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.push_to_hub" title="Link to this definition">¶</a></dt>
 <dd><p>Upload the model file to the 🤗 Model Hub.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -376,12 +376,15 @@ Will default to <cite>True</cite> if there is no directory named like <cite>repo
 <li><p><strong>token</strong> (<cite>bool</cite> or <cite>str</cite>, <em>optional</em>) – The token to use as HTTP bearer authorization for remote files. If <cite>True</cite>, will use the token generated
 when running <cite>huggingface-cli login</cite> (stored in <cite>~/.huggingface</cite>). Will default to <cite>True</cite> if <cite>repo_url</cite>
 is not specified.</p></li>
-<li><p><strong>max_shard_size</strong> (<cite>int</cite> or <cite>str</cite>, <em>optional</em>, defaults to <cite>“10GB”</cite>) – Only applicable for models. The maximum size for a checkpoint before being sharded. Checkpoints shard
+<li><p><strong>max_shard_size</strong> (<cite>int</cite> or <cite>str</cite>, <em>optional</em>, defaults to <cite>“5GB”</cite>) – Only applicable for models. The maximum size for a checkpoint before being sharded. Checkpoints shard
 will then be each of size lower than this size. If expressed as a string, needs to be digits followed
-by a unit (like <cite>“5MB”</cite>).</p></li>
+by a unit (like <cite>“5MB”</cite>). We default it to <cite>“5GB”</cite> so that users can easily load models on free-tier
+Google Colab instances without any CPU OOM issues.</p></li>
 <li><p><strong>create_pr</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>False</cite>) – Whether or not to create a PR with the uploaded files or directly commit.</p></li>
-<li><p><strong>safe_serialization</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>False</cite>) – Whether or not to convert the model weights in safetensors format for safer serialization.</p></li>
+<li><p><strong>safe_serialization</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>True</cite>) – Whether or not to convert the model weights in safetensors format for safer serialization.</p></li>
 <li><p><strong>revision</strong> (<cite>str</cite>, <em>optional</em>) – Branch to push the uploaded files to.</p></li>
+<li><p><strong>commit_description</strong> (<cite>str</cite>, <em>optional</em>) – The description of the commit that will be created</p></li>
+<li><p><strong>tags</strong> (<cite>List[str]</cite>, <em>optional</em>) – List of tags to push on the Hub.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -414,7 +417,7 @@ device).</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.cuda">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">cuda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.cuda" title="Link to this definition">¶</a></dt>
-<dd><p>Moves all model parameters and buffers to the GPU.</p>
+<dd><p>Move all model parameters and buffers to the GPU.</p>
 <p>This also makes associated parameters and buffers different objects. So
 it should be called before constructing optimizer if the module will
 live on GPU while being optimized.</p>
@@ -442,7 +445,7 @@ copied to that device</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.cpu">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">cpu</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.cpu" title="Link to this definition">¶</a></dt>
-<dd><p>Moves all model parameters and buffers to the CPU.</p>
+<dd><p>Move all model parameters and buffers to the CPU.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>This method modifies the module in-place.</p>
@@ -463,7 +466,7 @@ copied to that device</p></li>
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.train">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.train" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the module in training mode.</p>
+<dd><p>Set the module in training mode.</p>
 <p>This has any effect only on certain modules. See documentations of
 particular modules for details of their behaviors in training/evaluation
 mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
@@ -488,7 +491,7 @@ mode (<code class="docutils literal notranslate"><span class="pre">False</span><
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.eval">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.eval" title="Link to this definition">¶</a></dt>
-<dd><p>Sets the module in evaluation mode.</p>
+<dd><p>Set the module in evaluation mode.</p>
 <p>This has any effect only on certain modules. See documentations of
 particular modules for details of their behaviors in training/evaluation
 mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
@@ -535,7 +538,7 @@ etc.</p>
 
         
             <div id="copyright">
-                &copy; 2023, Tom Aarsen
+                &copy; 2024, Tom Aarsen
             </div>
         
 
