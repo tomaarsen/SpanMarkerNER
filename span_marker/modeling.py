@@ -11,6 +11,7 @@ from torch import device, nn
 from tqdm.autonotebook import trange
 from transformers import AutoConfig, AutoModel, PretrainedConfig, PreTrainedModel
 from typing_extensions import Self
+import numpy as np
 
 from span_marker import __version__ as span_marker_version
 from span_marker.configuration import SpanMarkerConfig
@@ -127,27 +128,21 @@ class SpanMarkerModel(PreTrainedModel):
         position_ids: torch.Tensor,
         start_marker_indices: torch.Tensor,
         num_marker_pairs: torch.Tensor,
-        labels: Optional[torch.Tensor] = None,
         num_words: Optional[torch.Tensor] = None,
         document_ids: Optional[torch.Tensor] = None,
         sentence_ids: Optional[torch.Tensor] = None,
+        labels: Optional[torch.Tensor] = None,
         **kwargs,
-    ) -> SpanMarkerOutput:
+    ) -> Dict[str, torch.Tensor]:
         """Forward call of the SpanMarkerModel.
-
         Args:
             input_ids (~torch.Tensor): Input IDs including start/end markers.
             attention_mask (~torch.Tensor): Attention mask matrix including one-directional attention for markers.
             position_ids (~torch.Tensor): Position IDs including start/end markers.
-            start_marker_indices (~torch.Tensor): The indices where the start markers begin per batch sample.
-            num_marker_pairs (~torch.Tensor): The number of start/end marker pairs per batch sample.
-            labels (Optional[~torch.Tensor]): The labels for each span candidate. Defaults to None.
-            num_words (Optional[~torch.Tensor]): The number of words for each batch sample. Defaults to None.
-            document_ids (Optional[~torch.Tensor]): The document ID of each batch sample. Defaults to None.
-            sentence_ids (Optional[~torch.Tensor]): The index of each sentence in their respective document. Defaults to None.
+        None.
 
         Returns:
-            SpanMarkerOutput: The output dataclass.
+            outputs: Encoder outputs
         """
         token_type_ids = torch.zeros_like(input_ids)
         outputs = self.encoder(
@@ -158,32 +153,20 @@ class SpanMarkerModel(PreTrainedModel):
         )
         last_hidden_state = outputs[0]
         last_hidden_state = self.dropout(last_hidden_state)
-
-        batch_size = last_hidden_state.size(0)
         sequence_length = last_hidden_state.size(1)
-
+        batch_size = last_hidden_state.size(0)
         # Get the indices where the end markers start
         end_marker_indices = start_marker_indices + num_marker_pairs
-
-        # The start marker embeddings concatenated with the end marker embeddings.
-        # This is kind of breaking the cardinal rule of GPU-based ML, as this is processing
-        # the batch iteratively per sample, but every sample produces a different shape matrix
-        # and this is the most convenient way to recombine them into a matrix.
-        embeddings = []
+        sequence_length_last_hidden_state = last_hidden_state.size(2) * 2
+        #  Pre-allocates the necessary space for feature_vector
+        feature_vector = torch.zeros(batch_size, sequence_length // 2, sequence_length_last_hidden_state, device=self.device)
         for i in range(batch_size):
-            embeddings.append(
-                torch.cat(
-                    (
-                        last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]],
-                        last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]],
-                    ),
-                    dim=-1,
-                )
-            )
-        padded_embeddings = [
-            F.pad(embedding, (0, 0, 0, sequence_length // 2 - embedding.shape[0])) for embedding in embeddings
-        ]
-        feature_vector = torch.stack(padded_embeddings)
+            feature_vector[
+                i, : end_marker_indices[i] - start_marker_indices[i], : last_hidden_state.shape[-1]
+            ] = last_hidden_state[i, start_marker_indices[i] : end_marker_indices[i]]
+            feature_vector[
+                i, : end_marker_indices[i] - start_marker_indices[i], last_hidden_state.shape[-1] :
+            ] = last_hidden_state[i, end_marker_indices[i] : end_marker_indices[i] + num_marker_pairs[i]]
 
         # NOTE: This was wrong in the older tests
         feature_vector = self.dropout(feature_vector)
@@ -196,10 +179,10 @@ class SpanMarkerModel(PreTrainedModel):
             loss=loss if labels is not None else None,
             logits=logits,
             *outputs[2:],
-            num_marker_pairs=num_marker_pairs,
-            num_words=num_words,
-            document_ids=document_ids,
-            sentence_ids=sentence_ids,
+            out_num_marker_pairs=num_marker_pairs,
+            out_num_words=num_words,
+            out_document_ids=document_ids,
+            out_sentence_ids=sentence_ids,
         )
 
     @classmethod
@@ -291,7 +274,7 @@ class SpanMarkerModel(PreTrainedModel):
                 )
             config.id2label = dict(enumerate(labels))
             config.label2id = {v: k for k, v in config.id2label.items()}
-            # Set the span_marker version for freshly initialized models
+            # Set the  version for freshly initialized models
             config = cls.config_class(
                 encoder_config=config.to_dict(), span_marker_version=span_marker_version, **kwargs
             )
@@ -515,12 +498,12 @@ class SpanMarkerModel(PreTrainedModel):
             # Get the labels and the correponding probability scores
             scores, labels = probs.max(-1)
             # TODO: Iterate over output.num_marker_pairs instead with enumerate
-            for iter_idx in range(output.num_marker_pairs.size(0)):
+            for iter_idx in range(output.out_num_marker_pairs.size(0)):
                 input_id = dataset["id"][batch_start_idx + iter_idx]
-                num_marker_pairs = output.num_marker_pairs[iter_idx]
-                results[input_id]["scores"].extend(scores[iter_idx, :num_marker_pairs].tolist())
-                results[input_id]["labels"].extend(labels[iter_idx, :num_marker_pairs].tolist())
-                results[input_id]["num_words"] = output.num_words[iter_idx]
+                out_num_marker_pairs = output.out_num_marker_pairs[iter_idx]
+                results[input_id]["scores"].extend(scores[iter_idx, :out_num_marker_pairs].tolist())
+                results[input_id]["labels"].extend(labels[iter_idx, :out_num_marker_pairs].tolist())
+                results[input_id]["num_words"] = output.out_num_words[iter_idx]
 
         all_entities = []
         id2label = self.config.id2label

@@ -30,6 +30,7 @@ dependencies = [
     "datasets>=2.14.0", # required for sorting with multiple columns
     "packaging>=20.0",
     "evaluate",
+    "optimum>=1.13.2",
     "seqeval",
     "jinja2",
     "huggingface_hub"

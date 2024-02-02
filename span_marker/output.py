@@ -36,7 +36,7 @@ class SpanMarkerOutput(TokenClassifierOutput):
             A vector with shape ``(batch_size,)`` that tracks the sentence in the document that the input text belongs to.
     """
 
-    num_marker_pairs: Optional[torch.Tensor] = None
-    num_words: Optional[torch.Tensor] = None
-    document_ids: Optional[torch.Tensor] = None
-    sentence_ids: Optional[torch.Tensor] = None
+    out_num_marker_pairs: Optional[torch.Tensor] = None
+    out_num_words: Optional[torch.Tensor] = None
+    out_document_ids: Optional[torch.Tensor] = None
+    out_sentence_ids: Optional[torch.Tensor] = None
