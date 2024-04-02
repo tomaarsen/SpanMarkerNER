@@ -5,7 +5,7 @@ from typing import Callable, Dict, List, Optional, Type, TypeVar, Union
 
 import torch
 import torch.nn.functional as F
-from datasets import Dataset, disable_progress_bar, enable_progress_bar
+from datasets import Dataset, disable_progress_bar, enable_progress_bar, is_progress_bar_enabled
 from packaging.version import Version, parse
 from torch import device, nn
 from tqdm.autonotebook import trange
@@ -489,7 +489,9 @@ class SpanMarkerModel(PreTrainedModel):
                 "inference without document-level context may cause decreased performance."
             )
 
-        if not show_progress_bar:
+        progress_bars_enabled = is_progress_bar_enabled()
+        if not show_progress_bar and progress_bars_enabled:
+            # disable progress bars if they are enabled
             disable_progress_bar()
         dataset = dataset.map(
             Trainer.spread_sample,
@@ -500,7 +502,8 @@ class SpanMarkerModel(PreTrainedModel):
                 "marker_max_length": self.config.marker_max_length,
             },
         )
-        if not show_progress_bar:
+        if not show_progress_bar and progress_bars_enabled:
+            # re-enable progress bars now if they were originally enabled
             enable_progress_bar()
         for batch_start_idx in trange(0, len(dataset), batch_size, leave=True, disable=not show_progress_bar):
             batch = dataset.select(range(batch_start_idx, min(len(dataset), batch_start_idx + batch_size)))
