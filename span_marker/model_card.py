@@ -13,13 +13,12 @@ import transformers
 from datasets import Dataset
 from huggingface_hub import (
     CardData,
-    DatasetFilter,
     ModelCard,
     dataset_info,
     list_datasets,
     model_info,
 )
-from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
+from huggingface_hub.repocard_data import EvalResult,eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
 from transformers import TrainerCallback
 from transformers.integrations import CodeCarbonCallback
@@ -366,7 +365,7 @@ class SpanMarkerModelCardData(CardData):
             # Make sure the normalized dataset IDs match
             dataset_list = [
                 dataset
-                for dataset in list_datasets(filter=DatasetFilter(author=author, dataset_name=dataset_name))
+                for dataset in list_datasets(author=author, dataset_name=dataset_name)
                 if normalize(dataset.id) == normalize(cache_dataset_name)
             ]
             # If there's only one match, get the ID from it

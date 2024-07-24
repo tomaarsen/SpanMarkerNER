@@ -32,7 +32,7 @@ dependencies = [
     "evaluate",
     "seqeval",
     "jinja2",
-    "huggingface_hub"
+    "huggingface_hub>=0.24.0"
 ]
 dynamic = ["version"]
 
