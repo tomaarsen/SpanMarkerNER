@@ -18,7 +18,7 @@ from huggingface_hub import (
     list_datasets,
     model_info,
 )
-from huggingface_hub.repocard_data import EvalResult,eval_results_to_model_index
+from huggingface_hub.repocard_data import EvalResult, eval_results_to_model_index
 from huggingface_hub.utils import yaml_dump
 from transformers import TrainerCallback
 from transformers.integrations import CodeCarbonCallback
