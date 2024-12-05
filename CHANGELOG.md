@@ -15,6 +15,16 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.6.0]
+
+### Fixed
+
+- Fixed integrations with newer dependency versions, like `transformers` and `huggingface_hub`.
+
+### Deprecated
+
+- Deprecated Python 3.8.
+
 ## [1.5.0]
 
 ### Added
