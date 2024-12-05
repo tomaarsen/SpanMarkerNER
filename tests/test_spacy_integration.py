@@ -28,6 +28,7 @@ def test_span_marker_as_spacy_pipeline_component():
         ("Paris", "LOC"),
     ]
 
+
 def test_span_marker_as_spacy_pipeline_component_pipe():
     nlp = spacy.load("en_core_web_sm", disable=["ner"])
     batch_size = 2

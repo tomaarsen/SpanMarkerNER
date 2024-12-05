@@ -13,7 +13,6 @@ import transformers
 from datasets import Dataset
 from huggingface_hub import (
     CardData,
-    DatasetFilter,
     ModelCard,
     dataset_info,
     list_datasets,
@@ -366,7 +365,7 @@ class SpanMarkerModelCardData(CardData):
             # Make sure the normalized dataset IDs match
             dataset_list = [
                 dataset
-                for dataset in list_datasets(filter=DatasetFilter(author=author, dataset_name=dataset_name))
+                for dataset in list_datasets(author=author, dataset_name=dataset_name)
                 if normalize(dataset.id) == normalize(cache_dataset_name)
             ]
             # If there's only one match, get the ID from it
