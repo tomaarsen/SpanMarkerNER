@@ -49,7 +49,6 @@ def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -
     )
     trainer.train()
     model_card = generate_model_card(trainer.model)
-    print(model_card)
     assert MODEL_CARD_PATTERN.fullmatch(model_card)
 
 

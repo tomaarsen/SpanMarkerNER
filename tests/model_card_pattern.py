@@ -155,7 +155,7 @@ trainer.save_model\("tomaarsen/span-marker-test-model-card-finetuned"\)
 - train_batch_size: 1
 - eval_batch_size: 8
 - seed: 42
-- optimizer: Use adamw_torch with betas=\(0\.9,0\.999\) and epsilon=1e-08 and optimizer_args=No additional optimizer arguments
+- optimizer: Use (OptimizerNames.ADAMW_TORCH|adamw_torch) with betas=\(0\.9,0\.999\) and epsilon=1e-08 and optimizer_args=No additional optimizer arguments
 - lr_scheduler_type: linear
 - num_epochs: 1
 
