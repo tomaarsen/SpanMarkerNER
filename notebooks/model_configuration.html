@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -122,14 +122,14 @@
     <img src="https://colab.research.google.com/assets/colab-badge.svg" style="display: inline; margin: 0" alt="Open In Colab"/>
 </a>
 </div><section id="Configuring-SpanMarker">
-<h1>Configuring SpanMarker<a class="headerlink" href="#Configuring-SpanMarker" title="Link to this heading">¶</a></h1>
+<h1>Configuring SpanMarker<a class="headerlink" href="#Configuring-SpanMarker" title="Permalink to this heading">¶</a></h1>
 <p><a class="reference external" href="https://github.com/tomaarsen/SpanMarkerNER">SpanMarker</a> is an accessible yet powerful Python module for training Named Entity Recognition models.</p>
 <p>In this short notebook, we’ll have a look at how to configure a SpanMarker model for training. For a larger and more general tutorial on how to use SpanMarker, please have a look at the <a class="reference internal" href="getting_started.html"><span class="doc">Getting Started</span></a> notebook.</p>
 <section id="Configuring-SpanMarkerModel.from_pretrained">
-<h2>Configuring <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code><a class="headerlink" href="#Configuring-SpanMarkerModel.from_pretrained" title="Link to this heading">¶</a></h2>
+<h2>Configuring <code class="docutils literal notranslate"><span class="pre">SpanMarkerModel.from_pretrained</span></code><a class="headerlink" href="#Configuring-SpanMarkerModel.from_pretrained" title="Permalink to this heading">¶</a></h2>
 <p>The <a class="reference external" href="https://tomaarsen.github.io/SpanMarkerNER/api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.from_pretrained">SpanMarkerModel.from_pretrained</a> method is the go-to approach to initialize a new or pretrained SpanMarker model. We will consider these two cases separately here.</p>
 <section id="Initializing-a-new-model">
-<h3>Initializing a new model<a class="headerlink" href="#Initializing-a-new-model" title="Link to this heading">¶</a></h3>
+<h3>Initializing a new model<a class="headerlink" href="#Initializing-a-new-model" title="Permalink to this heading">¶</a></h3>
 <p>A new model is initialized using a pretrained encoder, e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>. See <a class="reference internal" href="model_training.html#Initializing-a-SpanMarkerModel"><span class="std std-ref">Initializing &amp; Training</span></a> for details on valid encoders. Additionally, a new SpanMarker model <strong>must</strong> be initialized using a list of string labels. These labels can have the IOB, IOB2, BIOES or BILOU labeling scheme, or no scheme at all. For example:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
@@ -150,7 +150,7 @@
 <p>In particular, that first one is noteworthy. Its parameters (<code class="docutils literal notranslate"><span class="pre">model_max_length</span></code>, <code class="docutils literal notranslate"><span class="pre">marker_max_length</span></code> and <code class="docutils literal notranslate"><span class="pre">entity_max_length</span></code>) have large impacts on training &amp; inferencing speeds, as well as final performance.</p>
 </section>
 <section id="Initializing-a-pretrained-model">
-<h3>Initializing a pretrained model<a class="headerlink" href="#Initializing-a-pretrained-model" title="Link to this heading">¶</a></h3>
+<h3>Initializing a pretrained model<a class="headerlink" href="#Initializing-a-pretrained-model" title="Permalink to this heading">¶</a></h3>
 <p>A pretrained model is initialized in the same way as a new model, but most of the valuable parameters will have already been set when the model was originally initialized, trained and saved. As a result, we do not need to specify the labels anymore. Beyond that, we need to be careful with providing configuration parameters that differ from the parameters used to train the model. We may degrade model performance otherwise.</p>
 <p>Loading a pretrained SpanMarker model usually looks like this:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
@@ -162,7 +162,7 @@
 </section>
 </section>
 <section id="Configuring-🤗-TrainingArguments">
-<h2>Configuring 🤗 TrainingArguments<a class="headerlink" href="#Configuring-🤗-TrainingArguments" title="Link to this heading">¶</a></h2>
+<h2>Configuring 🤗 TrainingArguments<a class="headerlink" href="#Configuring-🤗-TrainingArguments" title="Permalink to this heading">¶</a></h2>
 <p>SpanMarker relies on the Hugging Face <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments">TrainingArguments</a>. As a result, online documentation or guides to optimize these training arguments for 🤗 Transformers tend to also apply for SpanMarker.</p>
 <p>The <code class="docutils literal notranslate"><span class="pre">TrainingArguments</span></code> class is quite massive, and a bit overwhelming, so here are my recommendations of parameters to look at:</p>
 <ul class="simple">

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
@@ -17,7 +17,7 @@
       <script type="text/javascript" src="../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../_static/doctools.js"></script>
       <script type="text/javascript" src="../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -118,10 +118,10 @@
         <div id="main-content" role="main">
           
   <section id="module-span_marker.evaluation">
-<span id="span-marker-evaluation-module"></span><h1>span_marker.evaluation module<a class="headerlink" href="#module-span_marker.evaluation" title="Link to this heading">¶</a></h1>
+<span id="span-marker-evaluation-module"></span><h1>span_marker.evaluation module<a class="headerlink" href="#module-span_marker.evaluation" title="Permalink to this heading">¶</a></h1>
 <dl class="py function">
 <dt class="sig sig-object py" id="span_marker.evaluation.compute_f1_via_seqeval">
-<span class="sig-prename descclassname"><span class="pre">span_marker.evaluation.</span></span><span class="sig-name descname"><span class="pre">compute_f1_via_seqeval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_in_train</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/evaluation.html#compute_f1_via_seqeval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.evaluation.compute_f1_via_seqeval" title="Link to this definition">¶</a></dt>
+<span class="sig-prename descclassname"><span class="pre">span_marker.evaluation.</span></span><span class="sig-name descname"><span class="pre">compute_f1_via_seqeval</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tokenizer</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_prediction</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">is_in_train</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/span_marker/evaluation.html#compute_f1_via_seqeval"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#span_marker.evaluation.compute_f1_via_seqeval" title="Permalink to this definition">¶</a></dt>
 <dd><p>Compute micro-F1, recall, precision and accuracy scores using <code class="docutils literal notranslate"><span class="pre">seqeval</span></code> for the evaluation predictions.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -133,7 +133,7 @@ With other words, don’t use this on the (shuffled) train dataset!</p>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – The model its tokenizer.</p></li>
 <li><p><strong>eval_prediction</strong> (<a class="reference external" href="https://huggingface.co/docs/transformers/main/en/internal/trainer_utils#transformers.EvalPrediction" title="(in transformers vmain)"><em>EvalPrediction</em></a>) – The predictions resulting from the evaluations.</p></li>
-<li><p><strong>is_in_train</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.12)"><em>bool</em></a>) – </p></li>
+<li><p><strong>is_in_train</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -144,7 +144,7 @@ With other words, don’t use this on the (shuffled) train dataset!</p>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.12)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.12)">float</a>]</p>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]</p>
 </dd>
 </dl>
 </dd></dl>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#2D2D2D" />
@@ -118,7 +118,7 @@
         <div id="main-content" role="main">
           
   <section id="spanmarker-for-named-entity-recognition">
-<h1>SpanMarker for Named Entity Recognition<a class="headerlink" href="#spanmarker-for-named-entity-recognition" title="Link to this heading">¶</a></h1>
+<h1>SpanMarker for Named Entity Recognition<a class="headerlink" href="#spanmarker-for-named-entity-recognition" title="Permalink to this heading">¶</a></h1>
 <p>SpanMarker is a framework for training powerful Named Entity Recognition models using familiar encoders such as BERT,
 RoBERTa and ELECTRA. Tightly implemented on top of the <a class="reference external" href="https://github.com/huggingface/transformers">🤗 Transformers</a>
 library, SpanMarker can take advantage of its valuable functionality.</p>
@@ -199,7 +199,7 @@ Alternatively, check out any model from this list of particularly useful models:
 </tbody>
 </table>
 <section id="context">
-<h2>Context<a class="headerlink" href="#context" title="Link to this heading">¶</a></h2>
+<h2>Context<a class="headerlink" href="#context" title="Permalink to this heading">¶</a></h2>
 <h1 align="center">
    <a href="https://github.com/argilla-io/argilla">
    <img src="https://github.com/dvsrepo/imgs/raw/main/rg.svg" alt="Argilla" width="150">
@@ -209,9 +209,9 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 </section>
 </section>
 <section id="quick-reference">
-<h1>Quick Reference<a class="headerlink" href="#quick-reference" title="Link to this heading">¶</a></h1>
+<h1>Quick Reference<a class="headerlink" href="#quick-reference" title="Permalink to this heading">¶</a></h1>
 <section id="how-to-train">
-<h2>How to Train<a class="headerlink" href="#how-to-train" title="Link to this heading">¶</a></h2>
+<h2>How to Train<a class="headerlink" href="#how-to-train" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
 <span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
 <span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
@@ -263,7 +263,7 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a>, <a class="reference internal" href="api/span_marker.trainer.html#span_marker.trainer.Trainer" title="span_marker.trainer.Trainer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Trainer</span></code></a>, <a class="reference external" href="https://huggingface.co/docs/datasets/main/en/package_reference/loading_methods#datasets.load_dataset" title="(in datasets vmain)"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_dataset()</span></code></a>, or <a class="reference external" href="https://huggingface.co/docs/transformers/main/en/main_classes/trainer#transformers.TrainingArguments" title="(in transformers vmain)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TrainingArguments</span></code></a>.</p>
 </section>
 <section id="how-to-predict">
-<h2>How to predict<a class="headerlink" href="#how-to-predict" title="Link to this heading">¶</a></h2>
+<h2>How to predict<a class="headerlink" href="#how-to-predict" title="Permalink to this heading">¶</a></h2>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="c1"># Load a finetuned SpanMarkerModel from the 🤗 Hub</span>
@@ -287,16 +287,16 @@ much like in 🤗 Transformers.</p>
 <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel" title="span_marker.modeling.SpanMarkerModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">SpanMarkerModel</span></code></a> or <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.predict" title="span_marker.modeling.SpanMarkerModel.predict"><code class="xref py py-meth docutils literal notranslate"><span class="pre">predict()</span></code></a>.</p>
 </section>
 <section id="how-to-save-a-model">
-<h2>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Link to this heading">¶</a></h2>
+<h2>How to save a model<a class="headerlink" href="#how-to-save-a-model" title="Permalink to this heading">¶</a></h2>
 <section id="locally">
-<h3>Locally<a class="headerlink" href="#locally" title="Link to this heading">¶</a></h3>
+<h3>Locally<a class="headerlink" href="#locally" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model</span><span class="o">.</span><span class="n">save_pretrained</span><span class="p">(</span><span class="s2">&quot;my_model_dir&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>See the documentation for <a class="reference internal" href="api/span_marker.modeling.html#span_marker.modeling.SpanMarkerModel.save_pretrained" title="span_marker.modeling.SpanMarkerModel.save_pretrained"><code class="xref py py-meth docutils literal notranslate"><span class="pre">save_pretrained()</span></code></a> for more details.</p>
 </section>
 <section id="to-the-hub">
-<h3>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Link to this heading">¶</a></h3>
+<h3>To the 🤗 Hub<a class="headerlink" href="#to-the-hub" title="Permalink to this heading">¶</a></h3>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">model_id</span> <span class="o">=</span> <span class="s2">&quot;span-marker-bert-base-fewnerd-fine-super&quot;</span>
 <span class="n">model</span><span class="o">.</span><span class="n">push_to_hub</span><span class="p">(</span><span class="n">model_id</span><span class="p">)</span>
 </pre></div>

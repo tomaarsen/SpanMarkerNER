@@ -16,7 +16,7 @@
       <script type="text/javascript" src="../../_static/documentation_options.js"></script>
       <script type="text/javascript" src="../../_static/doctools.js"></script>
       <script type="text/javascript" src="../../_static/sphinx_highlight.js"></script>
-      <script type="text/javascript" src="../../https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
   
 
   <script src="https://email.tl.fortawesome.com/c/eJxNjUEOgyAQAF8jR7Kw6wIHDh7sP1Cw2mgxgmn6-3JsMqc5zEQfE8dkxOY1KKMUOI3ACFKRJpSW2AAp7ontYIaxI6i7XPJVwyeVfCQ550Os3jLrGSNOLgbdAy6s0PBk2TFNjEbsfq31LB0OnX407pJa5v2faRadwSW63mn5KuLyR9j2tgx3zecanl-55R_-jjPs"></script> 
@@ -135,9 +135,7 @@
 <span class="sd">&quot;&quot;&quot;</span>
 
 
-<div class="viewcode-block" id="LabelNormalizer">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizer</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizer"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizer</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Class to convert NER training data into a common format used in the :class:`~span_marker.tokenizer.SpanMarkerTokenizer`.</span>
 
 <span class="sd">    The common format involves 3-tuples with entity labels, word start indices and word end indices.</span>
@@ -147,12 +145,9 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">config</span> <span class="o">=</span> <span class="n">config</span>
 
-<div class="viewcode-block" id="LabelNormalizer.ner_tags_to_entities">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer.ner_tags_to_entities">[docs]</a>
-    <span class="nd">@abstractmethod</span>
+<div class="viewcode-block" id="LabelNormalizer.ner_tags_to_entities"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer.ner_tags_to_entities">[docs]</a>    <span class="nd">@abstractmethod</span>
     <span class="k">def</span> <span class="nf">ner_tags_to_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Entity</span><span class="p">]:</span>
         <span class="k">pass</span></div>
-
 
     <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tokens</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
         <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ner_tags&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;entity_count&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;word_count&quot;</span><span class="p">:</span> <span class="p">[]}</span>
@@ -164,19 +159,14 @@
         <span class="k">return</span> <span class="n">output</span></div>
 
 
-
-<div class="viewcode-block" id="LabelNormalizerScheme">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizerScheme</span><span class="p">(</span><span class="n">LabelNormalizer</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizerScheme"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizerScheme</span><span class="p">(</span><span class="n">LabelNormalizer</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">config</span><span class="o">.</span><span class="n">group_label_ids_by_tag</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">start_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">end_ids</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
 
-<div class="viewcode-block" id="LabelNormalizerScheme.ner_tags_to_entities">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme.ner_tags_to_entities">[docs]</a>
-    <span class="k">def</span> <span class="nf">ner_tags_to_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Entity</span><span class="p">]:</span>
+<div class="viewcode-block" id="LabelNormalizerScheme.ner_tags_to_entities"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerScheme.ner_tags_to_entities">[docs]</a>    <span class="k">def</span> <span class="nf">ner_tags_to_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Entity</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Assumes a correct IOB or IOB2 annotation scheme&quot;&quot;&quot;</span>
         <span class="n">start_idx</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">reduced_label_id</span> <span class="o">=</span> <span class="kc">None</span>
@@ -193,14 +183,10 @@
                 <span class="n">start_idx</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="k">if</span> <span class="n">start_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">reduced_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
-</div>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">reduced_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div></div>
 
 
-
-<div class="viewcode-block" id="LabelNormalizerIOB">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerIOB">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizerIOB</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizerIOB"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerIOB">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizerIOB</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="c1"># Support for IOB2 and IOB, respectively:</span>
@@ -209,10 +195,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">end_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">]</span></div>
 
 
-
-<div class="viewcode-block" id="LabelNormalizerBIOES">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBIOES">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizerBIOES</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizerBIOES"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBIOES">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizerBIOES</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Detected the BIOES labeling scheme.&quot;</span><span class="p">)</span>
@@ -220,10 +203,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">end_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;S&quot;</span><span class="p">]</span></div>
 
 
-
-<div class="viewcode-block" id="LabelNormalizerBILOU">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBILOU">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizerBILOU</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizerBILOU"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerBILOU">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizerBILOU</span><span class="p">(</span><span class="n">LabelNormalizerScheme</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="c1"># Support for BILOU and BILO:</span>
@@ -232,17 +212,12 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">end_ids</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;B&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">]</span> <span class="o">|</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_ids_by_tag</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;U&quot;</span><span class="p">,</span> <span class="nb">set</span><span class="p">())</span></div>
 
 
-
-<div class="viewcode-block" id="LabelNormalizerNoScheme">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme">[docs]</a>
-<span class="k">class</span> <span class="nc">LabelNormalizerNoScheme</span><span class="p">(</span><span class="n">LabelNormalizer</span><span class="p">):</span>
+<div class="viewcode-block" id="LabelNormalizerNoScheme"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme">[docs]</a><span class="k">class</span> <span class="nc">LabelNormalizerNoScheme</span><span class="p">(</span><span class="n">LabelNormalizer</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;No labeling scheme detected: all label IDs belong to individual entity classes.&quot;</span><span class="p">)</span>
 
-<div class="viewcode-block" id="LabelNormalizerNoScheme.ner_tags_to_entities">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme.ner_tags_to_entities">[docs]</a>
-    <span class="k">def</span> <span class="nf">ner_tags_to_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Entity</span><span class="p">]:</span>
+<div class="viewcode-block" id="LabelNormalizerNoScheme.ner_tags_to_entities"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizerNoScheme.ner_tags_to_entities">[docs]</a>    <span class="k">def</span> <span class="nf">ner_tags_to_entities</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ner_tags</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterator</span><span class="p">[</span><span class="n">Entity</span><span class="p">]:</span>
         <span class="n">start_idx</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="n">entity_label_id</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">label_id</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">ner_tags</span><span class="p">):</span>
@@ -257,19 +232,13 @@
                 <span class="n">start_idx</span> <span class="o">=</span> <span class="n">idx</span>
 
         <span class="k">if</span> <span class="n">start_idx</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="p">(</span><span class="n">entity_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div>
-</div>
+            <span class="k">yield</span> <span class="p">(</span><span class="n">entity_label_id</span><span class="p">,</span> <span class="n">start_idx</span><span class="p">,</span> <span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span></div></div>
 
 
-
-<div class="viewcode-block" id="AutoLabelNormalizer">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer">[docs]</a>
-<span class="k">class</span> <span class="nc">AutoLabelNormalizer</span><span class="p">:</span>
+<div class="viewcode-block" id="AutoLabelNormalizer"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer">[docs]</a><span class="k">class</span> <span class="nc">AutoLabelNormalizer</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;Factory class to return the correct LabelNormalizer subclass.&quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="AutoLabelNormalizer.from_config">
-<a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer.from_config">[docs]</a>
-    <span class="nd">@staticmethod</span>
+<div class="viewcode-block" id="AutoLabelNormalizer.from_config"><a class="viewcode-back" href="../../api/span_marker.label_normalizer.html#span_marker.label_normalizer.AutoLabelNormalizer.from_config">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">from_config</span><span class="p">(</span><span class="n">config</span><span class="p">:</span> <span class="n">SpanMarkerConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LabelNormalizer</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">config</span><span class="o">.</span><span class="n">are_labels_schemed</span><span class="p">():</span>
             <span class="k">return</span> <span class="n">LabelNormalizerNoScheme</span><span class="p">(</span><span class="n">config</span><span class="p">)</span>
@@ -284,9 +253,7 @@
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
             <span class="s2">&quot;Data labeling scheme not recognized. Expected either IOB, IOB2, BIOES, BILOU &quot;</span>
             <span class="s2">&quot;or no scheme (i.e. one label ID per class, no B-, I- label prefixes, etc.)&quot;</span>
-        <span class="p">)</span></div>
-</div>
-
+        <span class="p">)</span></div></div>
 </pre></div>
 
         </div>
