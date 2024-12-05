@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "span_marker"
 description = "Named Entity Recognition using Span Markers"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
 keywords = [
     "data-science",
