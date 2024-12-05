@@ -6,7 +6,7 @@ build-backend = "setuptools.build_meta"
 name = "span_marker"
 description = "Named Entity Recognition using Span Markers"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 license = {text = "Apache-2.0"}
 keywords = [
     "data-science",
@@ -26,7 +26,7 @@ maintainers = [
 dependencies = [
     "torch",
     "accelerate",
-    "transformers>=4.19.0", # required for EvalPrediction.inputs
+    "transformers>=4.19.0,<5", # required for EvalPrediction.inputs
     "datasets>=2.14.0", # required for sorting with multiple columns
     "packaging>=20.0",
     "evaluate",

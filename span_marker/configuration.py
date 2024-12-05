@@ -65,6 +65,9 @@ class SpanMarkerConfig(PretrainedConfig):
         self.span_marker_version = kwargs.pop("span_marker_version", None)
         super().__init__(**kwargs)
 
+        if not self.encoder:
+            return
+
         # label2id and id2label are automatically set by super().__init__, but we want to rely on
         # the encoder configs instead if we can, so we delete them under two conditions
         # 1. if they're the default ({0: "LABEL_0", 1: "LABEL_1"})

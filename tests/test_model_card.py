@@ -103,10 +103,10 @@ def test_is_on_huggingface_edge_case() -> None:
     assert not is_on_huggingface("a/test/value")
 
 
-@pytest.mark.parametrize("dataset_id", ("conll2003", "tomaarsen/conll2003"))
+@pytest.mark.parametrize("dataset_id", ("eriktks/conll2003", "tomaarsen/conll2003"))
 def test_infer_dataset_id(dataset_id: str) -> None:
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)
-    train_dataset = load_dataset(dataset_id, split="train")
+    train_dataset = load_dataset(dataset_id, split="train", trust_remote_code=True)
 
     # This triggers inferring the dataset_id from train_dataset
     Trainer(model=model, train_dataset=train_dataset)
