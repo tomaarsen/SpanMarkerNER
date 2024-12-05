@@ -48,6 +48,7 @@ dev = [
 docs = [
     "nltk_theme",
     "sphinx==6.1.3",
+    "lxml==4.9.2",
     "m2r2==0.3.3.post2",
     "better-apidoc==0.3.2",
     "nbsphinx==0.9.1",
