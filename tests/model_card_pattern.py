@@ -6,22 +6,20 @@ MODEL_CARD_PATTERN = re.compile(
 language:
 - en
 license: apache-2\.0
-library_name: span-marker
 tags:
 - span-marker
 - token-classification
 - ner
 - named-entity-recognition
 - generated_from_span_marker_trainer
-datasets:
-- conll2003
+widget:
+- text: .*
+pipeline_tag: token-classification
+library_name: span-marker
 metrics:
 - precision
 - recall
 - f1
-widget:
-- text: .*
-pipeline_tag: token-classification
 co2_eq_emissions:
   emissions: [\d\.\-e]+
   source: codecarbon
@@ -31,7 +29,9 @@ co2_eq_emissions:
   ram_total_size: [\d\.]+
   hours_used: [\d\.]+
 (  hardware_used: .+
-)?base_model: prajjwal1/bert-tiny
+)?datasets:
+- conll2003
+base_model: prajjwal1/bert-tiny
 model-index:
 - name: SpanMarker with prajjwal1/bert-tiny on CoNLL 2003
   results:
@@ -155,7 +155,7 @@ trainer.save_model\("tomaarsen/span-marker-test-model-card-finetuned"\)
 - train_batch_size: 1
 - eval_batch_size: 8
 - seed: 42
-- optimizer: Adam with betas=\(0.9,0.999\) and epsilon=1e-08
+- optimizer: Use adamw_torch with betas=\(0\.9,0\.999\) and epsilon=1e-08 and optimizer_args=No additional optimizer arguments
 - lr_scheduler_type: linear
 - num_epochs: 1
 
