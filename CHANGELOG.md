@@ -15,6 +15,16 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.5.1]
+
+### Added
+
+### Changed
+
+### Fixed
+
+- Stop enabling progress bars when they are disabled
+
 ## [1.5.0]
 
 ### Added
