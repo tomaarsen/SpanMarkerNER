@@ -153,7 +153,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Mapping</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Type</span><span class="p">,</span> <span class="n">Union</span>
 
 
 <span class="c1"># Integrations must be imported before ML frameworks:</span>
@@ -185,7 +185,7 @@
 <span class="kn">from</span> <span class="nn">.integrations.deepspeed</span> <span class="kn">import</span> <span class="n">deepspeed_init</span><span class="p">,</span> <span class="n">deepspeed_load_checkpoint</span><span class="p">,</span> <span class="n">is_deepspeed_available</span>
 <span class="kn">from</span> <span class="nn">.integrations.tpu</span> <span class="kn">import</span> <span class="n">tpu_spmd_dataloader</span>
 <span class="kn">from</span> <span class="nn">.modelcard</span> <span class="kn">import</span> <span class="n">TrainingSummary</span>
-<span class="kn">from</span> <span class="nn">.modeling_utils</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">load_sharded_checkpoint</span>
+<span class="kn">from</span> <span class="nn">.modeling_utils</span> <span class="kn">import</span> <span class="n">PreTrainedModel</span><span class="p">,</span> <span class="n">load_sharded_checkpoint</span><span class="p">,</span> <span class="n">unwrap_model</span>
 <span class="kn">from</span> <span class="nn">.models.auto.modeling_auto</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">MODEL_FOR_CAUSAL_LM_MAPPING_NAMES</span><span class="p">,</span>
     <span class="n">MODEL_MAPPING_NAMES</span><span class="p">,</span>
@@ -236,9 +236,9 @@
     <span class="n">EvalPrediction</span><span class="p">,</span>
     <span class="n">HPSearchBackend</span><span class="p">,</span>
     <span class="n">HubStrategy</span><span class="p">,</span>
-    <span class="n">IntervalStrategy</span><span class="p">,</span>
     <span class="n">PredictionOutput</span><span class="p">,</span>
     <span class="n">RemoveColumnsCollator</span><span class="p">,</span>
+    <span class="n">SaveStrategy</span><span class="p">,</span>
     <span class="n">TrainerMemoryTracker</span><span class="p">,</span>
     <span class="n">TrainOutput</span><span class="p">,</span>
     <span class="n">check_target_module_exists</span><span class="p">,</span>
@@ -391,6 +391,25 @@
         <span class="k">return</span> <span class="p">{}</span>
 
 
+<span class="k">def</span> <span class="nf">safe_globals</span><span class="p">():</span>
+    <span class="c1"># Starting from version 2.4 PyTorch introduces a check for the objects loaded</span>
+    <span class="c1"># with torch.load(weights_only=True). Starting from 2.6 weights_only=True becomes</span>
+    <span class="c1"># a default and requires allowlisting of objects being loaded.</span>
+    <span class="c1"># See: https://github.com/pytorch/pytorch/pull/137602</span>
+    <span class="c1"># See: https://pytorch.org/docs/stable/notes/serialization.html#torch.serialization.add_safe_globals</span>
+    <span class="c1"># See: https://github.com/huggingface/accelerate/pull/3036</span>
+    <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">torch</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span><span class="o">.</span><span class="n">release</span> <span class="o">&lt;</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;2.6&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">release</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">contextlib</span><span class="o">.</span><span class="n">nullcontext</span><span class="p">()</span>
+
+    <span class="n">np_core</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">_core</span> <span class="k">if</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">__version__</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">version</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="s2">&quot;2.0.0&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">core</span>
+    <span class="n">allowlist</span> <span class="o">=</span> <span class="p">[</span><span class="n">np_core</span><span class="o">.</span><span class="n">multiarray</span><span class="o">.</span><span class="n">_reconstruct</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">]</span>
+    <span class="c1"># numpy &gt;1.25 defines numpy.dtypes.UInt32DType, but below works for</span>
+    <span class="c1"># all versions of numpy</span>
+    <span class="n">allowlist</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">type</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">uint32</span><span class="p">))]</span>
+
+    <span class="k">return</span> <span class="n">torch</span><span class="o">.</span><span class="n">serialization</span><span class="o">.</span><span class="n">safe_globals</span><span class="p">(</span><span class="n">allowlist</span><span class="p">)</span>
+
+
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">import</span> <span class="nn">optuna</span>
 
@@ -460,8 +479,7 @@
 <span class="sd">            inner layers, dropout probabilities etc).</span>
 <span class="sd">        compute_loss_func (`Callable`, *optional*):</span>
 <span class="sd">            A function that accepts the raw model outputs, labels, and the number of items in the entire accumulated</span>
-<span class="sd">            batch (batch_size * gradient_accumulation_steps) and returns the loss. For example, here is one using</span>
-<span class="sd">            the loss function from `transformers`</span>
+<span class="sd">            batch (batch_size * gradient_accumulation_steps) and returns the loss. For example, see the default [loss function](https://github.com/huggingface/transformers/blob/052e652d6d53c2b26ffde87e039b723949a53493/src/transformers/trainer.py#L3618) used by [`Trainer`].</span>
 <span class="sd">        compute_metrics (`Callable[[EvalPrediction], Dict]`, *optional*):</span>
 <span class="sd">            The function that will be used to compute metrics at evaluation. Must take a [`EvalPrediction`] and return</span>
 <span class="sd">            a dictionary string to metric values. *Note* When passing TrainingArgs with `batch_eval_metrics` set to</span>
@@ -476,6 +494,11 @@
 <span class="sd">        optimizers (`Tuple[torch.optim.Optimizer, torch.optim.lr_scheduler.LambdaLR]`, *optional*, defaults to `(None, None)`):</span>
 <span class="sd">            A tuple containing the optimizer and the scheduler to use. Will default to an instance of [`AdamW`] on your</span>
 <span class="sd">            model and a scheduler given by [`get_linear_schedule_with_warmup`] controlled by `args`.</span>
+<span class="sd">        optimizer_cls_and_kwargs (`Tuple[Type[torch.optim.Optimizer], Dict[str, Any]]`, *optional*):</span>
+<span class="sd">            A tuple containing the optimizer class and keyword arguments to use.</span>
+<span class="sd">            Overrides `optim` and `optim_args` in `args`. Incompatible with the `optimizers` argument.</span>
+
+<span class="sd">            Unlike `optimizers`, this argument avoids the need to place model parameters on the correct devices before initializing the Trainer.</span>
 <span class="sd">        preprocess_logits_for_metrics (`Callable[[torch.Tensor, torch.Tensor], torch.Tensor]`, *optional*):</span>
 <span class="sd">            A function that preprocess the logits right before caching them at each evaluation step. Must take two</span>
 <span class="sd">            tensors, the logits and the labels, and return the logits once processed as desired. The modifications made</span>
@@ -519,7 +542,8 @@
         <span class="n">compute_loss_func</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">compute_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">EvalPrediction</span><span class="p">],</span> <span class="n">Dict</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">callbacks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">TrainerCallback</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">optimizers</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">optimizers</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">lr_scheduler</span><span class="o">.</span><span class="n">LambdaLR</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+        <span class="n">optimizer_cls_and_kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">torch</span><span class="o">.</span><span class="n">optim</span><span class="o">.</span><span class="n">Optimizer</span><span class="p">],</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">preprocess_logits_for_metrics</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">],</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -537,6 +561,12 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;You have set `args.eval_strategy` to </span><span class="si">{</span><span class="n">args</span><span class="o">.</span><span class="n">eval_strategy</span><span class="si">}</span><span class="s2"> but you didn&#39;t pass an `eval_dataset` to `Trainer`. Either set `args.eval_strategy` to `no` or pass an `eval_dataset`. &quot;</span>
             <span class="p">)</span>
+        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">save_strategy</span> <span class="o">==</span> <span class="n">SaveStrategy</span><span class="o">.</span><span class="n">BEST</span> <span class="ow">or</span> <span class="n">args</span><span class="o">.</span><span class="n">load_best_model_at_end</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">metric_for_best_model</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="s2">&quot;`args.metric_for_best_model` must be provided when using &#39;best&#39; save_strategy or if `args.load_best_model_at_end` is set to `True`.&quot;</span>
+                <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">args</span> <span class="o">=</span> <span class="n">args</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss_func</span> <span class="o">=</span> <span class="n">compute_loss_func</span>
         <span class="c1"># Seed must be set before instantiating the model when using model</span>
@@ -628,6 +658,10 @@
             <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;hf_quantizer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">model</span><span class="o">.</span><span class="n">hf_quantizer</span><span class="o">.</span><span class="n">is_trainable</span>
         <span class="p">)</span>
 
+        <span class="n">_is_model_quantized_and_qat_trainable</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;hf_quantizer&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="nb">getattr</span><span class="p">(</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">hf_quantizer</span><span class="p">,</span> <span class="s2">&quot;is_qat_trainable&quot;</span><span class="p">,</span> <span class="kc">False</span>
+        <span class="p">)</span>
+
         <span class="c1"># Filter out quantized + compiled models</span>
         <span class="k">if</span> <span class="n">_is_quantized_and_base_model</span> <span class="ow">and</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="s2">&quot;_orig_mod&quot;</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -635,7 +669,7 @@
             <span class="p">)</span>
 
         <span class="c1"># At this stage the model is already loaded</span>
-        <span class="k">if</span> <span class="n">_is_quantized_and_base_model</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">_is_quantized_and_base_model</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_peft_model</span><span class="p">(</span><span class="n">model</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">_is_model_quantized_and_qat_trainable</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                 <span class="s2">&quot;You cannot perform fine-tuning on purely quantized models. Please attach trainable adapters on top of&quot;</span>
                 <span class="s2">&quot; the quantized model to correctly perform fine-tuning. Please see: https://huggingface.co/docs/transformers/peft&quot;</span>
@@ -708,15 +742,16 @@
             <span class="k">else</span> <span class="n">unwrapped_model</span><span class="o">.</span><span class="n">get_base_model</span><span class="p">()</span><span class="o">.</span><span class="n">forward</span>
         <span class="p">)</span>
         <span class="n">forward_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">model_forward</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">model_accepts_loss_kwargs</span> <span class="o">=</span> <span class="p">(</span>
-            <span class="s2">&quot;loss_kwargs&quot;</span> <span class="ow">in</span> <span class="n">forward_params</span> <span class="ow">and</span> <span class="n">forward_params</span><span class="p">[</span><span class="s2">&quot;loss_kwargs&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span>
-        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">model_accepts_loss_kwargs</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">k</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">forward_params</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">neftune_noise_alpha</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">neftune_noise_alpha</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">compute_metrics</span> <span class="o">=</span> <span class="n">compute_metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_logits_for_metrics</span> <span class="o">=</span> <span class="n">preprocess_logits_for_metrics</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="o">=</span> <span class="n">optimizers</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_cls_and_kwargs</span> <span class="o">=</span> <span class="n">optimizer_cls_and_kwargs</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_cls_and_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Passing both `optimizers` and `optimizer_cls_and_kwargs` arguments is incompatible.&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">model_init</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">optimizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">lr_scheduler</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
                 <span class="s2">&quot;Passing a `model_init` is incompatible with providing the `optimizers` argument. &quot;</span>
@@ -765,7 +800,7 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The `data_collator` should be a simple callable (function, class with `__call__`).&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">max_steps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">num_train_epochs</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;max_steps is given, it will override any value given in num_train_epochs&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;max_steps is given, it will override any value given in num_train_epochs&quot;</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">train_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">has_length</span><span class="p">(</span><span class="n">train_dataset</span><span class="p">)</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">max_steps</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -1285,7 +1320,10 @@
                 <span class="p">},</span>
             <span class="p">]</span>
 
-            <span class="n">optimizer_cls</span><span class="p">,</span> <span class="n">optimizer_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_optimizer_cls_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">opt_model</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_cls_and_kwargs</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">optimizer_cls</span><span class="p">,</span> <span class="n">optimizer_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">optimizer_cls_and_kwargs</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">optimizer_cls</span><span class="p">,</span> <span class="n">optimizer_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_optimizer_cls_and_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">opt_model</span><span class="p">)</span>
 
             <span class="c1"># Overwrite `params` in case it&#39;s created by `get_optimizer_cls_and_kwargs`</span>
             <span class="c1"># e.g. for GaLore optimizer.</span>
@@ -1772,21 +1810,21 @@
         <span class="k">except</span> <span class="p">(</span><span class="ne">NameError</span><span class="p">,</span> <span class="ne">AttributeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>  <span class="c1"># no dataset or length, estimate by length of dataloader</span>
             <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">per_device_train_batch_size</span>
 
-    <span class="k">def</span> <span class="nf">num_tokens</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">train_dl</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">num_tokens</span><span class="p">(</span><span class="n">train_dl</span><span class="p">:</span> <span class="n">DataLoader</span><span class="p">,</span> <span class="n">max_steps</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Helper to get number of tokens in a [`~torch.utils.data.DataLoader`] by enumerating dataloader.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">train_tokens</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">step</span><span class="p">,</span> <span class="n">batch</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">train_dl</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">train_dl</span><span class="p">:</span>
                 <span class="n">tokens</span> <span class="o">=</span> <span class="n">batch</span><span class="p">[</span><span class="s2">&quot;input_ids&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
                 <span class="k">if</span> <span class="n">max_steps</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
                     <span class="k">return</span> <span class="n">tokens</span> <span class="o">*</span> <span class="n">max_steps</span>
                 <span class="n">train_tokens</span> <span class="o">+=</span> <span class="n">tokens</span>
-            <span class="k">return</span> <span class="n">train_tokens</span>
         <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Cannot get num_tokens from dataloader&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">train_tokens</span>
+        <span class="k">return</span> <span class="n">train_tokens</span>
 
     <span class="k">def</span> <span class="nf">_hp_search_setup</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">trial</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;optuna.Trial&quot;</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;HP search setup code&quot;&quot;&quot;</span>
@@ -1826,6 +1864,9 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_deepspeed_enabled</span><span class="p">:</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">deepspeed</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;For sweeps with deepspeed, `args.deepspeed` must be set&quot;</span><span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">free_memory</span><span class="p">()</span>
+
             <span class="c1"># Rebuild the deepspeed config to reflect the updated training parameters</span>
             <span class="kn">from</span> <span class="nn">accelerate.utils</span> <span class="kn">import</span> <span class="n">DeepSpeedPlugin</span>
 
@@ -1849,7 +1890,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">hp_search_backend</span> <span class="o">==</span> <span class="n">HPSearchBackend</span><span class="o">.</span><span class="n">OPTUNA</span><span class="p">:</span>
             <span class="kn">import</span> <span class="nn">optuna</span>
 
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">trial</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">_is_multi_objective</span><span class="p">():</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="s2">&quot;study&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">trial</span><span class="o">.</span><span class="n">study</span><span class="o">.</span><span class="n">_is_multi_objective</span><span class="p">():</span>
                 <span class="n">trial</span><span class="o">.</span><span class="n">report</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">objective</span><span class="p">,</span> <span class="n">step</span><span class="p">)</span>
                 <span class="k">if</span> <span class="n">trial</span><span class="o">.</span><span class="n">should_prune</span><span class="p">():</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_train_end</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
@@ -2188,7 +2229,7 @@
                 <span class="ne">FutureWarning</span><span class="p">,</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train() received got unexpected keyword arguments: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;train() got unexpected keyword arguments: </span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">kwargs</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
         <span class="c1"># This might change the seed so needs to run first.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_hp_search_setup</span><span class="p">(</span><span class="n">trial</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_train_batch_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">train_batch_size</span>
@@ -2329,7 +2370,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">debug_overflow</span> <span class="o">=</span> <span class="n">DebugUnderflowOverflow</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>  <span class="c1"># noqa</span>
 
-        <span class="n">delay_optimizer_creation</span> <span class="o">=</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_xla_enabled</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span>
+        <span class="n">delay_optimizer_creation</span> <span class="o">=</span> <span class="n">is_sagemaker_mp_enabled</span><span class="p">()</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_xla_enabled</span>
 
         <span class="c1"># We need to reset the scheduler, as its parameters may be different on subsequent calls</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_created_lr_scheduler</span><span class="p">:</span>
@@ -2378,9 +2419,15 @@
         <span class="c1"># FSDP-XLA, SageMaker MP/DP, DataParallel, IPEX</span>
         <span class="n">use_accelerator_prepare</span> <span class="o">=</span> <span class="kc">True</span> <span class="k">if</span> <span class="n">model</span> <span class="ow">is</span> <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="k">else</span> <span class="kc">False</span>
 
+        <span class="k">if</span> <span class="n">use_accelerator_prepare</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_fsdp_enabled</span><span class="p">:</span>
+            <span class="c1"># In case of auto_find_batch_size=True</span>
+            <span class="c1"># Remove FSDP wrapping from sub-models.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">unwrap_model</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">,</span> <span class="n">recursive</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="c1"># configure fsdp plugin for qlora if any</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_fsdp_qlora_plugin_updates</span><span class="p">()</span>
+
         <span class="k">if</span> <span class="n">delay_optimizer_creation</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">use_accelerator_prepare</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_fsdp_qlora_plugin_updates</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">prepare</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">model</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">create_optimizer_and_scheduler</span><span class="p">(</span><span class="n">num_training_steps</span><span class="o">=</span><span class="n">max_steps</span><span class="p">)</span>
 
@@ -2503,7 +2550,6 @@
         <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">eval_on_start</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">,</span> <span class="n">skip_scheduler</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-        <span class="n">total_batched_samples</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">for</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">epochs_trained</span><span class="p">,</span> <span class="n">num_train_epochs</span><span class="p">):</span>
             <span class="n">epoch_dataloader</span> <span class="o">=</span> <span class="n">train_dataloader</span>
             <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">epoch_dataloader</span><span class="p">,</span> <span class="s2">&quot;set_epoch&quot;</span><span class="p">):</span>
@@ -2535,7 +2581,6 @@
             <span class="n">epoch_iterator</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="n">epoch_dataloader</span><span class="p">)</span>
             <span class="c1"># We chunkify the epoch iterator into gradient accumulation steps `n` batches</span>
             <span class="n">remainder</span> <span class="o">=</span> <span class="n">num_examples</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span>
-            <span class="n">num_items_in_batch</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">if</span> <span class="n">remainder</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
                 <span class="n">remainder</span> <span class="o">=</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span>
             <span class="n">update_step</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
@@ -2546,13 +2591,7 @@
                 <span class="n">batch_samples</span><span class="p">,</span> <span class="n">num_items_in_batch</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_batch_samples</span><span class="p">(</span><span class="n">epoch_iterator</span><span class="p">,</span> <span class="n">num_batches</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">inputs</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batch_samples</span><span class="p">):</span>
                     <span class="n">step</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">total_batched_samples</span> <span class="o">+=</span> <span class="mi">1</span>
-                    <span class="n">is_last_step_and_steps_less_than_grad_acc</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">steps_in_epoch</span> <span class="o">&lt;=</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="ow">and</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">steps_in_epoch</span>
-                    <span class="p">)</span>
-                    <span class="n">do_sync_step</span> <span class="o">=</span> <span class="n">is_last_step_and_steps_less_than_grad_acc</span> <span class="ow">or</span> <span class="p">(</span>
-                        <span class="n">total_batched_samples</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span>
-                    <span class="p">)</span>
+                    <span class="n">do_sync_step</span> <span class="o">=</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">%</span> <span class="n">args</span><span class="o">.</span><span class="n">gradient_accumulation_steps</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">steps_in_epoch</span>
                     <span class="c1"># Since we perform prefetching, we need to manually set sync_gradients</span>
                     <span class="k">if</span> <span class="ow">not</span> <span class="n">do_sync_step</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gradient_state</span><span class="o">.</span><span class="n">_set_sync_gradients</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
@@ -2570,7 +2609,9 @@
                         <span class="k">else</span><span class="p">:</span>
                             <span class="n">input_tokens</span> <span class="o">=</span> <span class="n">inputs</span><span class="p">[</span><span class="n">main_input_name</span><span class="p">]</span><span class="o">.</span><span class="n">numel</span><span class="p">()</span>
                             <span class="n">input_tokens</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">tensor</span><span class="p">(</span><span class="n">input_tokens</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-                            <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">num_input_tokens_seen</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">input_tokens</span><span class="p">)</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">num_input_tokens_seen</span> <span class="o">+=</span> <span class="p">(</span>
+                                <span class="bp">self</span><span class="o">.</span><span class="n">accelerator</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="n">input_tokens</span><span class="p">)</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+                            <span class="p">)</span>
                     <span class="k">if</span> <span class="n">rng_to_sync</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">_load_rng_state</span><span class="p">(</span><span class="n">resume_from_checkpoint</span><span class="p">)</span>
                         <span class="n">rng_to_sync</span> <span class="o">=</span> <span class="kc">False</span>
@@ -2664,7 +2705,9 @@
                         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span> <span class="o">+=</span> <span class="mi">1</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span> <span class="o">=</span> <span class="n">epoch</span> <span class="o">+</span> <span class="p">(</span><span class="n">step</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">+</span> <span class="n">steps_skipped</span><span class="p">)</span> <span class="o">/</span> <span class="n">steps_in_epoch</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_step_end</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
-                        <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_log_save_evaluate</span><span class="p">(</span><span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">)</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_log_save_evaluate</span><span class="p">(</span>
+                            <span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">,</span> <span class="n">start_time</span>
+                        <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_substep_end</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
 
@@ -2689,7 +2732,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_training_stop</span> <span class="o">=</span> <span class="kc">True</span>
 
             <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_epoch_end</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_log_save_evaluate</span><span class="p">(</span><span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_maybe_log_save_evaluate</span><span class="p">(</span><span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">DebugOption</span><span class="o">.</span><span class="n">TPU_METRICS_DEBUG</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">debug</span><span class="p">:</span>
                 <span class="k">if</span> <span class="n">is_torch_xla_available</span><span class="p">():</span>
@@ -3094,7 +3137,7 @@
                 <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
         <span class="k">return</span> <span class="n">metrics</span>
 
-    <span class="k">def</span> <span class="nf">_maybe_log_save_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_maybe_log_save_evaluate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tr_loss</span><span class="p">,</span> <span class="n">grad_norm</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">epoch</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">,</span> <span class="n">start_time</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_log</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_globalstep_last_logged</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">is_torch_xla_available</span><span class="p">():</span>
                 <span class="n">xm</span><span class="o">.</span><span class="n">mark_step</span><span class="p">()</span>
@@ -3116,14 +3159,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_globalstep_last_logged</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">store_flos</span><span class="p">()</span>
 
-            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">start_time</span><span class="p">)</span>
 
         <span class="n">metrics</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_evaluate</span><span class="p">:</span>
             <span class="n">metrics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_evaluate</span><span class="p">(</span><span class="n">trial</span><span class="p">,</span> <span class="n">ignore_keys_for_eval</span><span class="p">)</span>
+            <span class="n">is_new_best_metric</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_determine_best_metric</span><span class="p">(</span><span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">,</span> <span class="n">trial</span><span class="o">=</span><span class="n">trial</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_strategy</span> <span class="o">==</span> <span class="n">SaveStrategy</span><span class="o">.</span><span class="n">BEST</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_save</span> <span class="o">=</span> <span class="n">is_new_best_metric</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_save_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="n">metrics</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_save_checkpoint</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">control</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">callback_handler</span><span class="o">.</span><span class="n">on_save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">control</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_load_rng_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">checkpoint</span><span class="p">):</span>
@@ -3149,7 +3196,8 @@
                 <span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="n">checkpoint_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rng_file</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">safe_globals</span><span class="p">():</span>
+            <span class="n">checkpoint_rng_state</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">rng_file</span><span class="p">)</span>
         <span class="n">random</span><span class="o">.</span><span class="n">setstate</span><span class="p">(</span><span class="n">checkpoint_rng_state</span><span class="p">[</span><span class="s2">&quot;python&quot;</span><span class="p">])</span>
         <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_state</span><span class="p">(</span><span class="n">checkpoint_rng_state</span><span class="p">[</span><span class="s2">&quot;numpy&quot;</span><span class="p">])</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">set_rng_state</span><span class="p">(</span><span class="n">checkpoint_rng_state</span><span class="p">[</span><span class="s2">&quot;cpu&quot;</span><span class="p">])</span>
@@ -3200,7 +3248,48 @@
                         <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">This won&#39;t yield the same results as if the training had not been interrupted.&quot;</span>
                     <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">_save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">,</span> <span class="n">metrics</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_determine_best_metric</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">metrics</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determine if the model should be saved based on the evaluation metrics.</span>
+<span class="sd">        If args.metric_for_best_model is not set, the loss is used.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            bool: True if a new best metric was found, else False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">is_new_best_metric</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">metric_for_best_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">metric_to_check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">metric_for_best_model</span>
+
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_to_check</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;eval_&quot;</span><span class="p">):</span>
+                <span class="n">metric_to_check</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;eval_</span><span class="si">{</span><span class="n">metric_to_check</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">metric_value</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">metric_to_check</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;The `metric_for_best_model` training argument is set to &#39;</span><span class="si">{</span><span class="n">metric_to_check</span><span class="si">}</span><span class="s2">&#39;, which is not found in the evaluation metrics. &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;The available evaluation metrics are: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">. Consider changing the `metric_for_best_model` via the TrainingArguments.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
+
+            <span class="n">operator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">greater</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">greater_is_better</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span>
+
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;-inf&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">greater_is_better</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">operator</span><span class="p">(</span><span class="n">metric_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span><span class="p">):</span>
+                <span class="n">run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_output_dir</span><span class="p">(</span><span class="n">trial</span><span class="o">=</span><span class="n">trial</span><span class="p">)</span>
+                <span class="n">checkpoint_folder</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">PREFIX_CHECKPOINT_DIR</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">output_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">checkpoint_folder</span><span class="p">)</span>
+
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span> <span class="o">=</span> <span class="n">metric_value</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span> <span class="o">=</span> <span class="n">output_dir</span>
+
+                <span class="n">is_new_best_metric</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="k">return</span> <span class="n">is_new_best_metric</span>
+
+    <span class="k">def</span> <span class="nf">_save_checkpoint</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model</span><span class="p">,</span> <span class="n">trial</span><span class="p">):</span>
         <span class="c1"># In all cases, including ddp/dp/deepspeed, self.model is always a reference to the model we</span>
         <span class="c1"># want to save except FullyShardedDDP.</span>
         <span class="c1"># assert unwrap_model(model) is self.model, &quot;internal model should be a reference to self.model&quot;</span>
@@ -3220,31 +3309,6 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_optimizer_and_scheduler</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
             <span class="c1"># Save RNG state</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_save_rng_state</span><span class="p">(</span><span class="n">output_dir</span><span class="p">)</span>
-
-        <span class="c1"># Determine the new best metric / best model checkpoint</span>
-        <span class="k">if</span> <span class="n">metrics</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">metric_for_best_model</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">metric_to_check</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">metric_for_best_model</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">metric_to_check</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;eval_&quot;</span><span class="p">):</span>
-                <span class="n">metric_to_check</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;eval_</span><span class="si">{</span><span class="n">metric_to_check</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">metric_value</span> <span class="o">=</span> <span class="n">metrics</span><span class="p">[</span><span class="n">metric_to_check</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;The `metric_for_best_model` training argument is set to &#39;</span><span class="si">{</span><span class="n">metric_to_check</span><span class="si">}</span><span class="s2">&#39;, &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;which is not found in the evaluation metrics. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;The available evaluation metrics are: </span><span class="si">{</span><span class="nb">list</span><span class="p">(</span><span class="n">metrics</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span><span class="si">}</span><span class="s2">. &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Please ensure that the `compute_metrics` function returns a dictionary that includes &#39;</span><span class="si">{</span><span class="n">metric_to_check</span><span class="si">}</span><span class="s2">&#39; or &quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;consider changing the `metric_for_best_model` via the TrainingArguments.&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">exc</span>
-
-            <span class="n">operator</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">greater</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">greater_is_better</span> <span class="k">else</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span>
-            <span class="k">if</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span> <span class="ow">is</span> <span class="kc">None</span>
-                <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span> <span class="ow">is</span> <span class="kc">None</span>
-                <span class="ow">or</span> <span class="n">operator</span><span class="p">(</span><span class="n">metric_value</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span><span class="p">)</span>
-            <span class="p">):</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_metric</span> <span class="o">=</span> <span class="n">metric_value</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">best_model_checkpoint</span> <span class="o">=</span> <span class="n">output_dir</span>
 
         <span class="c1"># Save the Trainer state</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">should_save</span><span class="p">:</span>
@@ -3561,13 +3625,18 @@
 <span class="sd">            hp_name (`Callable[[&quot;optuna.Trial&quot;], str]]`, *optional*):</span>
 <span class="sd">                A function that defines the trial/run name. Will default to None.</span>
 <span class="sd">            kwargs (`Dict[str, Any]`, *optional*):</span>
-<span class="sd">                Additional keyword arguments passed along to `optuna.create_study` or `ray.tune.run`. For more</span>
-<span class="sd">                information see:</span>
+<span class="sd">                Additional keyword arguments for each backend:</span>
 
-<span class="sd">                - the documentation of</span>
-<span class="sd">                  [optuna.create_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html)</span>
-<span class="sd">                - the documentation of [tune.run](https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run)</span>
-<span class="sd">                - the documentation of [sigopt](https://app.sigopt.com/docs/endpoints/experiments/create)</span>
+<span class="sd">                - `optuna`: parameters from</span>
+<span class="sd">                  [optuna.study.create_study](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html)</span>
+<span class="sd">                  and also the parameters `timeout`, `n_jobs` and `gc_after_trial` from</span>
+<span class="sd">                  [optuna.study.Study.optimize](https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize)</span>
+<span class="sd">                - `ray`: parameters from [tune.run](https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run).</span>
+<span class="sd">                  If `resources_per_trial` is not set in the `kwargs`, it defaults to 1 CPU core and 1 GPU (if available).</span>
+<span class="sd">                  If `progress_reporter` is not set in the `kwargs`,</span>
+<span class="sd">                  [ray.tune.CLIReporter](https://docs.ray.io/en/latest/tune/api/doc/ray.tune.CLIReporter.html) is used.</span>
+<span class="sd">                - `sigopt`: the parameter `proxies` from</span>
+<span class="sd">                  [sigopt.Connection.set_proxies](https://docs.sigopt.com/support/faq#how-do-i-use-sigopt-with-a-proxy).</span>
 
 <span class="sd">        Returns:</span>
 <span class="sd">            [`trainer_utils.BestRun` or `List[trainer_utils.BestRun]`]: All the information about the best run or best</span>
@@ -3594,7 +3663,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">hp_search_backend</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">return</span> <span class="n">best_run</span></div>
 
-    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">float</span><span class="p">],</span> <span class="n">start_time</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Log `logs` on the various objects watching training.</span>
 
@@ -3603,11 +3672,15 @@
 <span class="sd">        Args:</span>
 <span class="sd">            logs (`Dict[str, float]`):</span>
 <span class="sd">                The values to log.</span>
+<span class="sd">            start_time (`Optional[float]`):</span>
+<span class="sd">                The start of training.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">logs</span><span class="p">[</span><span class="s2">&quot;epoch&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">include_num_input_tokens_seen</span><span class="p">:</span>
             <span class="n">logs</span><span class="p">[</span><span class="s2">&quot;num_input_tokens_seen&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">num_input_tokens_seen</span>
+            <span class="k">if</span> <span class="n">start_time</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">speed_metrics</span><span class="p">(</span><span class="s2">&quot;train&quot;</span><span class="p">,</span> <span class="n">start_time</span><span class="p">,</span> <span class="n">num_tokens</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">num_input_tokens_seen</span><span class="p">)</span>
 
         <span class="n">output</span> <span class="o">=</span> <span class="p">{</span><span class="o">**</span><span class="n">logs</span><span class="p">,</span> <span class="o">**</span><span class="p">{</span><span class="s2">&quot;step&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="p">}}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">log_history</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">output</span><span class="p">)</span>
@@ -3695,7 +3768,10 @@
             <span class="k">return</span> <span class="n">loss_mb</span><span class="o">.</span><span class="n">reduce_mean</span><span class="p">()</span><span class="o">.</span><span class="n">detach</span><span class="p">()</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
         <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss_context_manager</span><span class="p">():</span>
-            <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">num_items_in_batch</span><span class="o">=</span><span class="n">num_items_in_batch</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">model_accepts_loss_kwargs</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">loss</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">compute_loss</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">inputs</span><span class="p">,</span> <span class="n">num_items_in_batch</span><span class="o">=</span><span class="n">num_items_in_batch</span><span class="p">)</span>
 
         <span class="k">del</span> <span class="n">inputs</span>
         <span class="k">if</span> <span class="p">(</span>
@@ -4670,7 +4746,7 @@
         <span class="c1"># Same for the training arguments</span>
         <span class="n">torch</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_dir</span><span class="p">,</span> <span class="n">TRAINING_ARGS_NAME</span><span class="p">))</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_strategy</span> <span class="o">==</span> <span class="n">IntervalStrategy</span><span class="o">.</span><span class="n">STEPS</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">.</span><span class="n">save_strategy</span> <span class="o">==</span> <span class="n">SaveStrategy</span><span class="o">.</span><span class="n">STEPS</span><span class="p">:</span>
             <span class="n">commit_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Training in progress, step </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">global_step</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">commit_message</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Training in progress, epoch </span><span class="si">{</span><span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">epoch</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -4844,7 +4920,17 @@
             <span class="k">elif</span> <span class="n">args</span><span class="o">.</span><span class="n">bf16_full_eval</span><span class="p">:</span>
                 <span class="n">model</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">to</span><span class="p">(</span><span class="n">dtype</span><span class="o">=</span><span class="n">torch</span><span class="o">.</span><span class="n">bfloat16</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">device</span><span class="p">)</span>
 
-        <span class="n">batch_size</span> <span class="o">=</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">batch_size</span>
+        <span class="n">batch_size</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">dataloader</span><span class="o">.</span><span class="n">total_batch_size</span>
+            <span class="k">if</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">dataloader</span><span class="p">,</span> <span class="s2">&quot;_is_accelerate_prepared&quot;</span><span class="p">,</span> <span class="kc">False</span><span class="p">)</span>
+            <span class="k">else</span> <span class="n">dataloader</span><span class="o">.</span><span class="n">batch_size</span>
+        <span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">batch_size</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Batch size cannot be None. Ensure the dataloader has a valid batch_size or total_batch_size.&quot;</span>
+            <span class="p">)</span>
+
         <span class="n">num_examples</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">num_examples</span><span class="p">(</span><span class="n">dataloader</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">***** Running </span><span class="si">{</span><span class="n">description</span><span class="si">}</span><span class="s2"> *****&quot;</span><span class="p">)</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;  Num examples = </span><span class="si">{</span><span class="n">num_examples</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>

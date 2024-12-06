@@ -372,7 +372,7 @@ when pushing to a given organization.</p></li>
 <li><p><strong>use_temp_dir</strong> (<cite>bool</cite>, <em>optional</em>) – Whether or not to use a temporary directory to store the files saved before they are pushed to the Hub.
 Will default to <cite>True</cite> if there is no directory named like <cite>repo_id</cite>, <cite>False</cite> otherwise.</p></li>
 <li><p><strong>commit_message</strong> (<cite>str</cite>, <em>optional</em>) – Message to commit while pushing. Will default to <cite>“Upload model”</cite>.</p></li>
-<li><p><strong>private</strong> (<cite>bool</cite>, <em>optional</em>) – Whether or not the repository created should be private.</p></li>
+<li><p><strong>private</strong> (<cite>bool</cite>, <em>optional</em>) – Whether to make the repo private. If <cite>None</cite> (default), the repo will be public unless the organization’s default is private. This value is ignored if the repo already exists.</p></li>
 <li><p><strong>token</strong> (<cite>bool</cite> or <cite>str</cite>, <em>optional</em>) – The token to use as HTTP bearer authorization for remote files. If <cite>True</cite>, will use the token generated
 when running <cite>huggingface-cli login</cite> (stored in <cite>~/.huggingface</cite>). Will default to <cite>True</cite> if <cite>repo_url</cite>
 is not specified.</p></li>

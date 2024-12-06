@@ -380,13 +380,18 @@ several metrics. If it’s multi objectives optimization, direction is <cite>Lis
 <li><p><strong>backend</strong> (<cite>str</cite> or [<cite>~training_utils.HPSearchBackend</cite>], <em>optional</em>) – The backend to use for hyperparameter search. Will default to optuna or Ray Tune or SigOpt, depending
 on which one is installed. If all are installed, will default to optuna.</p></li>
 <li><p><strong>hp_name</strong> (<cite>Callable[[“optuna.Trial”], str]]</cite>, <em>optional</em>) – A function that defines the trial/run name. Will default to None.</p></li>
-<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – <p>Additional keyword arguments passed along to <cite>optuna.create_study</cite> or <cite>ray.tune.run</cite>. For more
-information see:</p>
+<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – <p>Additional keyword arguments for each backend:</p>
 <ul>
-<li><p>the documentation of
-[optuna.create_study](<a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html">https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html</a>)</p></li>
-<li><p>the documentation of [tune.run](<a class="reference external" href="https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run">https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run</a>)</p></li>
-<li><p>the documentation of [sigopt](<a class="reference external" href="https://app.sigopt.com/docs/endpoints/experiments/create">https://app.sigopt.com/docs/endpoints/experiments/create</a>)</p></li>
+<li><p><cite>optuna</cite>: parameters from
+[optuna.study.create_study](<a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html">https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html</a>)
+and also the parameters <cite>timeout</cite>, <cite>n_jobs</cite> and <cite>gc_after_trial</cite> from
+[optuna.study.Study.optimize](<a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize">https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.Study.html#optuna.study.Study.optimize</a>)</p></li>
+<li><p><cite>ray</cite>: parameters from [tune.run](<a class="reference external" href="https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run">https://docs.ray.io/en/latest/tune/api_docs/execution.html#tune-run</a>).
+If <cite>resources_per_trial</cite> is not set in the <cite>kwargs</cite>, it defaults to 1 CPU core and 1 GPU (if available).
+If <cite>progress_reporter</cite> is not set in the <cite>kwargs</cite>,
+[ray.tune.CLIReporter](<a class="reference external" href="https://docs.ray.io/en/latest/tune/api/doc/ray.tune.CLIReporter.html">https://docs.ray.io/en/latest/tune/api/doc/ray.tune.CLIReporter.html</a>) is used.</p></li>
+<li><p><cite>sigopt</cite>: the parameter <cite>proxies</cite> from
+[sigopt.Connection.set_proxies](<a class="reference external" href="https://docs.sigopt.com/support/faq#how-do-i-use-sigopt-with-a-proxy">https://docs.sigopt.com/support/faq#how-do-i-use-sigopt-with-a-proxy</a>).</p></li>
 </ul>
 </p></li>
 </ul>
