@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.7.0]
+
+### Fixed
+
+- Fixed compatibility with `transformers` v4.47+.
+
 ## [1.6.0]
 
 ### Fixed
