@@ -131,7 +131,7 @@
 <section id="Initializing-a-new-model">
 <h3>Initializing a new model<a class="headerlink" href="#Initializing-a-new-model" title="Permalink to this heading">¶</a></h3>
 <p>A new model is initialized using a pretrained encoder, e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>. See <a class="reference internal" href="model_training.html#Initializing-a-SpanMarkerModel"><span class="std std-ref">Initializing &amp; Training</span></a> for details on valid encoders. Additionally, a new SpanMarker model <strong>must</strong> be initialized using a list of string labels. These labels can have the IOB, IOB2, BIOES or BILOU labeling scheme, or no scheme at all. For example:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;bert-base-cased&quot;</span>
 <span class="n">labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;O&quot;</span><span class="p">,</span> <span class="s2">&quot;B-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;I-PER&quot;</span><span class="p">,</span> <span class="s2">&quot;B-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;I-ORG&quot;</span><span class="p">,</span> <span class="s2">&quot;B-LOC&quot;</span><span class="p">,</span> <span class="s2">&quot;I-LOC&quot;</span><span class="p">,</span> <span class="s2">&quot;B-MISC&quot;</span><span class="p">,</span> <span class="s2">&quot;I-MISC&quot;</span><span class="p">]</span>
@@ -153,7 +153,7 @@
 <h3>Initializing a pretrained model<a class="headerlink" href="#Initializing-a-pretrained-model" title="Permalink to this heading">¶</a></h3>
 <p>A pretrained model is initialized in the same way as a new model, but most of the valuable parameters will have already been set when the model was originally initialized, trained and saved. As a result, we do not need to specify the labels anymore. Beyond that, we need to be careful with providing configuration parameters that differ from the parameters used to train the model. We may degrade model performance otherwise.</p>
 <p>Loading a pretrained SpanMarker model usually looks like this:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="n">model_name</span> <span class="o">=</span> <span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="n">model_name</span><span class="p">)</span>
@@ -201,7 +201,7 @@
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

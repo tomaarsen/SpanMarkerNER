@@ -173,7 +173,7 @@ class SpanMarkerTokenizer:
         try:
             return super().__getattribute__(key)
         except AttributeError:
-            return super().__getattribute__("tokenizer").__getattribute__(key)
+            return getattr(super().__getattribute__("tokenizer"), key)
 
     def __call__(
         self, batch: Dict[str, List[Any]], return_num_words: bool = False, return_batch_encoding=False, **kwargs

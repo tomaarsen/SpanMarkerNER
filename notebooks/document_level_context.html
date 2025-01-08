@@ -136,7 +136,7 @@
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span><span class="p">,</span> <span class="n">Dataset</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span><span class="p">,</span> <span class="n">Dataset</span>
 
 <span class="c1"># Load the dataset from the Hub and throw away the non-NER columns</span>
 <span class="n">dataset</span> <span class="o">=</span> <span class="n">load_dataset</span><span class="p">(</span><span class="s2">&quot;tomaarsen/conll2003&quot;</span><span class="p">,</span> <span class="n">split</span><span class="o">=</span><span class="s2">&quot;train&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">((</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="s2">&quot;chunk_tags&quot;</span><span class="p">,</span> <span class="s2">&quot;pos_tags&quot;</span><span class="p">))</span>
@@ -415,7 +415,7 @@ as context. By default, these are set to <code class="docutils literal notransla
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="c1"># An example encoder and example labels</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
@@ -610,7 +610,7 @@ Dataset({
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-xlm-roberta-large-conll03-doc-context&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">try_cuda</span><span class="p">()</span>
 <span class="n">entities</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
@@ -687,7 +687,7 @@ Dataset({
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

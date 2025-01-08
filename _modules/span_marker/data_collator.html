@@ -117,18 +117,18 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.data_collator</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
-<span class="kn">from</span> <span class="nn">dataclasses</span> <span class="kn">import</span> <span class="n">dataclass</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">collections</span><span class="w"> </span><span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataclasses</span><span class="w"> </span><span class="kn">import</span> <span class="n">dataclass</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">torch.nn</span> <span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.nn</span><span class="w"> </span><span class="kn">import</span> <span class="n">functional</span> <span class="k">as</span> <span class="n">F</span>
 
-<span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
 
 
 <div class="viewcode-block" id="SpanMarkerDataCollator"><a class="viewcode-back" href="../../api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator">[docs]</a><span class="nd">@dataclass</span>
-<span class="k">class</span> <span class="nc">SpanMarkerDataCollator</span><span class="p">:</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">SpanMarkerDataCollator</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Data Collator class responsible for converting the minimal outputs from the tokenizer into</span>
 <span class="sd">    complete and meaningful inputs to the model. In particular, the ``input_ids`` from the tokenizer</span>
@@ -150,7 +150,7 @@
     <span class="n">tokenizer</span><span class="p">:</span> <span class="n">SpanMarkerTokenizer</span>
     <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span>
 
-<div class="viewcode-block" id="SpanMarkerDataCollator.__call__"><a class="viewcode-back" href="../../api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
+<div class="viewcode-block" id="SpanMarkerDataCollator.__call__"><a class="viewcode-back" href="../../api/span_marker.data_collator.html#span_marker.data_collator.SpanMarkerDataCollator.__call__">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">features</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">torch</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Convert the minimal tokenizer outputs into inputs ready for :meth:`~span_marker.modeling.SpanMarkerModel.forward`.</span>
 
 <span class="sd">        Args:</span>
@@ -266,7 +266,7 @@
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

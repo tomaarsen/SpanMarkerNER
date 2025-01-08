@@ -117,34 +117,34 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.trainer</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">dataclasses</span>
-<span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">import</span> <span class="nn">math</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">dataclasses</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">math</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">torch.utils.data</span> <span class="kn">import</span> <span class="n">DataLoader</span>
-<span class="kn">from</span> <span class="nn">tqdm.autonotebook</span> <span class="kn">import</span> <span class="n">tqdm</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="p">(</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">torch.utils.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataLoader</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">tqdm.autonotebook</span><span class="w"> </span><span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
     <span class="n">EvalPrediction</span><span class="p">,</span>
     <span class="n">TrainerCallback</span><span class="p">,</span>
     <span class="n">TrainingArguments</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">Trainer</span> <span class="k">as</span> <span class="n">TransformersTrainer</span>
-<span class="kn">from</span> <span class="nn">transformers.trainer_utils</span> <span class="kn">import</span> <span class="n">PredictionOutput</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">Trainer</span> <span class="k">as</span> <span class="n">TransformersTrainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers.trainer_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">PredictionOutput</span>
 
-<span class="kn">from</span> <span class="nn">span_marker.evaluation</span> <span class="kn">import</span> <span class="n">compute_f1_via_seqeval</span>
-<span class="kn">from</span> <span class="nn">span_marker.label_normalizer</span> <span class="kn">import</span> <span class="n">AutoLabelNormalizer</span><span class="p">,</span> <span class="n">LabelNormalizer</span>
-<span class="kn">from</span> <span class="nn">span_marker.model_card</span> <span class="kn">import</span> <span class="n">ModelCardCallback</span>
-<span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
-<span class="kn">from</span> <span class="nn">span_marker.tokenizer</span> <span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.evaluation</span><span class="w"> </span><span class="kn">import</span> <span class="n">compute_f1_via_seqeval</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.label_normalizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">AutoLabelNormalizer</span><span class="p">,</span> <span class="n">LabelNormalizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.model_card</span><span class="w"> </span><span class="kn">import</span> <span class="n">ModelCardCallback</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.modeling</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.tokenizer</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerTokenizer</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="Trainer"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer">[docs]</a><span class="k">class</span> <span class="nc">Trainer</span><span class="p">(</span><span class="n">TransformersTrainer</span><span class="p">):</span>
+<div class="viewcode-block" id="Trainer"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">Trainer</span><span class="p">(</span><span class="n">TransformersTrainer</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Trainer is a simple but feature-complete training and eval loop for SpanMarker,</span>
 <span class="sd">    built tightly on top of the 🤗 Transformers :external:doc:`Trainer &lt;main_classes/trainer&gt;`.</span>
@@ -205,7 +205,7 @@
     <span class="n">REQUIRED_COLUMNS</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">,</span> <span class="s2">&quot;ner_tags&quot;</span><span class="p">)</span>
     <span class="n">OPTIONAL_COLUMNS</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;document_id&quot;</span><span class="p">,</span> <span class="s2">&quot;sentence_id&quot;</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">SpanMarkerModel</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">args</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TrainingArguments</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -282,7 +282,7 @@
         <span class="c1"># and evaluation results</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">add_callback</span><span class="p">(</span><span class="n">ModelCardCallback</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
 
-<div class="viewcode-block" id="Trainer.preprocess_dataset"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">preprocess_dataset</span><span class="p">(</span>
+<div class="viewcode-block" id="Trainer.preprocess_dataset"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.preprocess_dataset">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">preprocess_dataset</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
         <span class="n">label_normalizer</span><span class="p">:</span> <span class="n">LabelNormalizer</span><span class="p">,</span>
@@ -395,7 +395,7 @@
         <span class="k">return</span> <span class="n">dataset</span></div>
 
 <div class="viewcode-block" id="Trainer.add_context"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.add_context">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">add_context</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">add_context</span><span class="p">(</span>
         <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span>
         <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">max_prev_context</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -485,7 +485,7 @@
         <span class="k">return</span> <span class="n">dataset</span></div>
 
 <div class="viewcode-block" id="Trainer.spread_sample"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.spread_sample">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">spread_sample</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">spread_sample</span><span class="p">(</span>
         <span class="n">batch</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]],</span> <span class="n">model_max_length</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">marker_max_length</span><span class="p">:</span> <span class="nb">int</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Spread sentences between multiple samples if lack of space per sample requires it.</span>
@@ -523,12 +523,12 @@
                     <span class="n">batch_samples</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">batch_samples</span></div>
 
-    <span class="k">def</span> <span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_train_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed training DataLoader.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_dataset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">train_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_train_dataloader</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">get_eval_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_eval_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eval_dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed evaluation DataLoader.&quot;&quot;&quot;</span>
         <span class="n">eval_dataset</span> <span class="o">=</span> <span class="n">eval_dataset</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_dataset</span>
         <span class="k">if</span> <span class="n">eval_dataset</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
@@ -537,14 +537,14 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_eval_dataloader</span><span class="p">(</span><span class="n">eval_dataset</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">get_test_dataloader</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">DataLoader</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Return the preprocessed evaluation DataLoader.&quot;&quot;&quot;</span>
         <span class="n">test_dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">preprocess_dataset</span><span class="p">(</span>
             <span class="n">test_dataset</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">label_normalizer</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">,</span> <span class="n">dataset_name</span><span class="o">=</span><span class="s2">&quot;test&quot;</span><span class="p">,</span> <span class="n">is_evaluate</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">get_test_dataloader</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">predict</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">test_dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;test&quot;</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">PredictionOutput</span><span class="p">:</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
@@ -553,7 +553,7 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">test_dataset</span><span class="p">,</span> <span class="n">ignore_keys</span><span class="p">,</span> <span class="n">metric_key_prefix</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Trainer.create_model_card"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.create_model_card">[docs]</a>    <span class="k">def</span> <span class="nf">create_model_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="Trainer.create_model_card"><a class="viewcode-back" href="../../api/span_marker.trainer.html#span_marker.trainer.Trainer.create_model_card">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">create_model_card</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">_args</span><span class="p">,</span> <span class="o">**</span><span class="n">_kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates a draft of a model card using the information available to the `Trainer`,</span>
 <span class="sd">        the `SpanMarkerModel` and the `SpanMarkerModelCardData`.</span>
@@ -579,7 +579,7 @@
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

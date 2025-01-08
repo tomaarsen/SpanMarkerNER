@@ -117,19 +117,19 @@
         <div id="main-content" role="main">
           
   <h1>Source code for span_marker.spacy_integration</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">types</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">types</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">torch</span>
-<span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">spacy.tokens</span> <span class="kn">import</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">Span</span>
-<span class="kn">from</span> <span class="nn">spacy.util</span> <span class="kn">import</span> <span class="n">filter_spans</span><span class="p">,</span> <span class="n">minibatch</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">torch</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spacy.tokens</span><span class="w"> </span><span class="kn">import</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">Span</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">spacy.util</span><span class="w"> </span><span class="kn">import</span> <span class="n">filter_spans</span><span class="p">,</span> <span class="n">minibatch</span>
 
-<span class="kn">from</span> <span class="nn">span_marker.modeling</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker.modeling</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 
-<div class="viewcode-block" id="SpacySpanMarkerWrapper"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper">[docs]</a><span class="k">class</span> <span class="nc">SpacySpanMarkerWrapper</span><span class="p">:</span>
+<div class="viewcode-block" id="SpacySpanMarkerWrapper"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper">[docs]</a><span class="k">class</span><span class="w"> </span><span class="nc">SpacySpanMarkerWrapper</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;This wrapper allows SpanMarker to be used as a drop-in replacement of the &quot;ner&quot; pipeline component.</span>
 
 <span class="sd">    Usage:</span>
@@ -168,7 +168,7 @@
 <span class="sd">        (30 BCE, &#39;DATE&#39;)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">pretrained_model_name_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">PathLike</span><span class="p">],</span>
         <span class="o">*</span><span class="n">args</span><span class="p">,</span>
@@ -197,7 +197,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_entities</span> <span class="o">=</span> <span class="n">overwrite_entities</span>
 
 <div class="viewcode-block" id="SpacySpanMarkerWrapper.convert_inputs_to_dataset"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.convert_inputs_to_dataset">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">convert_inputs_to_dataset</span><span class="p">(</span><span class="n">inputs</span><span class="p">):</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="n">Dataset</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span>
             <span class="p">{</span>
                 <span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">inputs</span><span class="p">,</span>
@@ -207,13 +207,13 @@
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">inputs</span></div>
 
-<div class="viewcode-block" id="SpacySpanMarkerWrapper.set_ents"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.set_ents">[docs]</a>    <span class="k">def</span> <span class="nf">set_ents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Span</span><span class="p">]):</span>
+<div class="viewcode-block" id="SpacySpanMarkerWrapper.set_ents"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.set_ents">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">set_ents</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">,</span> <span class="n">ents</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Span</span><span class="p">]):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">overwrite_entities</span><span class="p">:</span>
             <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">ents</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">doc</span><span class="o">.</span><span class="n">set_ents</span><span class="p">(</span><span class="n">filter_spans</span><span class="p">(</span><span class="n">ents</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">ents</span><span class="p">)))</span></div>
 
-    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Doc</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">doc</span><span class="p">:</span> <span class="n">Doc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Doc</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill `doc.ents` and `span.label_` using the chosen SpanMarker model.&quot;&quot;&quot;</span>
         <span class="n">sents</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">doc</span><span class="o">.</span><span class="n">sents</span><span class="p">)</span>
         <span class="n">inputs</span> <span class="o">=</span> <span class="p">[[</span><span class="n">token</span><span class="o">.</span><span class="n">text</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">token</span><span class="o">.</span><span class="n">is_space</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span> <span class="k">for</span> <span class="n">token</span> <span class="ow">in</span> <span class="n">sent</span><span class="p">]</span> <span class="k">for</span> <span class="n">sent</span> <span class="ow">in</span> <span class="n">sents</span><span class="p">]</span>
@@ -236,7 +236,7 @@
 
         <span class="k">return</span> <span class="n">doc</span>
 
-<div class="viewcode-block" id="SpacySpanMarkerWrapper.pipe"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.pipe">[docs]</a>    <span class="k">def</span> <span class="nf">pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
+<div class="viewcode-block" id="SpacySpanMarkerWrapper.pipe"><a class="viewcode-back" href="../../api/span_marker.spacy_integration.html#span_marker.spacy_integration.SpacySpanMarkerWrapper.pipe">[docs]</a>    <span class="k">def</span><span class="w"> </span><span class="nf">pipe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">stream</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;Fill `doc.ents` and `span.label_` using the chosen SpanMarker model.&quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">stream</span> <span class="o">=</span> <span class="p">[</span><span class="n">stream</span><span class="p">]</span>
@@ -306,7 +306,7 @@
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

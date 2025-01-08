@@ -212,9 +212,9 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 <h1>Quick Reference<a class="headerlink" href="#quick-reference" title="Permalink to this heading">¶</a></h1>
 <section id="how-to-train">
 <h2>How to Train<a class="headerlink" href="#how-to-train" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">datasets</span> <span class="kn">import</span> <span class="n">load_dataset</span>
-<span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
-<span class="kn">from</span> <span class="nn">transformers</span> <span class="kn">import</span> <span class="n">TrainingArguments</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">datasets</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_dataset</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span><span class="p">,</span> <span class="n">Trainer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">transformers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TrainingArguments</span>
 
 <span class="c1"># The dataset labels can have a tagging schemed (IOB, IOB2, BIOES),</span>
 <span class="c1"># but that is not necessary. This dataset has no tagging scheme:</span>
@@ -264,7 +264,7 @@ Feel free to ⭐ star or watch the <a class="reference external" href="https://g
 </section>
 <section id="how-to-predict">
 <h2>How to predict<a class="headerlink" href="#how-to-predict" title="Permalink to this heading">¶</a></h2>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">SpanMarkerModel</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">SpanMarkerModel</span>
 
 <span class="c1"># Load a finetuned SpanMarkerModel from the 🤗 Hub</span>
 <span class="n">model</span> <span class="o">=</span> <span class="n">SpanMarkerModel</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span><span class="s2">&quot;tomaarsen/span-marker-bert-base-fewnerd-fine-super&quot;</span><span class="p">)</span>
@@ -363,7 +363,7 @@ much like in 🤗 Transformers.</p>
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 

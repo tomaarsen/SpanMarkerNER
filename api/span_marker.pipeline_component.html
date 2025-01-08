@@ -128,7 +128,7 @@
 <code class="docutils literal notranslate"><span class="pre">from</span> <span class="pre">transformers</span> <span class="pre">import</span> <span class="pre">pipeline</span></code>, but you must also import <code class="docutils literal notranslate"><span class="pre">span_marker</span></code> to register the
 <code class="docutils literal notranslate"><span class="pre">&quot;span-marker&quot;</span></code> pipeline task.</p>
 <p>Example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">span_marker</span> <span class="kn">import</span> <span class="n">pipeline</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">span_marker</span><span class="w"> </span><span class="kn">import</span> <span class="n">pipeline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipe</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">task</span><span class="o">=</span><span class="s2">&quot;span-marker&quot;</span><span class="p">,</span> <span class="n">model</span><span class="o">=</span><span class="s2">&quot;tomaarsen/span-marker-mbert-base-multinerd&quot;</span><span class="p">,</span> <span class="n">device_map</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipe</span><span class="p">(</span><span class="s2">&quot;Amelia Earhart flew her single engine Lockheed Vega 5B across the Atlantic to Paris.&quot;</span><span class="p">)</span>
 <span class="go">[{&#39;span&#39;: &#39;Amelia Earhart&#39;, &#39;label&#39;: &#39;PER&#39;, &#39;score&#39;: 0.9999709129333496, &#39;char_start_index&#39;: 0, &#39;char_end_index&#39;: 14},</span>
@@ -183,7 +183,7 @@
 
         
             <div id="copyright">
-                &copy; 2024, Tom Aarsen
+                &copy; 2025, Tom Aarsen
             </div>
         
 
