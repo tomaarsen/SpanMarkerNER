@@ -13,6 +13,7 @@ from span_marker.configuration import SpanMarkerConfig
 from span_marker.model_card import SpanMarkerModelCardData
 from span_marker.modeling import SpanMarkerModel
 from span_marker.pipeline_component import SpanMarkerPipeline
+from span_marker.data_collator import SpanMarkerDataCollator
 from span_marker.trainer import Trainer
 
 # Set up for Transformers
