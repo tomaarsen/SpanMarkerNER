@@ -117,6 +117,8 @@ class SpanMarkerConfig(PretrainedConfig):
                 return super().__getattribute__("encoder")[key]
             except KeyError:
                 raise e
+            except TypeError:
+                raise e
 
     def are_labels_schemed(self) -> bool:
         """True if all labels are strings matching one of the two following rules:
