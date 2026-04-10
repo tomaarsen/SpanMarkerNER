@@ -251,9 +251,14 @@ class SpanMarkerModel(PreTrainedModel):
         """
         # If loading a SpanMarkerConfig, then we don't want to override id2label and label2id
         # Create an encoder or SpanMarker config
+        # Pop `dtype` before passing to AutoConfig, as it's a model loading parameter
+        # that would otherwise override the config's saved dtype with the string "auto"
+        dtype = kwargs.pop("dtype", None)
         config: PretrainedConfig = config or AutoConfig.from_pretrained(
             pretrained_model_name_or_path, *model_args, **kwargs
         )
+        if dtype is not None:
+            kwargs["dtype"] = dtype
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         loading_span_marker = isinstance(config, cls.config_class)
@@ -306,7 +311,7 @@ class SpanMarkerModel(PreTrainedModel):
         # Since transformers 4.32.0 we should use `pad_to_multiple_of=8`.
         # That'll fail for earlier versions, so we try-except it.
         try:
-            model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+            model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8, mean_resizing=False)
         except TypeError:
             model.resize_token_embeddings(len(tokenizer))
         return model
@@ -457,7 +462,7 @@ class SpanMarkerModel(PreTrainedModel):
 
         # Tokenize & add start/end markers
         tokenizer_dict = self.tokenizer(
-            {"tokens": dataset["tokens"]}, return_num_words=True, return_batch_encoding=True
+            {"tokens": list(dataset["tokens"])}, return_num_words=True, return_batch_encoding=True
         )
         batch_encoding = tokenizer_dict.pop("batch_encoding")
         dataset = dataset.remove_columns("tokens")

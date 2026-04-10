@@ -38,7 +38,7 @@ def test_model_card(fewnwerd_coarse_dataset_dict: DatasetDict, tmp_path: Path) -
         report_to="codecarbon",
         eval_steps=1,
         per_device_train_batch_size=1,
-        evaluation_strategy="steps",
+        eval_strategy="steps",  # Or `evaluation_strategy` if your `transformers<4.54.1`
         num_train_epochs=1,
     )
     trainer = Trainer(
@@ -103,10 +103,11 @@ def test_is_on_huggingface_edge_case() -> None:
     assert not is_on_huggingface("a/test/value")
 
 
-@pytest.mark.parametrize("dataset_id", ("eriktks/conll2003", "tomaarsen/conll2003"))
+# "eriktks/conll2003" uses dataset loading scripts, removed from `datasets` >= 4.0.
+@pytest.mark.parametrize("dataset_id", ("tomaarsen/conll2003",))
 def test_infer_dataset_id(dataset_id: str) -> None:
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS)
-    train_dataset = load_dataset(dataset_id, split="train", trust_remote_code=True)
+    train_dataset = load_dataset(dataset_id, split="train")
 
     # This triggers inferring the dataset_id from train_dataset
     Trainer(model=model, train_dataset=train_dataset)
