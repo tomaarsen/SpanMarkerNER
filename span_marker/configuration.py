@@ -114,7 +114,10 @@ class SpanMarkerConfig(PretrainedConfig):
             return super().__getattribute__(key)
         except AttributeError as e:
             try:
-                return super().__getattribute__("encoder")[key]
+                encoder = super().__getattribute__("encoder")
+                if encoder is None:
+                    raise e
+                return encoder[key]
             except KeyError:
                 raise e
 
