@@ -140,11 +140,11 @@ def test_correct_predictions(
             ),
             [
                 [
-                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29},
-                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50},
+                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29, "document_id": 0, "sentence_id": 0},
+                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50, "document_id": 0, "sentence_id": 0},
                 ],
-                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14}],
-                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26}],
+                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14, "document_id": 0, "sentence_id": 1}],
+                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26, "document_id": 0, "sentence_id": 2}],
                 [],
             ],
         ),
@@ -163,11 +163,11 @@ def test_correct_predictions(
             ),
             [
                 [
-                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29},
-                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50},
+                    {"span": "Netherlands", "label": "LOC", "char_start_index": 18, "char_end_index": 29, "document_id": 0, "sentence_id": 0},
+                    {"span": "Spain", "label": "LOC", "char_start_index": 45, "char_end_index": 50, "document_id": 0, "sentence_id": 0},
                 ],
-                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14}],
-                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26}],
+                [{"span": "Tom", "label": "PER", "char_start_index": 11, "char_end_index": 14, "document_id": 1, "sentence_id": 0}],
+                [{"span": "Paris", "label": "LOC", "char_start_index": 21, "char_end_index": 26, "document_id": 0, "sentence_id": 2}],
                 [],
             ],
         ),

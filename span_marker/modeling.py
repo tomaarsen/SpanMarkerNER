@@ -526,6 +526,10 @@ class SpanMarkerModel(PreTrainedModel):
                 results[input_id]["scores"].extend(scores[iter_idx, :num_marker_pairs].tolist())
                 results[input_id]["labels"].extend(labels[iter_idx, :num_marker_pairs].tolist())
                 results[input_id]["num_words"] = output.num_words[iter_idx]
+                if "document_ids" in batch:
+                    results[input_id]["document_id"] = batch["document_ids"][iter_idx].item()
+                if "sentence_ids" in batch:
+                    results[input_id]["sentence_id"] = batch["sentence_ids"][iter_idx].item()
 
         all_entities = []
         id2label = self.config.id2label
@@ -553,6 +557,10 @@ class SpanMarkerModel(PreTrainedModel):
                         "label": id2label[label_id],
                         "score": score,
                     }
+                    if "document_id" in sample:
+                        entity["document_id"] = sample["document_id"]
+                    if "sentence_id" in sample:
+                        entity["sentence_id"] = sample["sentence_id"]
                     if isinstance(sentence, str):
                         entity["char_start_index"] = char_start_index
                         entity["char_end_index"] = char_end_index
