@@ -17,7 +17,7 @@ jobs:
       - name: Setup Python environment
         uses: actions/setup-python@v4
         with:
-          python-version: 3.10
+          python-version: "3.10"
 
       - name: Setup pandoc, required for nbsphinx
         uses: r-lib/actions/setup-pandoc@v2
