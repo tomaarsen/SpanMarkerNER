@@ -186,13 +186,13 @@ in <code class="docutils literal notranslate"><span class="pre">train</span></co
 <li><p><strong>label_normalizer</strong> (<a class="reference internal" href="span_marker.label_normalizer.html#span_marker.label_normalizer.LabelNormalizer" title="span_marker.label_normalizer.LabelNormalizer"><em>LabelNormalizer</em></a>) – A callable that normalizes <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> into start-end-label tuples.</p></li>
 <li><p><strong>tokenizer</strong> (<a class="reference internal" href="span_marker.tokenizer.html#span_marker.tokenizer.SpanMarkerTokenizer" title="span_marker.tokenizer.SpanMarkerTokenizer"><em>SpanMarkerTokenizer</em></a>) – The tokenizer responsible for tokenizing <code class="docutils literal notranslate"><span class="pre">tokens</span></code> into input IDs,
 and adding start and end markers.</p></li>
-<li><p><strong>dataset_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dataset. Defaults to “train”.</p></li>
-<li><p><strong>is_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to return the number of words for each sample.
+<li><p><strong>dataset_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – The name of the dataset. Defaults to “train”.</p></li>
+<li><p><strong>is_evaluate</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to return the number of words for each sample.
 Required for evaluation. Defaults to False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Raises<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.13)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns.</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If the <code class="docutils literal notranslate"><span class="pre">dataset</span></code> does not contain <code class="docutils literal notranslate"><span class="pre">tokens</span></code> and <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> columns.</p>
 </dd>
 <dt class="field-odd">Returns<span class="colon">:</span></dt>
 <dd class="field-odd"><p>The normalized and tokenized version of the input dataset.</p>
@@ -249,7 +249,7 @@ and 128 end markers, for a total of 256 markers per sample.</p></li>
 <dd class="field-even"><p>A dictionary of dataset keys to lists of values.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, List[Any]]</p>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, List[Any]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -278,10 +278,10 @@ the <cite>SpanMarkerModel</cite> and the <cite>SpanMarkerModelCardData</cite>.</
 <li><p><strong>resume_from_checkpoint</strong> (<cite>str</cite> or <cite>bool</cite>, <em>optional</em>) – If a <cite>str</cite>, local path to a saved checkpoint as saved by a previous instance of [<cite>Trainer</cite>]. If a
 <cite>bool</cite> and equals <cite>True</cite>, load the last checkpoint in <em>args.output_dir</em> as saved by a previous instance
 of [<cite>Trainer</cite>]. If present, training will resume from the model/optimizer/scheduler states loaded here.</p></li>
-<li><p><strong>trial</strong> (<cite>optuna.Trial</cite> or <cite>Dict[str, Any]</cite>, <em>optional</em>) – The trial run or the hyperparameter dictionary for hyperparameter search.</p></li>
-<li><p><strong>ignore_keys_for_eval</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+<li><p><strong>trial</strong> (<cite>optuna.Trial</cite> or <cite>dict[str, Any]</cite>, <em>optional</em>) – The trial run or the hyperparameter dictionary for hyperparameter search.</p></li>
+<li><p><strong>ignore_keys_for_eval</strong> (<cite>list[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
 gathering predictions for evaluation during the training.</p></li>
-<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments used to hide deprecated arguments</p></li>
+<li><p><strong>kwargs</strong> (<cite>dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments used to hide deprecated arguments</p></li>
 </ul>
 </dd>
 </dl>
@@ -297,7 +297,7 @@ gathering predictions for evaluation during the training.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>eval_dataset</strong> (Union[<cite>Dataset</cite>, Dict[str, <cite>Dataset</cite>]), <em>optional</em>) – <p>Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
+<li><p><strong>eval_dataset</strong> (Union[<cite>Dataset</cite>, dict[str, <cite>Dataset</cite>]), <em>optional</em>) – <p>Pass a dataset if you wish to override <cite>self.eval_dataset</cite>. If it is a [<cite>~datasets.Dataset</cite>], columns
 not accepted by the <cite>model.forward()</cite> method are automatically removed. If it is a dictionary, it will
 evaluate on each dataset, prepending the dictionary key to the metric name. Datasets must implement the
 <cite>__len__</cite> method.</p>
@@ -311,7 +311,7 @@ of the datasets. If you, for example, pass in <cite>{“data1”: data1, “data
 loss on <cite>data1</cite> and <cite>metric_for_best_model=”eval_data2_loss”</cite> for the loss on <cite>data2</cite>.</p>
 <p>&lt;/Tip&gt;</p>
 </p></li>
-<li><p><strong>ignore_keys</strong> (<cite>List[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
+<li><p><strong>ignore_keys</strong> (<cite>list[str]</cite>, <em>optional</em>) – A list of keys in the output of your model (if it is a dictionary) that should be ignored when
 gathering predictions.</p></li>
 <li><p><strong>metric_key_prefix</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>“eval”</cite>) – An optional prefix to be used as the metrics key prefix. For example the metrics “bleu” will be named
 “eval_bleu” if the prefix is “eval” (default)</p></li>
@@ -322,7 +322,7 @@ gathering predictions.</p></li>
 dictionary also contains the epoch number which comes from the training state.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.13)"><em>Dict</em></a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a>[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -338,7 +338,7 @@ dictionary also contains the epoch number which comes from the training state.</
 <li><p><strong>blocking</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>True</cite>) – Whether the function should return only when the <cite>git push</cite> has finished.</p></li>
 <li><p><strong>token</strong> (<cite>str</cite>, <em>optional</em>, defaults to <cite>None</cite>) – Token with write permission to overwrite Trainer’s original args.</p></li>
 <li><p><strong>revision</strong> (<cite>str</cite>, <em>optional</em>) – The git revision to commit from. Defaults to the head of the “main” branch.</p></li>
-<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments passed along to [<cite>~Trainer.create_model_card</cite>].</p></li>
+<li><p><strong>kwargs</strong> (<cite>dict[str, Any]</cite>, <em>optional</em>) – Additional keyword arguments passed along to [<cite>~Trainer.create_model_card</cite>].</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -346,7 +346,7 @@ dictionary also contains the epoch number which comes from the training state.</
 progress of the commit if <cite>blocking=True</cite>.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -366,21 +366,21 @@ optimizer/scheduler.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>hp_space</strong> (<cite>Callable[[“optuna.Trial”], Dict[str, float]]</cite>, <em>optional</em>) – A function that defines the hyperparameter search space. Will default to
+<li><p><strong>hp_space</strong> (<cite>Callable[[“optuna.Trial”], dict[str, float]]</cite>, <em>optional</em>) – A function that defines the hyperparameter search space. Will default to
 [<cite>~trainer_utils.default_hp_space_optuna</cite>] or [<cite>~trainer_utils.default_hp_space_ray</cite>] or
 [<cite>~trainer_utils.default_hp_space_sigopt</cite>] depending on your backend.</p></li>
-<li><p><strong>compute_objective</strong> (<cite>Callable[[Dict[str, float]], float]</cite>, <em>optional</em>) – A function computing the objective to minimize or maximize from the metrics returned by the <cite>evaluate</cite>
+<li><p><strong>compute_objective</strong> (<cite>Callable[[dict[str, float]], float]</cite>, <em>optional</em>) – A function computing the objective to minimize or maximize from the metrics returned by the <cite>evaluate</cite>
 method. Will default to [<cite>~trainer_utils.default_compute_objective</cite>].</p></li>
 <li><p><strong>n_trials</strong> (<cite>int</cite>, <em>optional</em>, defaults to 100) – The number of trial runs to test.</p></li>
-<li><p><strong>direction</strong> (<cite>str</cite> or <cite>List[str]</cite>, <em>optional</em>, defaults to <cite>“minimize”</cite>) – If it’s single objective optimization, direction is <cite>str</cite>, can be <cite>“minimize”</cite> or <cite>“maximize”</cite>, you
+<li><p><strong>direction</strong> (<cite>str</cite> or <cite>list[str]</cite>, <em>optional</em>, defaults to <cite>“minimize”</cite>) – If it’s single objective optimization, direction is <cite>str</cite>, can be <cite>“minimize”</cite> or <cite>“maximize”</cite>, you
 should pick <cite>“minimize”</cite> when optimizing the validation loss, <cite>“maximize”</cite> when optimizing one or
-several metrics. If it’s multi objectives optimization, direction is <cite>List[str]</cite>, can be List of
+several metrics. If it’s multi objectives optimization, direction is <cite>list[str]</cite>, can be List of
 <cite>“minimize”</cite> and <cite>“maximize”</cite>, you should pick <cite>“minimize”</cite> when optimizing the validation loss,
 <cite>“maximize”</cite> when optimizing one or several metrics.</p></li>
 <li><p><strong>backend</strong> (<cite>str</cite> or [<cite>~training_utils.HPSearchBackend</cite>], <em>optional</em>) – The backend to use for hyperparameter search. Will default to optuna or Ray Tune or SigOpt, depending
 on which one is installed. If all are installed, will default to optuna.</p></li>
 <li><p><strong>hp_name</strong> (<cite>Callable[[“optuna.Trial”], str]]</cite>, <em>optional</em>) – A function that defines the trial/run name. Will default to None.</p></li>
-<li><p><strong>kwargs</strong> (<cite>Dict[str, Any]</cite>, <em>optional</em>) – <p>Additional keyword arguments for each backend:</p>
+<li><p><strong>kwargs</strong> (<cite>dict[str, Any]</cite>, <em>optional</em>) – <p>Additional keyword arguments for each backend:</p>
 <ul>
 <li><p><cite>optuna</cite>: parameters from
 [optuna.study.create_study](<a class="reference external" href="https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html">https://optuna.readthedocs.io/en/stable/reference/generated/optuna.study.create_study.html</a>)
@@ -402,7 +402,7 @@ runs for multi-objective optimization. Experiment summary can be found in <cite>
 backend.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>[<cite>trainer_utils.BestRun</cite> or <cite>List[trainer_utils.BestRun]</cite>]</p>
+<dd class="field-odd"><p>[<cite>trainer_utils.BestRun</cite> or <cite>list[trainer_utils.BestRun]</cite>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -433,7 +433,7 @@ backend.</p>
 
         
             <div id="copyright">
-                &copy; 2025, Tom Aarsen
+                &copy; 2026, Tom Aarsen
             </div>
         
 

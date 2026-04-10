@@ -370,9 +370,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># If loading a SpanMarkerConfig, then we don&#39;t want to override id2label and label2id</span>
         <span class="c1"># Create an encoder or SpanMarker config</span>
+        <span class="c1"># Pop `dtype` before passing to AutoConfig, as it&#39;s a model loading parameter</span>
+        <span class="c1"># that would otherwise override the config&#39;s saved dtype with the string &quot;auto&quot;</span>
+        <span class="n">dtype</span> <span class="o">=</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;dtype&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
         <span class="n">config</span><span class="p">:</span> <span class="n">PretrainedConfig</span> <span class="o">=</span> <span class="n">config</span> <span class="ow">or</span> <span class="n">AutoConfig</span><span class="o">.</span><span class="n">from_pretrained</span><span class="p">(</span>
             <span class="n">pretrained_model_name_or_path</span><span class="p">,</span> <span class="o">*</span><span class="n">model_args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
+        <span class="k">if</span> <span class="n">dtype</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;dtype&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">dtype</span>
 
         <span class="c1"># if &#39;pretrained_model_name_or_path&#39; refers to a SpanMarkerModel instance, initialize it directly</span>
         <span class="n">loading_span_marker</span> <span class="o">=</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">config</span><span class="p">,</span> <span class="bp">cls</span><span class="o">.</span><span class="n">config_class</span><span class="p">)</span>
@@ -425,7 +430,7 @@
         <span class="c1"># Since transformers 4.32.0 we should use `pad_to_multiple_of=8`.</span>
         <span class="c1"># That&#39;ll fail for earlier versions, so we try-except it.</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">),</span> <span class="n">pad_to_multiple_of</span><span class="o">=</span><span class="mi">8</span><span class="p">)</span>
+            <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">),</span> <span class="n">pad_to_multiple_of</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">mean_resizing</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
             <span class="n">model</span><span class="o">.</span><span class="n">resize_token_embeddings</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">tokenizer</span><span class="p">))</span>
         <span class="k">return</span> <span class="n">model</span></div>
@@ -576,7 +581,7 @@
 
         <span class="c1"># Tokenize &amp; add start/end markers</span>
         <span class="n">tokenizer_dict</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">tokenizer</span><span class="p">(</span>
-            <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">]},</span> <span class="n">return_num_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">True</span>
+            <span class="p">{</span><span class="s2">&quot;tokens&quot;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])},</span> <span class="n">return_num_words</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">return_batch_encoding</span><span class="o">=</span><span class="kc">True</span>
         <span class="p">)</span>
         <span class="n">batch_encoding</span> <span class="o">=</span> <span class="n">tokenizer_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;batch_encoding&quot;</span><span class="p">)</span>
         <span class="n">dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">remove_columns</span><span class="p">(</span><span class="s2">&quot;tokens&quot;</span><span class="p">)</span>
@@ -770,7 +775,7 @@
 
         
             <div id="copyright">
-                &copy; 2025, Tom Aarsen
+                &copy; 2026, Tom Aarsen
             </div>
         
 

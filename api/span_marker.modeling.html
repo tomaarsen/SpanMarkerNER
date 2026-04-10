@@ -190,7 +190,7 @@ e.g. like so:</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pretrained_model_name_or_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.13)"><em>os.PathLike</em></a><em>]</em>) – <p>Either a pretrained encoder (e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>, <code class="docutils literal notranslate"><span class="pre">roberta-large</span></code>, etc.), or a pretrained SpanMarkerModel.
+<li><p><strong>pretrained_model_name_or_path</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.14)"><em>os.PathLike</em></a><em>]</em>) – <p>Either a pretrained encoder (e.g. <code class="docutils literal notranslate"><span class="pre">bert-base-cased</span></code>, <code class="docutils literal notranslate"><span class="pre">roberta-large</span></code>, etc.), or a pretrained SpanMarkerModel.
 Can be either:</p>
 <blockquote>
 <div><ul>
@@ -209,7 +209,7 @@ PyTorch model using the provided conversion scripts and loading the PyTorch mode
 </ul>
 </div></blockquote>
 </p></li>
-<li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> in your datasets.
+<li><p><strong>labels</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em><em>, </em><em>optional</em>) – A list of string labels corresponding to the <code class="docutils literal notranslate"><span class="pre">ner_tags</span></code> in your datasets.
 Only necessary when loading a SpanMarker model using a pretrained encoder. Defaults to None.</p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>model_card_data</strong> (<a class="reference internal" href="span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData" title="span_marker.model_card.SpanMarkerModelCardData"><em>SpanMarkerModelCardData</em></a><em> | </em><em>None</em>) – </p></li>
@@ -230,8 +230,8 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 </dd>
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>pretrained_model_name_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.13)"><em>PathLike</em></a>) – </p></li>
-<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.13)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
+<li><p><strong>pretrained_model_name_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.14)"><em>PathLike</em></a>) – </p></li>
+<li><p><strong>labels</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><em>List</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>] </em><em>| </em><em>None</em>) – </p></li>
 <li><p><strong>config</strong> (<a class="reference internal" href="span_marker.configuration.html#span_marker.configuration.SpanMarkerConfig" title="span_marker.configuration.SpanMarkerConfig"><em>SpanMarkerConfig</em></a><em> | </em><em>None</em>) – </p></li>
 <li><p><strong>model_card_data</strong> (<a class="reference internal" href="span_marker.model_card.html#span_marker.model_card.SpanMarkerModelCardData" title="span_marker.model_card.SpanMarkerModelCardData"><em>SpanMarkerModelCardData</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
@@ -260,7 +260,7 @@ Only necessary when loading a SpanMarker model using a pretrained encoder. Defau
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>inputs</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>, </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>Dataset</em><em>]</em>) – <p>Input sentences from which to extract entities.
+<li><p><strong>inputs</strong> (<em>Union</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em><em>, </em><em>List</em><em>[</em><em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em><em>]</em><em>, </em><em>Dataset</em><em>]</em>) – <p>Input sentences from which to extract entities.
 Valid datastructures are:</p>
 <ul>
 <li><p>str: a string sentence.</p></li>
@@ -274,9 +274,9 @@ Valid datastructures are:</p>
 </li>
 </ul>
 </p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a>) – The number of samples to include in a batch, a higher batch size is faster,
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>) – The number of samples to include in a batch, a higher batch size is faster,
 but requires more memory. Defaults to 4</p></li>
-<li><p><strong>show_progress_bar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – Whether to show a progress bar, useful for longer inputs. Defaults to <cite>False</cite>.</p></li>
+<li><p><strong>show_progress_bar</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – Whether to show a progress bar, useful for longer inputs. Defaults to <cite>False</cite>.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -295,7 +295,7 @@ if the input is a string.</p></li>
 </p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Union[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]], List[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.13)">float</a>]]]]]</p>
+<dd class="field-odd"><p>Union[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]], List[List[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, Union[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]]]]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -306,14 +306,14 @@ if the input is a string.</p></li>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>save_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.13)"><em>PathLike</em></a>) – </p></li>
-<li><p><strong>is_main_process</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – </p></li>
-<li><p><strong>state_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.13)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
-<li><p><strong>save_function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.13)"><em>Callable</em></a>) – </p></li>
-<li><p><strong>push_to_hub</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – </p></li>
-<li><p><strong>max_shard_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a>) – </p></li>
-<li><p><strong>safe_serialization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – </p></li>
-<li><p><strong>variant</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>save_directory</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/os.html#os.PathLike" title="(in Python v3.14)"><em>PathLike</em></a>) – </p></li>
+<li><p><strong>is_main_process</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – </p></li>
+<li><p><strong>state_dict</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em> | </em><em>None</em>) – </p></li>
+<li><p><strong>save_function</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Callable" title="(in Python v3.14)"><em>Callable</em></a>) – </p></li>
+<li><p><strong>push_to_hub</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – </p></li>
+<li><p><strong>max_shard_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>) – </p></li>
+<li><p><strong>safe_serialization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – </p></li>
+<li><p><strong>variant</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>) – </p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
@@ -331,7 +331,7 @@ if the input is a string.</p></li>
 <dd class="field-odd"><p>The model card string.</p>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -346,7 +346,7 @@ if the input is a string.</p></li>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – if specified, all parameters will be
+<dd class="field-odd"><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – if specified, all parameters will be
 copied to that device</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -374,7 +374,7 @@ Will default to <cite>True</cite> if there is no directory named like <cite>repo
 <li><p><strong>commit_message</strong> (<cite>str</cite>, <em>optional</em>) – Message to commit while pushing. Will default to <cite>“Upload model”</cite>.</p></li>
 <li><p><strong>private</strong> (<cite>bool</cite>, <em>optional</em>) – Whether to make the repo private. If <cite>None</cite> (default), the repo will be public unless the organization’s default is private. This value is ignored if the repo already exists.</p></li>
 <li><p><strong>token</strong> (<cite>bool</cite> or <cite>str</cite>, <em>optional</em>) – The token to use as HTTP bearer authorization for remote files. If <cite>True</cite>, will use the token generated
-when running <cite>huggingface-cli login</cite> (stored in <cite>~/.huggingface</cite>). Will default to <cite>True</cite> if <cite>repo_url</cite>
+when running <cite>hf auth login</cite> (stored in <cite>~/.huggingface</cite>). Will default to <cite>True</cite> if <cite>repo_url</cite>
 is not specified.</p></li>
 <li><p><strong>max_shard_size</strong> (<cite>int</cite> or <cite>str</cite>, <em>optional</em>, defaults to <cite>“5GB”</cite>) – Only applicable for models. The maximum size for a checkpoint before being sharded. Checkpoints shard
 will then be each of size lower than this size. If expressed as a string, needs to be digits followed
@@ -384,11 +384,11 @@ Google Colab instances without any CPU OOM issues.</p></li>
 <li><p><strong>safe_serialization</strong> (<cite>bool</cite>, <em>optional</em>, defaults to <cite>True</cite>) – Whether or not to convert the model weights in safetensors format for safer serialization.</p></li>
 <li><p><strong>revision</strong> (<cite>str</cite>, <em>optional</em>) – Branch to push the uploaded files to.</p></li>
 <li><p><strong>commit_description</strong> (<cite>str</cite>, <em>optional</em>) – The description of the commit that will be created</p></li>
-<li><p><strong>tags</strong> (<cite>List[str]</cite>, <em>optional</em>) – List of tags to push on the Hub.</p></li>
+<li><p><strong>tags</strong> (<cite>list[str]</cite>, <em>optional</em>) – List of tags to push on the Hub.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.13)">str</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
 </dd>
 </dl>
 <p>Examples:</p>
@@ -419,7 +419,7 @@ device).</p>
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">cuda</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.cuda" title="Permalink to this definition">¶</a></dt>
 <dd><p>Move all model parameters and buffers to the GPU.</p>
 <p>This also makes associated parameters and buffers different objects. So
-it should be called before constructing optimizer if the module will
+it should be called before constructing the optimizer if the module will
 live on GPU while being optimized.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
@@ -427,11 +427,8 @@ live on GPU while being optimized.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.13)"><em>int</em></a><em>, </em><em>optional</em>) – if specified, all parameters will be
-copied to that device</p></li>
-<li><p><strong>self</strong> (<em>T</em>) – </p></li>
-</ul>
+<dd class="field-odd"><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – if specified, all parameters will be
+copied to that device</p>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>self</p>
@@ -457,33 +454,15 @@ copied to that device</p></li>
 <dt class="field-even">Return type<span class="colon">:</span></dt>
 <dd class="field-even"><p>Module</p>
 </dd>
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<em>T</em>) – </p>
-</dd>
 </dl>
 </dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.train">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.train" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the module in training mode.</p>
-<p>This has any effect only on certain modules. See documentations of
-particular modules for details of their behaviors in training/evaluation
-mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
-etc.</p>
-<dl class="field-list simple">
+<dd><dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.13)"><em>bool</em></a>) – whether to set training mode (<code class="docutils literal notranslate"><span class="pre">True</span></code>) or evaluation
-mode (<code class="docutils literal notranslate"><span class="pre">False</span></code>). Default: <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
-<li><p><strong>self</strong> (<em>T</em>) – </p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>self</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>Module</p>
+<dd class="field-odd"><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>) – </p>
 </dd>
 </dl>
 </dd></dl>
@@ -491,26 +470,7 @@ mode (<code class="docutils literal notranslate"><span class="pre">False</span><
 <dl class="py method">
 <dt class="sig sig-object py" id="span_marker.modeling.SpanMarkerModel.eval">
 <span class="sig-prename descclassname"><span class="pre">SpanMarkerModel.</span></span><span class="sig-name descname"><span class="pre">eval</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#span_marker.modeling.SpanMarkerModel.eval" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set the module in evaluation mode.</p>
-<p>This has any effect only on certain modules. See documentations of
-particular modules for details of their behaviors in training/evaluation
-mode, if they are affected, e.g. <code class="xref py py-class docutils literal notranslate"><span class="pre">Dropout</span></code>, <code class="xref py py-class docutils literal notranslate"><span class="pre">BatchNorm</span></code>,
-etc.</p>
-<p>This is equivalent with <code class="xref py py-meth docutils literal notranslate"><span class="pre">self.train(False)</span></code>.</p>
-<p>See <span class="xref std std-ref">locally-disable-grad-doc</span> for a comparison between
-<cite>.eval()</cite> and several similar mechanisms that may be confused with it.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns<span class="colon">:</span></dt>
-<dd class="field-odd"><p>self</p>
-</dd>
-<dt class="field-even">Return type<span class="colon">:</span></dt>
-<dd class="field-even"><p>Module</p>
-</dd>
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>self</strong> (<em>T</em>) – </p>
-</dd>
-</dl>
-</dd></dl>
+<dd></dd></dl>
 
 </section>
 
@@ -538,7 +498,7 @@ etc.</p>
 
         
             <div id="copyright">
-                &copy; 2025, Tom Aarsen
+                &copy; 2026, Tom Aarsen
             </div>
         
 
