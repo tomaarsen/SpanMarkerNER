@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.8.0]
+
+### Fixed
+
+- Fixed compatibility with `transformers` up to v5 and `datasets` v4+.
+
 ## [1.7.0]
 
 ### Fixed
