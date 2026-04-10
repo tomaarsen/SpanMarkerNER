@@ -31,9 +31,9 @@ co2_eq_emissions:
 (  hardware_used: .+
 )?datasets:
 - conll2003
-base_model: prajjwal1/bert-tiny
+base_model: sentence-transformers-testing/stsb-bert-tiny-safetensors
 model-index:
-- name: SpanMarker with prajjwal1/bert-tiny on CoNLL 2003
+- name: SpanMarker with sentence-transformers-testing/stsb-bert-tiny-safetensors on CoNLL 2003
   results:
   - task:
       type: token-classification
@@ -54,15 +54,15 @@ model-index:
       name: Recall
 ---
 
-# SpanMarker with prajjwal1/bert-tiny on CoNLL 2003
+# SpanMarker with sentence-transformers-testing/stsb-bert-tiny-safetensors on CoNLL 2003
 
-This is a \[SpanMarker\]\(https://github.com/tomaarsen/SpanMarkerNER\) model trained on the \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\) dataset that can be used for Named Entity Recognition. This SpanMarker model uses \[prajjwal1/bert-tiny\]\(https://huggingface.co/prajjwal1/bert-tiny\) as the underlying encoder.
+This is a \[SpanMarker\]\(https://github.com/tomaarsen/SpanMarkerNER\) model trained on the \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\) dataset that can be used for Named Entity Recognition. This SpanMarker model uses \[sentence-transformers-testing/stsb-bert-tiny-safetensors\]\(https://huggingface.co/sentence-transformers-testing/stsb-bert-tiny-safetensors\) as the underlying encoder.
 
 ## Model Details
 
 ### Model Description
 - \*\*Model Type:\*\* SpanMarker
-- \*\*Encoder:\*\* \[prajjwal1/bert-tiny\]\(https://huggingface.co/prajjwal1/bert-tiny\)
+- \*\*Encoder:\*\* \[sentence-transformers-testing/stsb-bert-tiny-safetensors\]\(https://huggingface.co/sentence-transformers-testing/stsb-bert-tiny-safetensors\)
 - \*\*Maximum Sequence Length:\*\* 512 tokens
 - \*\*Maximum Entity Length:\*\* 8 words
 - \*\*Training Dataset:\*\* \[CoNLL 2003\]\(https://huggingface.co/datasets/conll2003\)

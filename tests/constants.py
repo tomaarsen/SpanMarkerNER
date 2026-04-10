@@ -122,6 +122,6 @@ FABNER_LABELS = [
     "E-BIOP",
     "S-BIOP",
 ]
-TINY_BERT = "prajjwal1/bert-tiny"
+TINY_BERT = "sentence-transformers-testing/stsb-bert-tiny-safetensors"
 
 DEFAULT_ARGS = TrainingArguments(output_dir="models/my_span_marker_model", report_to="none", num_train_epochs=1)
