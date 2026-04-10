@@ -457,7 +457,7 @@ class SpanMarkerModel(PreTrainedModel):
 
         # Tokenize & add start/end markers
         tokenizer_dict = self.tokenizer(
-            {"tokens": dataset["tokens"]}, return_num_words=True, return_batch_encoding=True
+            {"tokens": list(dataset["tokens"])}, return_num_words=True, return_batch_encoding=True
         )
         batch_encoding = tokenizer_dict.pop("batch_encoding")
         dataset = dataset.remove_columns("tokens")
