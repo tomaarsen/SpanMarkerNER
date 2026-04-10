@@ -33,7 +33,7 @@ co2_eq_emissions:
 - conll2003
 base_model: sentence-transformers-testing/stsb-bert-tiny-safetensors
 model-index:
-- name: SpanMarker with sentence-transformers-testing/stsb-bert-tiny-safetensors on CoNLL 2003
+- name: SpanMarker with sentence-transformers-testing/stsb-bert-tiny-safetensors on\n    CoNLL 2003
   results:
   - task:
       type: token-classification
