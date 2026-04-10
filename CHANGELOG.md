@@ -15,6 +15,12 @@ Types of changes
 * "Security" in case of vulnerabilities.
 -->
 
+## [1.8.1]
+
+### Security
+
+- Strip `trust_remote_code` from the encoder configuration to prevent it from being injected via a remote `config.json`.
+
 ## [1.8.0]
 
 ### Fixed
