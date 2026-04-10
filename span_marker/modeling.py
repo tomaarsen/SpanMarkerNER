@@ -251,9 +251,14 @@ class SpanMarkerModel(PreTrainedModel):
         """
         # If loading a SpanMarkerConfig, then we don't want to override id2label and label2id
         # Create an encoder or SpanMarker config
+        # Pop `dtype` before passing to AutoConfig, as it's a model loading parameter
+        # that would otherwise override the config's saved dtype with the string "auto"
+        dtype = kwargs.pop("dtype", None)
         config: PretrainedConfig = config or AutoConfig.from_pretrained(
             pretrained_model_name_or_path, *model_args, **kwargs
         )
+        if dtype is not None:
+            kwargs["dtype"] = dtype
 
         # if 'pretrained_model_name_or_path' refers to a SpanMarkerModel instance, initialize it directly
         loading_span_marker = isinstance(config, cls.config_class)
