@@ -27,7 +27,7 @@ dependencies = [
     "torch",
     "accelerate",
     "transformers>=4.23.0,<5", # required for EvalPrediction.inputs
-    "datasets>=2.14.0", # required for sorting with multiple columns
+    "datasets>=2.20.0", # required to solve AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?
     "packaging>=20.0",
     "evaluate",
     "seqeval",
