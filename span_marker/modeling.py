@@ -311,7 +311,7 @@ class SpanMarkerModel(PreTrainedModel):
         # Since transformers 4.32.0 we should use `pad_to_multiple_of=8`.
         # That'll fail for earlier versions, so we try-except it.
         try:
-            model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8)
+            model.resize_token_embeddings(len(tokenizer), pad_to_multiple_of=8, mean_resizing=False)
         except TypeError:
             model.resize_token_embeddings(len(tokenizer))
         return model
