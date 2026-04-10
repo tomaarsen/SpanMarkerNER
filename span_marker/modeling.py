@@ -77,7 +77,9 @@ class SpanMarkerModel(PreTrainedModel):
             # Load the encoder via the Config to prevent having to use AutoModel.from_pretrained, which
             # could load e.g. all of `roberta-large` from the Hub unnecessarily.
             # However, use the SpanMarkerModel updated vocab_size
-            encoder_config = AutoConfig.from_pretrained(self.config.encoder["_name_or_path"], **self.config.encoder)
+            # Also strip trust_remote_code from configuration. See https://github.com/tomaarsen/SpanMarkerNER/issues/85
+            encoder_kwargs = {k: v for k, v in self.config.encoder.items() if k not in ("trust_remote_code",)}
+            encoder_config = AutoConfig.from_pretrained(self.config.encoder["_name_or_path"], **encoder_kwargs)
             encoder = AutoModel.from_config(encoder_config)
         self.encoder = encoder
 

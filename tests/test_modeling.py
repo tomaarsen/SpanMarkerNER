@@ -5,6 +5,7 @@ from typing import Dict, List, Optional, Union
 import pytest
 import torch
 from datasets import Dataset
+from transformers import AutoConfig
 
 from span_marker.configuration import SpanMarkerConfig
 from span_marker.modeling import SpanMarkerModel
@@ -235,6 +236,27 @@ def test_load_with_kwargs(kwargs) -> None:
     # We only test that the model can be loaded without issues
     model = SpanMarkerModel.from_pretrained(TINY_BERT, labels=CONLL_LABELS, kwargs=kwargs)
     assert isinstance(model, SpanMarkerModel)
+
+
+def test_trust_remote_code_stripped_from_encoder_config(fresh_conll_span_marker_model: SpanMarkerModel) -> None:
+    """Test that trust_remote_code is stripped from the encoder config to prevent
+    a two-repository attack. See https://github.com/tomaarsen/SpanMarkerNER/issues/85
+    """
+    model = fresh_conll_span_marker_model
+    # Inject trust_remote_code into the encoder config, as a malicious config.json would
+    model.config.encoder["trust_remote_code"] = True
+
+    from unittest.mock import patch
+
+    with patch(
+        "span_marker.modeling.AutoConfig.from_pretrained", wraps=AutoConfig.from_pretrained
+    ) as mock_from_pretrained:
+        SpanMarkerModel(model.config)
+        mock_from_pretrained.assert_called_once()
+        call_kwargs = mock_from_pretrained.call_args
+        # trust_remote_code must not be passed through
+        assert "trust_remote_code" not in call_kwargs.kwargs
+        assert "trust_remote_code" not in (call_kwargs.args[1:] if len(call_kwargs.args) > 1 else ())
 
 
 def test_try_cuda(finetuned_conll_span_marker_model: SpanMarkerModel) -> None:
