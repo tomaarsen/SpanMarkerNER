@@ -96,7 +96,7 @@ def main() -> None:
         # Other Training parameters
         logging_first_step=True,
         logging_steps=50,
-        evaluation_strategy="steps",
+        eval_strategy="steps",  # Or `evaluation_strategy` if your `transformers<4.54.1`
         save_strategy="steps",
         eval_steps=3000,
         save_total_limit=2,
