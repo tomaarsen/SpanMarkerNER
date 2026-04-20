@@ -30,6 +30,7 @@ dependencies = [
     "datasets>=2.20.0", # required to solve AttributeError: module 'pyarrow' has no attribute 'PyExtensionType'. Did you mean: 'ExtensionType'?
     "packaging>=20.0",
     "evaluate",
+    "optimum>=1.13.2",
     "seqeval",
     "scikit-learn",
     "jinja2",
